@@ -1,0 +1,911 @@
+﻿@model PlusCP.Models.PDFReport
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+
+}
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<style>
+    .RedColor {
+        color: red;
+    }
+
+    .GreenColor {
+        color: green;
+    }
+    .required:after {
+        content: " *";
+        color: red;
+    }
+
+    .datepicker td, th {
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .Message {
+        height: 200px;
+        width: 500px
+    }
+
+    .custom-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .custom-modal-title {
+        margin: 0;
+    }
+
+    .custom-modal-header .close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .table.dataTable {
+        font-family: "Segoe UI", "Roboto";
+        clear: both;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 16px;
+    }
+
+    .dataTables_wrapper,
+    .dataTables_length,
+    .dataTables_filter,
+    .dataTables_info,
+    .dataTables_paginate,
+    table.dataTable thead th,
+    table.dataTable tbody td {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+    }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: left !important;
+            float: none !important;
+            display: flex;
+            justify-content: left;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                font-size: 15px !important; /* Increase font size */
+                padding: 8px 12px; /* Increase button padding */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_paginate {
+            margin-left: 60px !important; /* Adjust this value as needed */
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button i {
+                font-size: 15px !important; /* Increase icon size */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_info {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+            font-size: 16px !important; /* Adjust size */
+            color: #333 !important; /* Darker text */
+            margin-left: 5px;
+        }
+    /* Change odd row background color */
+    table.dataTable tbody tr:nth-child(odd) {
+        background-color: #ECEDEF; /* Change to your desired color */
+    }
+
+    /* Change even row background color */
+    table.dataTable tbody tr:nth-child(even) {
+        background-color: #ffffff; /* Change to your desired color */
+    }
+
+    table.dataTable tbody tr.selected {
+        background-color: #D6EFE8; /* Orange color */
+        /*color: white;*/ /* Change text color if needed */
+    }
+    /* Search icon inside input */
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        transform: translateY(-50%);
+        color: darkgrey;
+        font-size: 14px;
+        pointer-events: none; /* Prevents clicking on the icon */
+    }
+
+    .search-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .txtSearch-frame {
+        margin-top: 5px;
+        height: 28px;
+        width: 150px;
+        border: none;
+        color: #003B59;
+        border: 2px solid #003B59 !important;
+        width: 200px;
+        padding-left: 30px; /* Space for the icon */
+    }
+
+    .pdf-icon {
+        width: 30px;
+        height: 30px;
+        image-rendering: crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+    }
+
+    .pad {
+        padding-bottom: 15px;
+        padding: 2px;
+        padding-top: 10px;
+    }
+
+    .lblHeading {
+        font-size: 19px;
+        color: #003B59 !important;
+    }
+
+    .table-container {
+        height: 200px; /* Set the desired fixed height */
+        overflow-y: auto;
+    }
+
+    /*table > thead > tr > th {
+        background-color: gray !important;
+        color: white;
+    }*/
+
+    table.table thead th {
+        background-color: #003B59 !important; /* Change to your desired color */
+        color: white; /* Change to desired text color */
+        font-size: 15px;
+        font-family: 'Poppins', sans-serif;
+        height: 40px;
+    }
+
+    table.table tbody td, lbl_ {
+        /*background-color: white !important; /* Change to your desired color */
+        font-size: 15px;
+        color: #003B59 !important;
+    }
+
+    table.table tbody tr {
+        height: 50px; /* Adjust height as needed */
+    }
+
+        /* Hover effect */
+        table.table tbody tr:hover {
+            background-color: #f5f5f5 !important; /* Light gray background on hover */
+            transition: background-color 0.8s ease-in-out;
+            cursor: pointer;
+        }
+
+
+
+
+    table th {
+        /*padding: 1rem 0.5rem !important;*/
+        border: 1px solid black;
+        border-bottom: 1px solid black;
+        /*padding: 8px;*/
+        text-align: left;
+    }
+
+    table td {
+        padding: 1rem 0.5rem !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        vertical-align: middle;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0 10px; /* Adjust the second value to increase/decrease the vertical gap */
+        width: 100%;
+    }
+
+        table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td {
+            border-bottom-width: 1px;
+        }
+
+
+
+
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2;
+    }
+
+
+
+    .t-head {
+        color: #023160;
+    }
+
+    /* Modal Styling */
+    .modal-dialog {
+        margin: 30px auto;
+    }
+
+        .modal-dialog.centered {
+            display: flex;
+            min-height: calc(100vh - 60px);
+            align-content: stretch;
+            flex-wrap: wrap;
+            align-items: stretch;
+            flex-direction: column;
+            justify-content: center;
+            width: 32%;
+        }
+
+    .box-header {
+        background-color: #f8f9fc !important;
+        color: #003B59 !important;
+        border-bottom: 2px solid #f8f9fc;
+        box-shadow: 0px 5px #ededed;
+    }
+
+
+    .btn-box-tool {
+        color: #003B59 !important;
+    }
+
+
+    /*/Badges/*/
+
+    .btn-badges {
+        color: #003B59 !important;
+        border-radius: 25px !important;
+        margin-left: 5px !important;
+        height: 25px !important;
+        padding: 2px 12px !important;
+    }
+
+        .btn-badges:hover {
+            background-color: #325FAB !important;
+            color: white !important;
+        }
+
+            .btn-badges:hover .badge_light {
+                background-color: white !important;
+                color: #003B59 !important;
+            }
+
+    .badge_light {
+        background-color: #003B59 !important;
+        color: white !important;
+    }
+
+    .btn-badges-Sent {
+        border-radius: 25px !important;
+        height: 25px !important;
+        width: 60px;
+    }
+
+    .selected {
+        background-color: deepskyblue;
+        color: black;
+    }
+
+    .ModalHeaderColor {
+        background-color: #D6EFE8;
+        color: #003B59
+    }
+
+    .ModalLabelColor {
+        color: #003B59;
+    }
+
+    .btn-hover-save {
+        background-color: #003B59; /* Default background color */
+        border-color: #003B59; /* Default border color */
+        color: #fff; /* Default text color */
+    }
+
+        .btn-hover-save:hover {
+            background-color: transparent; /* Make background transparent on hover */
+            border-color: #003B59; /* Dark border color on hover */
+            color: #003B59; /* Dark font color on hover */
+        }
+
+    .btnClose {
+        background-color: whitesmoke; /* Make background transparent on hover */
+        color: #003B59; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnClose:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: #003B59; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+        }
+</style>
+
+<div id="parent" class="container-fluid">
+    <input id="rptCode" type="hidden" value="019" />
+    <input id="rptTitle" class="lblHeading" type="hidden" value="@ViewBag.ReportTitle" />
+    <div id="dataLists" class="box panel panel-default">
+        <div class="box-header with-border">
+
+            <h5 class="box-title"><strong>@ViewBag.ReportTitle  </strong><strong id="filterString"></strong></h5>
+            <div id="buttons" class="box-tools pull-right">
+
+            </div>
+        </div>
+
+        <div class="box-body" id="lstP">
+            <table id="lstPdfReport" class="table table-bordered table-striped text-sm table-hover" style="width:100%">
+                <thead class="sorted-asc">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                @*<tbody id="tblBody"></tbody>*@
+                <tfoot>
+                    <tr>
+                        @*<th>Total :</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>*@
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+</div>
+<!-- Modal Email  -->
+<div id="EmailModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog centered" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_">Add Email Address</h5>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Email Address :</label>
+                                        @Html.EditorFor(model => model.EmailAddress, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Email" } })
+                                        <label id="lblEmailmsg" style="color: red; font-weight: 100"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">CC Email:</label>
+                                        @Html.EditorFor(model => model.CCEmailAddress, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "CC Email" } })
+                                        <label id="lblCCEmailmsg" style="color: red; font-weight: 100"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnAwaitingCancel" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                <button onclick="SendEmail()" id="btnSend" type="button" class="btn btn-hover-save">Send</button>
+                <label id="_PONo" style="visibility:hidden" hidden></label>
+                <label id="_SupplierName" style="visibility:hidden" hidden></label>
+                <label id="_SupplierEmail" style="visibility:hidden" hidden></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/Message.js"></script>
+<script>
+    ToggleDataList(false);
+
+    LoadData();
+    function LoadData() {
+        $('#tblBody').empty();
+        $('#lstPdfReport').DataTable().clear();
+        $('#lstPdfReport').DataTable().destroy();
+
+        $('#option').modal('hide');
+        var isSingleRow = false;
+        var Mode = '@Session["DefaultDB"]';
+        var type = '@Session["UserType"]';
+        var IsVisible;
+                if (type === 'Admin') {
+                    IsVisible = true;
+                }
+                else {
+                    IsVisible = false;
+                }
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/PDFReport/GetPDFReport',
+            data: {
+
+            },
+            datatype: JSON,
+            success: function (data) {
+                $('#filterString').append(data.filterString);
+                $('#tblBody').empty();
+                $('#lstPdfReport').DataTable().clear();
+                $('#lstPdfReport').DataTable().destroy();
+
+                if (!isSingleRow) {
+                    var columnDef = [
+                        {
+                            "data": "PDF", "title": "Send", "width": "80px", "className": "text-center",
+                            render: function (data, type, row) {
+                                var url = '';
+                                if (Mode === 'Prod' || Mode === 'Pilot' ) {
+                                    if (row["POHeader_Approve"] === true) {
+                                        url = '<a href="#" onclick="OpenPDFPopUp(\'' + row["POHeader_PONum"] + '\', \'' + row["Vendor_Name"] + '\',\'' + row["Vendor_EMailAddress"] + '\' )">Send PDF</a>';
+                                    } 
+                                }
+                                else {
+                                    url = '<a href="#" onclick="OpenPDFPopUp(\'' + row["POHeader_PONum"] + '\', \'' + row["Vendor_Name"] + '\',\'' + row["Vendor_EMailAddress"] + '\' )">Send PDF</a>';
+
+                                }
+                                return url;
+                            }
+                        },
+
+
+                        {
+                            "data": "ViewPDF", "title": "View", "width": "60px", "className": "text-center",
+                            render: function (data, type, row) {
+                                if (Mode === 'Prod' || Mode === 'Pilot') {
+                                    var url = '';
+                                    if (row["POHeader_Approve"] === true) {
+                                        // Image source for the PDF icon
+                                        var pdfIconSrc = '/Content/images/PDFPic.png'; // Replace 'path/to/pdf-icon.png' with the actual path to your PDF icon image
+                                        //open POPUP show Email Details.
+                                        url = '<a href="#" onclick="OpenPDF(\'' + row["POHeader_PONum"] + '\')">' +
+                                            '<img style="width: 30px; height: 30px;" src="/Content/images/file-pdf-solid.svg" alt="PDF">' +
+                                            '</a>';
+                                    }
+                                   
+                                }
+                                else {
+                                    var pdfFilePath = "/Content/images/Sample.pdf"; // Path to your sample PDF
+                                    var pdfIconSrc = "/Content/images/file-pdf-solid.svg"; // PDF icon path
+
+                                     url = '<a href="' + pdfFilePath + '" target="_blank">' +
+                                        '<img style="width: 30px; height: 30px;" src="' + pdfIconSrc + '" alt="PDF">' +
+                                        '</a>';
+                                }
+                                return url;
+                            }
+                        },
+
+                      
+                        { "data": "POHeader_PONum", "title": "PO No.", "width": "50px", "className": "text-center" },
+                        {
+                            "data": "POHeader_Approve",
+                            "title": "PO Approved?",
+                            "width": "190px",
+                            "className": "text-center",
+                            "render": function (data, type, row) {
+                                if (data === true || data === "True") {
+                                    return '<span class="GreenColor">' + data + '</span>';
+                                } else {
+                                    return '<span class="RedColor">' + data + '</span>';
+                                }
+                            }
+                        },
+                        { "data": "Vendor_Name", "title": "Supplier Name", "className": "text-center" },
+                        { "data": "Vendor_EMailAddress", "title": "Supplier Email", "width": "200px", "className": "text-center" },
+                        { "data": "BuyerName", "title": "Buyer Name", "width": "200px", "visible": IsVisible, "className": "text-center" },
+                        { "data": "CreatedOn", "title": "Sent On", "width": "150px", "className": "text-center" },
+                    ]
+
+
+                    ToggleDataList(true);
+
+                    MakeDataGridForTraining('lstPdfReport', data.lstPDFPO, 0, columnDef, 'buttons', true, true, false, false);
+
+                }
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+    }
+
+    function OpenPDFPopUp(PONo, SupplierName, SupplierEmail) {
+        var Mode = '@Session["DefaultDB"]';
+
+        if (Mode === 'Test') {
+            $("#btnSend").prop("disabled", true);
+        }
+        $('#EmailAddress').val('');
+        $('#CCEmailAddress').val('');
+
+        $('#_PONo').empty();
+        $('#_SupplierName').empty();
+        $('#_SupplierEmail').empty();
+
+
+        $('#_PONo').val(PONo);
+        $('#_SupplierName').val(SupplierName);
+        $('#_SupplierEmail').val(SupplierEmail);
+
+        $('#lblEmailmsg').empty();
+        $('#lblCCEmailmsg').empty();
+
+        $('#EmailModal').modal('show');
+
+
+
+
+       /* $('#EmailAddress').val(SupplierEmail);*/
+
+
+    }
+
+
+
+    function SendEmail() {
+        var PONo = $('#_PONo').val();
+        var SupplierName = $('#_SupplierName').val();
+        var SupplierEmail = $('#_SupplierEmail').val();
+        var EmailAddress = $('#EmailAddress').val();
+        var CCEmailAddress = $('#CCEmailAddress').val();
+
+        // Clear previous error messages
+        $('#lblEmailmsg').text('');
+        $('#lblCCEmailmsg').text('');
+
+        // Validate Email Address
+        if (EmailAddress == '') {
+            $('#lblEmailmsg').text('Please Enter Email Address');
+            return;
+        }
+
+        if (!validateEmail(EmailAddress)) {
+            $('#lblEmailmsg').text('Please Enter Valid Email Address');
+            return;
+        }
+
+        // Validate CC Email Address if present
+        if (CCEmailAddress !== '' && !validateEmail(CCEmailAddress)) {
+            $('#lblCCEmailmsg').text('Please Enter Valid CC Email Address');
+            return;
+        }
+
+        // Proceed with the AJAX request if all validations pass
+        $.ajax({
+            cache: false,
+            type: 'GET',
+            url: '/PDFReport/SendPDFEmail',
+            data: {
+                PONo: PONo,
+                SupplierName: SupplierName,
+                SupplierEmail: SupplierEmail,
+                EmailAddress: EmailAddress,
+                CCEmailAddress: CCEmailAddress
+            },
+            datatype: 'JSON',
+            success: function (data) {debugger
+                if (data.ResultMsg === "SENT") {
+                    MsgToast("Success!", "Email has been sent!", "success");
+                    $('#EmailModal').modal('hide');
+                    LoadData();
+                } else if (data.ResultMsg === "InvalidEmail") {
+                    // Handle invalid email from server
+                    MsgToast("Error!", "The email address is invalid.", "error");
+                } else {
+                    MsgToast("Oops!", "An error occurred!", "error");
+                }
+            },
+            error: function (r) {
+                MsgToast("Oops!", "An error occurred!", "error");
+            },
+            failure: function (r) {
+                MsgToast("Oops!", "An error occurred!", "error");
+            }
+        });
+    }
+
+
+    function validateEmail(emailInput) {
+        // Regex
+        var emailReg = /^[\w-]+(\.[\w-]+)*@@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+
+        // Test
+        return emailReg.test(emailInput);
+    }
+
+    function OpenPDF(PoNo) {
+        $.ajax({
+            url: '/PDFReport/OpenPDF',
+            cache: false,
+            type: 'POST',
+            data: {
+                PoNo: PoNo,
+            },
+            success: function (response) {
+                if (response.success) {
+                    var base64StringChunks = response.dataChunks;
+
+                    // Convert each chunk to a Uint8Array
+                    var uint8Arrays = base64StringChunks.map(function (chunk) {
+                        return Uint8Array.from(atob(chunk), c => c.charCodeAt(0));
+                    });
+
+                    // Concatenate Uint8Arrays
+                    var binaryData = new Uint8Array(uint8Arrays.reduce(function (acc, chunk) {
+                        return acc.concat(Array.from(chunk));
+                    }, []));
+
+                    // Create a Blob from the Uint8Array data
+                    var blob = new Blob([binaryData], { type: 'application/pdf' });
+
+                    // Create a URL for the Blob
+                    var url = URL.createObjectURL(blob);
+
+                    // Open the PDF in a new tab/window
+                    window.open(url);
+                } else {
+                    MsgToast("Oops!", response, "warning");
+                }
+            },
+            error: function (xhr, status, error) {
+                MsgToast("Oops!", "An error occurred!", "error");
+            }
+        });
+    }
+
+
+    function MakeDataGridForTraining(tableId, data, tableHeight, columns, buttonId, search, isScrollX, footerFunction, isFramed, detailed, reportTitleId, rowSelection, lstHeight) {
+        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+        var isFramed = isFramed === undefined || isFramed === false ? false : true;
+        var isDetailed = detailed === undefined ? false : true;
+        var reportTitle = '';
+
+        if (reportTitleId === undefined)
+            reportTitle = $('.box-title').text();
+        else
+            reportTitle = reportTitleId;
+
+        var gridHeight = 0;
+
+        isScrollX = isScrollX === undefined ? false : true;
+        if (search === undefined) { search = true; }
+
+        var gridButtonsClass = '';
+        var gridSearchBoxClass = '';
+        if (isDetailed === true) {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'bg-white';
+            gridButtonSize = 30;
+        }
+        else {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+            gridButtonSize = 30;
+        }
+
+        var boxtool;
+        if (search === true) {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search..">
+        </div>`;
+                $('#trHeadSearch').append(boxtool);
+            } else {
+                $('#' + buttonId).empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch${tableId}" type="text" placeholder="Search..">
+        </div>`;
+                $('#' + buttonId).append(boxtool);
+            }
+        }
+        else {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = '<input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+                $('#trHeadSearch').append(boxtool);
+            }
+            else {
+                $('#' + buttonId).empty();
+
+            }
+        }
+
+        var table = $('#' + tableId).DataTable({
+            order: [],
+            createdRow: rowSelection,
+            data: data,
+            columns: columns,
+            paging: true,
+            ordering: true,
+            searching: search,
+            deferRender: true,
+            destroy: true,
+            pagingType: 'full',
+            pageLength: 20,
+            scrollCollapse: false,
+            scrollX: isScrollX,
+            colReorder: true,
+            orderClasses: false,
+            deferRender: true,
+            select: true,
+            colResize: true,
+            //scrollY: gridHeight,
+
+            footerCallback: footerFunction,
+            language: {
+                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                oPaginate: {
+                    sNext: '<i class="fa fa-angle-right"></i>',
+                    sPrevious: '<i class="fa fa-angle-left"></i>',
+                    sFirst: '<i class="fa fa-angle-double-left"></i>',
+                    sLast: '<i class="fa fa-angle-double-right"></i>'
+                }
+            },
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5 dataTables_info' i><'col-sm-6 ms-3 dataTables_paginate' p>>",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Copy',
+                    title: reportTitle,
+                    filename: 'DataExport',
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)' // Excluding columns while exporting
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Export to excel',
+                    title: reportTitle,
+                    filename: 'DataExport', //Added By Tahir
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Print',
+                    title: '',
+                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                    filename: 'DataExport',
+                    exportOptions: {
+                        // columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                }
+            ],
+            select: true
+        });
+        table.buttons().container()
+            .appendTo('#buttons');
+
+        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+        table.button(0).nodes().addClass(gridButtonsClass);
+
+        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(1).nodes().addClass(gridButtonsClass);
+
+        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(2).nodes().addClass(gridButtonsClass);
+
+        var dsgndby = $('.modal-footer > #designedby ').html();
+
+        if (dsgndby === "") {
+            $('#designedBy').html($('.desgndBy').html());
+        }
+
+        var layoutHeader = $('nav').innerHeight();
+        var cardHeader = $('.box-header').innerHeight();
+        var tableHeader = $('.dataTables_scrollHead').innerHeight();
+        var tableFooter = 0;
+        var cardFooterH = 30;
+
+        if (isFooter === true)
+            tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+        var parentHeight = $('#' + lstHeight).innerHeight();
+        if (parentHeight == undefined)
+            parentHeight = window.innerHeight;
+        else
+            parentHeight = $('#' + lstHeight).innerHeight();
+
+        if (isFooter === true)
+            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+        var browserHeight = parentHeight;
+        if (tableHeight === 0) {
+            if (layoutHeader === undefined)
+                gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+            else
+                gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+        }
+        else { gridHeight = tableHeight; }
+
+        var topHeader = $('#topHeader').innerHeight();
+        if (topHeader > 0)
+            gridHeight = gridHeight - (topHeader + 1);
+
+        gridHeight = gridHeight - 6;
+
+        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+        table.columns.adjust().draw();
+
+        $('#txtFrameSearch' + tableId).on('keyup change', function () {
+            table.search(this.value).draw();
+        });
+        $('.dataTables_filter').hide();
+        table.columns.adjust().draw();
+
+
+        //return table;
+    }
+    function MsgToast(msg, title, type) {
+
+        toastr.options = {
+            closeButton: true,
+            debug: false,
+            newestOnTop: false,
+            progressBar: true,
+            positionClass: 'toast-top-right',
+            preventDuplicates: true,
+            onclick: null
+        };
+
+
+
+        var $toast = toastr[type](title, msg); // Wire up an event handler to a button in the toast, if it exists
+        $toastlast = $toast;
+
+        if (typeof $toast === 'undefined') {
+            return;
+        }
+
+
+    }
+</script>

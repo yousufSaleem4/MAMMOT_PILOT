@@ -1,0 +1,413 @@
+﻿@model PlusCP.Models.UserRoleX
+@{
+    ViewBag.Title = "Detail";
+    Layout = null;
+}
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="~/Scripts/bootstrap-dropdown.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>*@
+<style>
+
+
+    .center {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+
+    .Red {
+        color: red;
+    }
+
+    /*.green {
+        color: green;
+    }*/
+    .ModalHeaderColor {
+        background-color: #D6EFE8;
+        color: #003B59
+    }
+
+    .ModalLabelColor {
+        color: #003B59;
+    }
+
+    .btn-hover-save {
+        background-color: #003B59; /* Default background color */
+        border-color: #003B59; /* Default border color */
+        color: #fff; /* Default text color */
+    }
+
+        .btn-hover-save:hover {
+            background-color: transparent; /* Make background transparent on hover */
+            border-color: #003B59; /* Dark border color on hover */
+            color: #003B59; /* Dark font color on hover */
+        }
+
+    .btnClose {
+        background-color: whitesmoke; /* Make background transparent on hover */
+        color: #003B59; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnClose:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: #003B59; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+        }
+</style>
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<div class="container-fluid" style="background-color: white">
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+
+            <div class="box-header with-border" style="margin-top: 1px; margin-left: 1px; background-color: #f8f9fc; color: #003B59 !important">
+                <button type="button" class="btn btn-box-tool">
+                    <span class="fa fa-th-list fa-lg"></span>
+                </button>
+                <h5 class="box-title ModalLabelColor"><strong>User Permission > For User = @ViewBag.UserName <span><label id="lblUsrInfo" style="color:white;"></label></span> </strong>  </h5>
+            </div>
+
+            <label class="col-lg-4 col-md-4 col-sm-4 ModalLabelColor" style="padding-left:13px;padding-top:25px;">
+
+                <input id="CBisAdmin" type="checkbox">
+                <span class="checkmark"></span>
+                Make Admin
+            </label>
+
+            <label class="col-lg-4 col-md-4 col-sm-4 ModalLabelColor" style="padding-left:13px;padding-top:25px;">
+
+                <input id="CBisActive" type="checkbox">
+                <span class="checkmark"></span>
+                Active
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12" style="padding-top:25px;">
+            <label class="col-lg-12 col-md-8 col-sm-4 ModalLabelColor" style="padding-left:13px; width:97%">
+                <span>Temperory Password:</span>
+                <input style="font-weight:100" id="UserPassword" type="text" class="form-control" placeholder="Enter Password">
+            </label>
+            <button id="btnSend" class="btn btn-hover-save" type="button" style="border-radius:3px; width:70px;height:30px; font-size:12px; font-weight:bold; margin-left:12px;">
+                Send
+            </button>
+        </div>
+    </div>
+    <div class="row" style="padding-top:100px;text-align:center;">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="form-group">
+
+                <button id="btnCancel" class="btn btnClose" type="button" style="border-radius:3px; width:70px;height:30px; font-size:12px; font-weight:bold;" onclick="Navigate('Index','/UserRoleX/Index', 'Roles', 'User Roles', '', '')">
+                    Cancel
+                </button>
+                <button id="btnUser" class="btn btn-hover-save" type="button" style="border-radius:3px; width:70px;height:30px; font-size:12px; font-weight:bold;">
+                    Save
+                </button>
+                <div id="lblMsg" class="optionMsg">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/Message.js"></script>
+<script>
+    LoadData();
+
+    function LoadData() {
+
+        $('#lblMsg').empty();
+        var selectedProgram = '';
+        var selectedMnu = '';
+
+
+        var _isAdmin = @Html.Raw(Json.Encode(Model.isAdmin));
+
+        var _isActive=@Html.Raw(Json.Encode(Model.isActiveUser));
+
+        var _password=@Html.Raw(Json.Encode(Model.Password));
+
+
+
+       /* $('#UserPassword').val(_password); */
+
+
+        //IsAdmin Checked
+        if (_isAdmin == "True") {debugger
+
+            $("input:checkbox").prop("checked", false);
+            $("input:checkbox").prop("disabled", true);
+            $("#CBisAdmin").prop("disabled", false);
+            $("#CBisActive").prop("disabled", false);
+            $("#CBisAdmin").prop("checked", true);
+            $("#CBisActive").prop("checked", true);
+
+        }
+
+        if (_isActive == true) {
+            $("#CBisActive").prop("disabled", false);
+            $("#CBisActive").prop("checked", true);
+
+        }
+        else {
+            $("#CBisActive").prop("disabled", false);
+            $("#CBisActive").prop("checked", false);
+        }
+    }
+
+
+    $("#btnUser").click(function () {
+        $('#lblMsg').empty();
+
+
+        var _userId = '@Request.QueryString["ID"]';
+        var _isAdmin = '';
+        var _isActiveUser = 0;
+        var _password = '';
+        //var _isActive=@Html.Raw(Json.Encode(Model.isActiveUser));
+        // Get selected Program List
+
+
+
+
+
+        // Is Admin Checkbox
+        _isAdmin = $("#CBisAdmin").is(":checked");
+        // Is Active Customer Checkbox
+        _isActiveUser = $("#CBisActive").is(":checked");
+
+        _password = $('#UserPassword').val().trim();
+        $.ajax({
+            cache: false,
+            type: 'GET',
+            url: '/UserRoleX/InsertAxs',
+            data:
+            {
+                userId: _userId,
+                isAdmin: _isAdmin,
+                isActiveUserchange: _isActiveUser,
+                password: _password
+            },
+
+            datatype: JSON,
+            success: function (data) {
+
+                if (data.lblMsg == 'N') {
+                    MsgToast("Success!", "There are no changes to save", "success");
+
+                }
+                else if (data.Message == "Wrong") {
+                    MsgToast("Oops!", "Email not sent!", "error");
+                }
+                else {
+                    //loadUserData(_userId);
+                    MsgToast("Success!", "Record has been saved", "success");
+                    //$('#lblMsg').append('Record has been saved');
+                    //changeColor('lblMsg', 'green');
+                    OpenPage('/USerRoleX/Index');
+                }
+
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+
+        });
+        //loadUserData(_userId);
+
+    });
+
+
+      $("#btnSend").click(function () {
+        $('#lblMsg').empty();
+
+        var _userId = '@Request.QueryString["ID"]';
+        var _password = ''; 
+          _password = $('#UserPassword').val().trim();
+
+          if (_password === '' || _password === 'undefined') {
+              MsgToast("Oops!", "Please Enter Temperory Password!", "error");
+              return;
+          }
+
+        $.ajax({
+            cache: false,
+            type: 'GET',
+            url: '/UserRoleX/SendTempKey',
+            data:
+            {
+                userId: _userId,
+                password: _password
+            },
+
+            datatype: JSON,
+            success: function (data) {
+
+                if (data.lblMsg == 'N') {
+                    MsgToast("Success!", "There are no changes to save", "success");
+
+                }
+                else if (data.Message == "Wrong") {
+                    MsgToast("Oops!", "Email not sent!", "error");
+                }
+                else {
+                    //loadUserData(_userId);
+                    MsgToast("Success!", "Record has been saved", "success");
+                    //$('#lblMsg').append('Record has been saved');
+                    //changeColor('lblMsg', 'green');
+                    OpenPage('/USerRoleX/Index');
+                }
+
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+
+        });
+        //loadUserData(_userId);
+
+    });
+    //This method is not called from anywhere.
+    function loadUserData(id) {
+        $.ajax({
+            cache: false,
+            type: 'GET',
+            url: '/UserRoleX/Detail',
+            data:
+            {
+                ID: id
+            },
+
+            datatype: JSON,
+            success: function (data)
+            {
+
+
+
+                    var _isAdmin = @Html.Raw(Json.Encode(Model.isAdmin));
+
+                    var _isActive =@Html.Raw(Json.Encode(Model.isActiveUser));
+
+                    var _password=@Html.Raw(Json.Encode(Model.Password));
+
+                $('#UserPassword').val(_password);debugger
+
+                //IsAdmin Checked
+                if (_isAdmin == "True") {
+
+
+
+
+                    $("input:checkbox").prop('checked', $(this).prop("checked"));
+                    $('#CBisAdmin').prop('checked', true);
+                    $(":checkbox").attr("checked", true);
+
+                }
+                else {
+                    $("input:checkbox").prop('checked', $(this).prop("checked"));
+                    $('#CBisAdmin').prop('checked', false);
+                    $(":checkbox").attr("checked", false);
+
+                }
+                if (_isActive == true) {
+                    $("#CBisActive").prop("disabled", false);
+                    $("#CBisActive").prop("checked", true);
+
+                }
+
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+
+        });
+    }
+
+
+
+
+    $("#CBisAdmin").change(function () {
+        $('#lblMsg').empty();
+    });
+
+    function changeColor(id, newColor) {
+        $("#" + id).css("color", newColor);
+    }
+</script>
+<script>
+    //function EnableDisabledCheckbox() {
+    //    var _isAdmin = $("#CBisAdmin").is(":checked");
+    //    if (_isAdmin == true) {
+
+    //        alert("a");
+    //        $("input:checkbox").prop("checked", false);
+    //        $("input:checkbox").prop("disabled", true);
+    //        $("#CBisAdmin").prop("disabled", false);
+    //        $("#CBisAdmin").prop("checked", true);
+
+    //    }
+    //}
+
+    $(document).ready(function () {
+
+        // EnableDisabledCheckbox();
+
+        //$("#CBisAdmin").change(function () {
+        //    $('#ProgramLst').val('');
+        //    $('#MnuLst').val('');
+        //    var _isAdmin = $("#CBisAdmin").is(":checked");
+        //    var _isActive = $("#CBisActive").is(":checked");
+        //    if (_isAdmin == true) {
+
+        //        $("input:checkbox").prop("checked", false);
+        //        $("input:checkbox").prop("disabled", true);
+        //        $("#CBisAdmin").prop("disabled", false);
+        //        $("#CBisAdmin").prop("checked", true);
+
+
+        //    }
+        //    else {
+        //        $("input:checkbox").prop("disabled", false);
+        //        $("input:checkbox").prop("checked", false);
+        //        $('#ProgramLst').val('');
+        //        $('#MnuLst').val('');
+        //    }
+        //    if (_isActive) {
+        //        $("#CBisActive").prop("disabled", false);
+        //        $("#CBisActive").prop("checked", true);
+        //    }
+
+
+        //});
+
+
+
+
+
+
+
+
+
+    });
+
+    function MsgToast(msg, title, type) {
+        toastr.options = {
+            closeButton: true,
+            debug: false,
+            newestOnTop: false,
+            progressBar: true,
+            positionClass: 'toast-top-right',
+            preventDuplicates: true,
+            onclick: null
+        };
+
+        var $toast = toastr[type](title, msg);
+
+        if (typeof $toast === 'undefined') {
+            return;
+        }
+
+    }
+</script>

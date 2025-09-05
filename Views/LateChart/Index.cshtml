@@ -1,0 +1,596 @@
+﻿@model PlusCP.Models.LateChart
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+
+
+
+<style>
+    .card {
+        transition: box-shadow 0.3s; /* Add transition for smooth hover effect */
+    }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adjust shadow as needed */
+        }
+
+    .dataTables_scrollBody {
+        height:30%;
+    }
+
+    .bg-green {
+        background-color: green !important;
+        color: white; /* Adjust text color for visibility */
+    }
+
+    .bg-yellow {
+        background-color: orange !important;
+        color: black; /* Adjust text color for visibility */
+    }
+
+    .bg-red {
+        background-color: crimson !important;
+        color: white; /* Adjust text color for visibility */
+    }
+
+
+</style>
+
+<div style="background-color: whitesmoke">
+
+
+    <div class="container-fluid">
+        <div class="row" id="ADMIN">
+            <div class="col-lg-6 col-md-6 col-sm-6" >
+                <div id="dataList" class="box panel panel-default">
+                    <div class="box-header with-border" style=" background-color: #f8f9fc; color: #003B59 !important">
+                        <span class="fa fa-list fa-lg" style="color: #003B59"></span>
+                        <h5 class="box-title ModalLabelColor"><strong>Detailed Supplier Performance Report</strong></h5>
+                    </div>
+                    <div class="box-body">
+                        <table id="lstData" class="table table-bordered table-striped text-sm table-hover" style="width:100%;">
+                            <thead class="sorted-asc">
+                                <tr>
+                                  
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                   
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <canvas style="background-color: white; margin-left:8px; margin-bottom:10px" id="pie-chart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <canvas style="background-color: white; margin-left:10px; margin-bottom:10px" id="bar-chart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+
+            @*<div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <canvas style="background-color: white; margin-left:20px; margin-bottom:10px" id="line-chart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </div>*@
+        </div>
+        <div class="row bg-light" id="NOT_ADMIN"></div>
+    </div>
+</div>
+<script src="~/Scripts/Chart.js"></script>
+<script src="~/Scripts/ChartJsLabeling.js"></script>
+<script src="~/Scripts/chartCommon.js"></script>
+<script src="~/Scripts/ChartBundle.js"></script>
+<script>
+    //GetPartCount();
+    GetSupplierPerformance();
+    GetPerformanceChart();
+    GetPartCountPie();
+   // GetPartCountBar();
+    //GetPartCountLine();
+    function GetSupplierPerformance() {
+        $.ajax({
+            cache: false,
+            type: 'GET',
+            url: '/LateChart/SupplierAllPerformance',
+            dataType: 'json',
+            success: function (data) {
+                $('#tblBody').empty();
+                $('#lstData').DataTable().clear();
+                $('#lstData').DataTable().destroy();
+
+                var columnDef = [
+                    {
+                        "data": "VendorName", "title": "Vendor Name"
+                    },
+                    {
+                        "data": "TotalPOs", "title": "PO's", "width": "10px"
+                    },
+                    {
+                        "data": "OnTimePOs", "title": "On Time", "width": "45px"
+                    },
+                    {
+                        "data": "OnTimePercentage", "title": "Percentage", "width": "10px",
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            var percentage = rowData.OnTimePercentage;
+
+                            // Change font color based on the percentage
+                            if (percentage === 100) {
+                                $(td).addClass('bg-green');
+                            } else if (percentage >= 50) {
+                                $(td).addClass('bg-yellow');
+                            } else if (percentage < 50) {
+                                $(td).addClass('bg-red');
+                            }
+                        },
+                        render: function (data, type, row) {
+                            return data + "%"; // Display percentage sign
+                        }
+                    }
+                ];
+
+                ToggleDataList(true);
+                MakeDataGrid('lstData', data.lstPerformance, 0, columnDef, true, false, false, false);
+                $('.dropdown-toggle').dropdown();
+
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            error: function (r) {
+                console.error(r);
+            },
+            failure: function (r) {
+                console.error(r);
+            }
+        });
+    }
+
+
+    function GetPerformanceChart() {
+        var _VendorNames = [];
+        var _TotalPOs = [];
+        var _AnsweredPOs = [];
+        var _ResponseRate = [];
+        var _label = "Supplier Performance Overview";
+
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: '/LateChart/GetOnTimeVendors',
+            dataType: "json",
+            success: function (data) {
+                // Parse JSON result
+                var jsonResult = JSON.parse(data);
+
+                // Loop through each item to populate the vendor names and dataset arrays
+                $(jsonResult).each(function (index, item) {
+                    _VendorNames.push(item.VendorName);
+                    _TotalPOs.push(item.TotalPOs);
+                    _AnsweredPOs.push(item.AnsweredPOs);
+                    _ResponseRate.push(item.ResponseRate);
+                });
+
+                // Create the chart
+                new Chart(document.getElementById("bar-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: _VendorNames,
+                        datasets: [
+                            {
+                                label: 'Total POs',
+                                backgroundColor: "#004c6d",
+                                data: _TotalPOs
+                            },
+                            {
+                                label: 'Answered POs',
+                                backgroundColor: "#66c5ff",
+                                data: _AnsweredPOs
+                            },
+                            {
+                                label: 'Response Rate (%)',
+                                backgroundColor: "#0091e0",
+                                data: _ResponseRate
+                            }
+                        ]
+                    },
+                    options: {
+                        legend: { display: true },
+                        title: {
+                            display: true,
+                            text: _label
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            xAxes: [{
+                                barThickness: 50,  // Adjust as needed
+                                maxBarThickness: 40
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    callback: function (value) {
+                                        return Number.isInteger(value) ? value : ''; // Only show integer values
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                });
+            },
+            error: function (r) {
+                alert(r);
+            },
+            failed: function (f) {
+                alert(f);
+            }
+        });
+    }
+
+    function GetPartCountPie() {
+        var _Key = [];
+        var _Value = [];
+        var _label = "Total PO Qty: ";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: '/LateChart/GetSupplierQty',
+            dataType: "json",
+            success: function (data) {
+                var jsonResult = JSON.parse(data);
+                $(jsonResult).each(function (index, item) {
+                    _Key.push(item.KEY);
+                    _Value.push(item.VALUE);
+                });
+
+                // Convert the doughnut chart to a pie chart
+                new Chart(document.getElementById("pie-chart"), {
+                    type: 'pie',
+                    data: {
+                        labels: _Key,
+                        datasets: [{
+                            label: _label,
+                            backgroundColor: ["#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff"],
+
+                            data: _Value
+                        }]
+                    },
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Total Quantity By Supplier'
+                        },
+                        maintainAspectRatio: false,
+                        responsive: true,
+                    }
+                });
+            },
+            error: function (r) {
+                alert(r);
+            },
+            failed: function (f) {
+                alert(f);
+            }
+        });
+    }
+
+
+
+
+
+    function GetPartCountBar() {
+        var _Key = []
+        var _Value = []
+        var _label = "Vendor Communication by days";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: '/LateChart/GetOnTimeVendors',
+            dataType: "json",
+            success: function (data) {
+                var jsonResult = JSON.parse(data);
+                $(jsonResult).each(function (index, item) {
+                    _Key.push(item.KEY);
+                    _Value.push(item.VALUE);
+                });
+
+                //now set values to chart
+                new Chart(document.getElementById("bar-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: _Key,
+                        datasets: [
+                            {
+                                maxBarThickness: 1,
+                                label: _label,
+                                backgroundColor: [
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff"
+                                ],
+                                data: _Value
+                            }
+                        ]
+                    },
+                    options: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Supplier Performance Overview'
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            xAxes: [{
+                                barThickness: 50,  // number (pixels) or 'flex'
+                                maxBarThickness: 40
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize: 1, // Ensure step size is 1 so only whole numbers appear
+                                    callback: function (value) {
+                                        return Number.isInteger(value) ? value : ''; // Only display integer values
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                });
+            },
+            error: function (r) {
+                alert(r);
+            },
+            failed: function (f) {
+                alert(f);
+            }
+        });
+    }
+
+    
+    function GetPartCountLine() {
+        var _Key = [];
+        var _Value = [];
+        var _label = "Total Late PO: ";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: '/LateChart/GetLateChart',
+            dataType: "json",
+            success: function (data) {
+                var jsonResult = JSON.parse(data);
+                $(jsonResult).each(function (index, item) {
+                    _Key.push(item.KEY);
+                    _Value.push(item.VALUE);
+                });
+
+                //now set values to chart
+                new Chart(document.getElementById("line-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: _Key,
+                        datasets: [{
+                            label: _label,
+                            borderColor: "#3e95cd",
+                            fill: false,
+                            data: _Value
+                        }]
+                    },
+                    options: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Purchase Order Late by Days'
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            },
+            error: function (r) {
+                alert(r);
+            },
+            failed: function (f) {
+                alert(f);
+            }
+        });
+    }
+  
+
+
+    function MakeDataGrid(tableId, data, tableHeight, columns, search, isScrollX, footerFunction, detailed, reportTitleId, rowSelection, lstHeight) {
+        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+        var isDetailed = detailed === undefined ? false : true;
+        var reportTitle = '';
+
+        if (reportTitleId === undefined)
+            reportTitle = $('.box-title').text();
+        else
+            reportTitle = reportTitleId;
+
+        var gridHeight = 0;
+
+        isScrollX = isScrollX === undefined ? false : true;
+        if (search === undefined) { search = true; }
+
+        var gridButtonsClass = '';
+        var gridSearchBoxClass = '';
+        if (isDetailed === true) {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'bg-white  txtSearch';
+            gridButtonSize = 20;
+        }
+        else {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+            gridButtonSize = 20;
+        }
+
+        
+
+        if (search === true) {
+            var boxtool = '<input class="' + gridSearchBoxClass + '" id="txtSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+            $('#buttons').empty();
+            $('#buttons').append(boxtool);
+        }
+
+        var table = $('#' + tableId).DataTable({
+            order: [],
+            createdRow: rowSelection,         // add Parameter for row selection in PO Detail // Added By Tahir
+            data: data,
+            columns: columns,
+            paging: false,
+            ordering: true,
+            searching: false,
+            select: {
+                style: 'single'
+            },
+            deferRender: true,
+            destroy: true,
+            pagingType: 'full',
+            pageLength: 100,
+            scrollCollapse: true,
+            scrollX: isScrollX,
+            scrollY: '210px',
+            footerCallback: footerFunction,
+            language: {
+                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                oPaginate: {
+                    sNext: '<i class="fa fa-forward"></i>',
+                    sPrevious: '<i class="fa fa-backward"></i>',
+                    sFirst: '<i class="fa fa-step-backward"></i>',
+                    sLast: '<i class="fa fa-step-forward"></i>'
+                }
+            },
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-3'i><'#designedBy.col-sm-7'><'col-sm-2'p>>",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Copy',
+                    title: reportTitle,
+                    filename: 'DataExport',
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)' // Excluding columns while exporting
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Export to excel',
+                    title: reportTitle,
+                    filename: 'DataExport', //Added By Tahir
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Print',
+                    title: '',
+                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                    filename: 'DataExport',
+                    exportOptions: {
+                        // columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                }
+            ],
+            select: true
+        });
+        table.buttons().container()
+            .appendTo('#buttons');
+
+        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+        table.button(0).nodes().addClass(gridButtonsClass);
+
+        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(1).nodes().addClass(gridButtonsClass);
+
+        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(2).nodes().addClass(gridButtonsClass);
+
+        var dsgndby = $('.modal-footer > #designedby ').html();
+
+        if (dsgndby === "") {
+            $('#designedBy').html($('.desgndBy').html());
+        }
+
+        var layoutHeader = $('nav').innerHeight();
+        var cardHeader = $('.box-header').innerHeight();
+        var tableHeader = $('.dataTables_scrollHead').innerHeight();
+        var tableFooter = 0;
+        var cardFooterH = 30;
+
+        if (isFooter === true)
+            tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+        var parentHeight = $('#' + lstHeight).innerHeight();
+        if (parentHeight == undefined)
+            parentHeight = window.innerHeight;
+        else
+            parentHeight = $('#' + lstHeight).innerHeight();
+
+        if (isFooter === true)
+            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+        var browserHeight = parentHeight;
+        if (tableHeight === 0) {
+            if (layoutHeader === undefined)
+                gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+            else
+                gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+        }
+        else { gridHeight = tableHeight; }
+
+        var topHeader = $('#topHeader').innerHeight();
+        if (topHeader > 0)
+            gridHeight = gridHeight - (topHeader + 1);
+
+        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+        table.columns.adjust().draw();
+
+        $('.dataTables_filter').hide();
+        $('#txtSearch').on('keyup change', function () {
+            table.search(this.value).draw();
+        });
+
+        return table;
+    }
+
+</script>

@@ -1,0 +1,3523 @@
+﻿@model PlusCP.Models.NewPO
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+<link href="~/Content/css/jquery.dataTables.colResize.css" rel="stylesheet" />
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<style>
+
+    .custom-modal-width {
+        max-width: 90%; /* Adjust width as needed */
+        width: 90%;
+    }
+
+    .table.dataTable {
+        font-family: "Segoe UI", "Roboto";
+        clear: both;
+       /* border-collapse: separate;*/
+        border-spacing: 0;
+        font-size: 16px;
+        margin-top: 1px;
+    }
+
+    .dataTables_wrapper,
+    .dataTables_length,
+    .dataTables_filter,
+    .dataTables_info,
+    .dataTables_paginate,
+    table.dataTable thead th,
+    table.dataTable tbody td {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+    }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: left !important;
+            float: none !important;
+            display: flex;
+            justify-content: left;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                font-size: 15px !important; /* Increase font size */
+                padding: 8px 12px; /* Increase button padding */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_paginate {
+            margin-left: 60px !important; /* Adjust this value as needed */
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button i {
+                font-size: 15px !important; /* Increase icon size */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_info {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+            font-size: 16px !important; /* Adjust size */
+            color: #333 !important; /* Darker text */
+            margin-left: 5px;
+        }
+    /* Change odd row background color */
+    table.dataTable tbody tr:nth-child(odd) {
+        background-color: #ECEDEF; /* Change to your desired color */
+    }
+
+    /* Change even row background color */
+    table.dataTable tbody tr:nth-child(even) {
+        background-color: #ffffff; /* Change to your desired color */
+    }
+
+    table.dataTable tbody tr.selected {
+        background-color: #D6EFE8; /* Orange color */
+        /*color: white;*/ /* Change text color if needed */
+    }
+    /* Search icon inside input */
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        transform: translateY(-50%);
+        color: darkgrey;
+        font-size: 14px;
+        pointer-events: none; /* Prevents clicking on the icon */
+    }
+
+    .search-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .txtSearch-frame {
+        margin-top: 5px;
+        height: 28px;
+        width: 150px;
+        border: none;
+        color: #003B59;
+        border: 2px solid #003B59 !important;
+        width: 200px;
+        padding-left: 30px; /* Space for the icon */
+    }
+
+    table.table thead th {
+        background-color: #003B59 !important; /* Change to your desired color */
+        color: white; /* Change to desired text color */
+        font-size: 15px;
+        font-family: 'Poppins', sans-serif;
+        height: 40px;
+    }
+
+    table.table tbody td, lbl_ {
+        /*background-color: white !important; /* Change to your desired color */
+        font-size: 15px;
+        color: #003B59 !important;
+    }
+
+    table.table tbody tr {
+        height: 50px; /* Adjust height as needed */
+    }
+
+        /* Hover effect */
+        table.table tbody tr:hover {
+            background-color: #f5f5f5 !important; /* Light gray background on hover */
+            transition: background-color 0.8s ease-in-out;
+            cursor: pointer;
+        }
+
+
+
+
+    table th {
+        /*padding: 1rem 0.5rem !important;*/
+        border: 1px solid white;
+        border-bottom: 1px solid white;
+        /*padding: 8px;*/
+        text-align: left;
+    }
+
+    table td {
+        padding: 1rem 0.5rem !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        vertical-align: middle;
+    }
+
+    table {
+       /* border-collapse: separate;*/
+        border-spacing: 0 10px; /* Adjust the second value to increase/decrease the vertical gap */
+        width: 100%;
+    }
+
+        table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td {
+            border-bottom-width: 1px;
+        }
+
+
+    .lblHeading {
+        font-size: 19px;
+        color: #003B59 !important;
+    }
+    #SecondemailInputContainer {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        padding: 5px;
+        border-radius: 4px;
+        min-height: 35px;
+        cursor: text;
+    }
+
+    #FirstemailInputContainer {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 5px;
+        border-radius: 4px;
+        min-height: 40px;
+        cursor: text;
+    }
+
+    #emailInputContainer {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 5px;
+        border-radius: 4px;
+        min-height: 40px;
+        cursor: text;
+    }
+
+    .tag {
+        background-color: #003B59;
+        color: #fff;
+        padding: 5px 10px;
+        margin: 3px;
+        border-radius: 15px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+    }
+
+        .tag .remove {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+    .tempinput {
+        border: none;
+        outline: none;
+        padding: 5px;
+        font-size: 12px;
+        min-width: 100px;
+        flex-grow: 1;
+    }
+
+
+
+
+
+    .required:after {
+        content: " *";
+        color: red;
+    }
+
+    .datepicker td, th {
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .Message {
+        height: 200px;
+        width: 500px
+    }
+
+    .custom-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .custom-modal-title {
+        margin: 0;
+    }
+
+    .pad {
+        padding-bottom: 15px;
+        padding: 2px;
+        padding-top: 10px;
+    }
+
+
+
+    .table-container {
+        height: 500px; /* Set the desired fixed height */
+        overflow-y: auto;
+    }
+    /* Set a fixed height for the scrollable table body */
+    .fixed-table-container {
+        max-height: 500px; /* Adjust the height as needed */
+        overflow-y: auto; /* Enable vertical scrolling */
+        border: 1px solid #ddd; /* Optional: Add a border */
+    }
+
+    /* Make the table header sticky */
+    .fixed-header th {
+        position: sticky;
+        top: 0;
+        background: white; /* Ensures header stays visible */
+        z-index: 1000; /* Ensures it stays above content */
+        border-bottom: 2px solid #ddd; /* Optional: Adds a bottom border */
+    }
+    /* Center align table body */
+    #dataTable td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2;
+    }
+
+
+
+    .t-head {
+        color: #023160;
+    }
+
+   
+
+    .box-header {
+        background-color: #f8f9fc !important;
+        color: #003B59 !important;
+        border-bottom: 2px solid #f8f9fc;
+        box-shadow: 0px 5px #ededed;
+    }
+
+   
+
+    .btn-box-tool {
+        color: #003B59 !important;
+    }
+
+
+    /*/Badges/*/
+
+    .btn-badges {
+        color: #003B59 !important;
+        border-radius: 25px !important;
+        margin-left: 5px !important;
+        height: 25px !important;
+        padding: 2px 12px !important;
+    }
+
+        .btn-badges:hover {
+            background-color: #003B59 !important;
+            color: white !important;
+        }
+
+            .btn-badges:hover .badge_light {
+                background-color: white !important;
+                color: #003B59 !important;
+            }
+
+    .badge_light {
+        background-color: #003B59 !important;
+        color: white !important;
+    }
+
+    .btn-badges-Sent {
+        border-radius: 25px !important;
+        height: 25px !important;
+        width: 60px;
+    }
+    /* Refresh Button */
+    .btn-refresh {
+        background-color: #003B59 !important; /* Distinct orange color */
+        color: white !important;
+        border-radius: 30px !important;
+        margin-left: 5px !important;
+        height: 25px !important;
+        padding: 0px 12px !important;
+        border: 2px solid #003B59 !important;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .btn-refresh:hover {
+            background-color: white !important;
+            color: #003B59 !important;
+            border: 2px solid #003B59 !important;
+        }
+    .selected {
+        background-color: deepskyblue;
+        color: black;
+    }
+    /* Modal Styling */
+    .modal-dialog {
+        margin: 30px auto;
+    }
+
+        .modal-dialog.centered {
+            display: flex;
+            min-height: calc(100vh - 60px);
+            align-content: stretch;
+            flex-wrap: wrap;
+            align-items: stretch;
+            flex-direction: column;
+            justify-content: center;
+            width: 32%;
+        }
+
+    .ModalHeaderColor {
+        background-color: #D6EFE8;
+        color: #003B59
+    }
+
+    .ModalLabelColor {
+        color: #003B59;
+    }
+
+    .btn-hover-save {
+        background-color: #003B59; /* Default background color */
+        border-color: #003B59; /* Default border color */
+        color: #fff; /* Default text color */
+    }
+
+        .btn-hover-save:hover {
+            background-color: transparent; /* Make background transparent on hover */
+            border-color: #003B59; /* Dark border color on hover */
+            color: #003B59; /* Dark font color on hover */
+        }
+
+
+    .btnClose {
+        background-color: whitesmoke; /* Make background transparent on hover */
+        color: #003B59; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnClose:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: #003B59; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+        }
+
+    .btnReset {
+        background-color: crimson; /* Make background transparent on hover */
+        color: white; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnReset:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: white; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            background-color: #d44646;
+        }
+</style>
+<div id="parentDiv" class="container-fluid">
+    <input id="rptCode" type="hidden" value="019" />
+    <input id="rptTitle" class="lbl_" style="font-size:14px !important;" type="hidden" value="@ViewBag.ReportTitle" />
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <div id="dataList" class="box panel panel-default">
+            <div class="box-header with-border">
+                <button type="button" class="btn btn-box-tool" title="Option Page" id="btnOptionFilter">
+                    <span class="fa fa-filter fa-lg blue"></span>
+                </button>
+
+
+                <h5 class="box-title"><strong style="font-size:14px !important;">@ViewBag.ReportTitle  </strong><strong id="filterString"></strong></h5>
+                <button id="btnUpdate" style="margin-left:100px; display:none" type="button" class="btn btn-secondary">Update</button>
+
+                <div id="buttons" class="box-tools pull-right">
+
+                </div>
+                <button id="AllCard" class="btn btn-badges">
+                    All @*<span id="AllCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAll"></span></span>*@
+                </button>
+                <!--<button id="AllOpenCard" class="btn btn-badges">
+                    Idle--> @*<span id="AllOpenCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAllOpen"></span></span>*@
+                <!--</button>-->
+                <button id="CardPending" class="btn btn-badges">
+                    In Process @*<span id="badgeCount" class="badge badge_light"><span id="lblPending"></span></span>*@
+                </button>
+                <button id="CardLate" class="btn btn-badges">
+                    Late @*<span id="badgeCount" class="badge badge_light"><span id="lblLate"></span></span>*@
+                </button>
+                <button id="CardArrived" class="btn btn-badges">
+                    Early @*<span id="badgeCount" class="badge badge_light"><span id="lblArrived"></span></span>*@
+                </button>
+                <button id="CardUpdate" class="btn btn-badges">
+                    Completed @*<span id="badgeCount" class="badge badge_light"><span id="lblUpdate"></span></span>*@
+                </button>
+                <button id="CardRefresh" type="button" class="btn btn-badges btn-refresh" title="Refresh Page">
+                    @*<span class="fas fa-redo-alt fa-lg">Refresh</span>*@
+                    Refresh
+                </button>
+                <h5 class="box-title"><strong id="RefreshTime" style="font-size:14px !important; margin-left:5px;"></strong></h5>
+                <button id="actionButton" style="margin-left:6px" type="button" class="btn-hover-save">Send</button>
+            </div>
+            <div class="box-body bg-light card mt-4" id="lstP">
+                <table id="lstData" class="table table-bordered table-striped text-sm table-hover">
+                    <thead class="sorted-asc fw-light small">
+                        <tr style="background-color: white">
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+
+                        </tr>
+                    </thead>
+                    @*<tbody id="tblBody"></tbody>*@
+                    <tfoot>
+                        <tr>
+                            @*<th>Total :</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>*@
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    </div>
+    @*<div class="col-lg-2 col-md-2 col-sm-2" id="rghtPanel">
+            <h4 style="padding-top:300px; padding-left:180px;"></h4>
+
+        </div>*@
+</div>
+
+<!-- Modal Email Entry -->
+<div id="EmailEntry" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header ModalHeaderColor" style="height: 35px;">
+                <h5 class="modal-title" style="font-weight:bold">
+                    Purchase Order Details
+
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- Left side with green background color -->
+                        <div class="col-md-6" style="background-color:#F5F5F5;">
+                            <div class="form-group" style="margin-bottom: 0; display: none">
+                                <label class="ModalLabelColor">Supplier Company :&nbsp</label><label class="lbl_" style="font-weight:100; " id="BuyerCompany"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Buyer :&nbsp</label><label class="lbl_" style="font-weight:100" id="BuyerName"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">PO-Ln-Rel :&nbsp</label><label class="lbl_" style="font-weight:100" id="PONo"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Due Date :&nbsp</label><label class="lbl_" style="font-weight:100" id="DueDate"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Part No. :&nbsp</label><label class="lbl_" style="font-weight:100" id="PartNo"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Part Desc :&nbsp</label><label class="lbl_" style="font-weight:100" id="PartDesc"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Order Date :&nbsp</label><label class="lbl_" style="font-weight:100" id="OrderDate"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">UOM :&nbsp</label><label class="lbl_" style="font-weight:100" id="UOM"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Qty :&nbsp</label><label class="lbl_" style="font-weight:100" id="Qty"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="modallabelcolor">unit cost :&nbsp</label><label class="lbl_" style="font-weight:100" id="UnitCost"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Ext. Cost :&nbsp</label><label class="lbl_" style="font-weight:100" id="ExtCost"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Price :&nbsp</label><label class="lbl_" style="font-weight:100" id="Price"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">Supplier :&nbsp</label><label class="lbl_" style="font-weight:100" id="SupplierName"></label>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="ModalLabelColor">SupplierId :&nbsp</label><label class="lbl_" style="font-weight:100" id="SupplierId"></label>
+                            </div>
+
+                        </div>
+                        <!-- Right side -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="required ModalLabelColor">Email :</label>
+                                @Html.EditorFor(model => model.EmailId, new { htmlAttributes = new { placeholder = "Email", @class = "form-control input-sm" } })
+                                <label id="lblEmailmsg" style="color:red; font-weight:100"></label>
+                            </div>
+                            @*<div class="form-group">
+                                    <label class="ModalLabelColor">CC Email :</label>
+                                    @Html.EditorFor(model => model.CCEmailId, new { htmlAttributes = new { placeholder = "CC Email", @class = "form-control input-sm" } })
+                                    <label id="lblCCEmailmsg" style="color: red; font-weight: 100"></label>
+                                </div>*@
+
+                            <div class="col-md-12">
+                                <label class="ModalLabelColor" style="padding-left:7px">CC Email :</label>
+                                <div id="FirstemailInputContainer" style="margin-left:6px; margin-right:6px" tabindex="0">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="ModalLabelColor" for="contactReason">Contact Reason :</label>
+                                <select class="form-control" id="contactReason">
+                                    <option value="Confirmation">Confirmation</option>
+                                    <option value="Change">Change</option>
+                                    <option value="Update">Update</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="NewDueDate" style="display:none">
+                                <div class='input-group date' style="margin-left:7px" id='dtpDueDate'>
+                                    <label class="ModalLabelColor">New Due Date :</label>
+                                    @Html.TextBoxFor(model => model.newDueDate, htmlAttributes: new { @class = "form-control" })
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="ModalLabelColor">Message :</label>
+                                <br />
+                                @Html.TextAreaFor(model => model.Message, new { style = "height: 80px; width: 280px;", htmlAttributes = new { placeholder = "Email Body", @class = "form-control input-lg" } })
+                                <label id="lblMsg1" style="color:green"></label>
+                            </div>
+                            <!-- File attachment control -->
+                            <div class="form-group">
+                                <label class="ModalLabelColor" for="fileAttachment">Attach File :</label>
+                                <input type="file" id="fileAttachment" class="form-control-file" accept=".pdf,.doc,.docx,.jpg,.png,.xls,.xlsx" onchange="validateFileSize(this)">
+                                <small class="ModalLabelColor" id="fileHelp" class="form-text text-muted">Max file size: 1MB</small>
+                                <label class="ModalLabelColor" id="fileSizeError" style="color:red; display:none; font-weight:100">File size exceeds 1MB. Please upload a smaller file.</label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row" style="vertical-align:middle;text-align:center; padding-top:18px">
+                        <button type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-hover-save" id="btnSend">Send</button>
+                        <label id="VendorId" style="visibility:hidden" hidden></label>
+                        <label id="VendorName" style="visibility:hidden" hidden></label>
+                        <label id="BuyerId" style="visibility:hidden" hidden></label>
+                        <label id="LineNo" style="visibility:hidden" hidden></label>
+                        <label id="ReleaseNo" style="visibility:hidden" hidden></label>
+                        <label id="GUID" style="visibility:hidden" hidden></label>
+                        <label id="OrderQty" style="visibility:hidden" hidden></label>
+                        <label id="TrackingNumber" style="visibility:hidden" hidden></label>
+                        <label id="BuyerEmail" style="visibility:hidden" hidden></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Awaiting Response -->
+<div id="AwaitingDtl" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog centered" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_">Awaiting Response Details</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Email Created On:</label>
+                                        @Html.EditorFor(model => model.CreatedOn, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Email Created On", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Supplier Email:</label>
+                                        @Html.EditorFor(model => model.VendorEmail, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Supplier Email", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnAwaitingCancel" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                <button onclick="ResendEmail()" id="btnResend" type="button" class="btn btn-hover-save" data-dismiss="modal">Resend</button>
+                <label id="_PONumber" style="visibility:hidden" hidden></label>
+                <label id="_POLine" style="visibility:hidden" hidden></label>
+                <label id="_PORel" style="visibility:hidden" hidden></label>
+                <label id="_GUID" style="visibility:hidden" hidden></label>
+                <label id="_VendorEmail" style="visibility:hidden" hidden></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Multiple Email -->
+<div id="MultiEmail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg custom-modal-width" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor">Multiple PO's</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Left side with green background color -->
+                    <div class="row">
+                        <!-- Left side (Table Grid) -->
+                        <div class="col-md-12 table-container">
+                            <div class="table-responsive fixed-table-container">
+                                <table id="dataTable" class="table table-striped text-sm table-hover">
+                                    <thead class="fixed-header">
+                                        <tr>
+                                            <th class="t-head">PO</th>
+                                            <th class="t-head">Part No.</th>
+                                            <th class="t-head">Supplier</th>
+                                            <th class="t-head">Supplier Email</th>
+                                            <th class="t-head">Qty</th>
+                                            <th class="t-head">Price</th>
+                                            <th class="t-head">Due Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Table rows will be dynamically added here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Right side -->
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label class="ModalLabelColor" for="contactReason">Contact Reason</label>
+                                <select class="form-control" id="contactReasonMulti">
+                                    <option value="Confirmation">Confirmation</option>
+                                    <option value="Change">Change</option>
+                                    <option value="Update">Update</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required ModalLabelColor" style="padding-left:7px;">Email :</label>
+                                <input type="text" placeholder="Email" id="MultipleEmailId" style="height:35px" class="form-control input-sm">
+                                <label id="lblEmailmsg" style="color:red; font-weight:100"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" style=" margin-top: 7px">
+                            <label class="ModalLabelColor" style="padding-left:7px">CC Email :</label>
+                            <div id="SecondemailInputContainer" style="margin-left: 6px; margin-right: 6px; height: 35px;" tabindex="0">
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnMultiPO" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                <button id="btnMultiSend" type="button" class="btn btn-hover-save">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Transaction -->
+<div id="TransactionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg custom-modal-width" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor">Communication History</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Left side with green background color -->
+                    <div class="row">
+                        @*Left side (Table Grid)*@
+                        <div class="col-md-12 table-container" style="height:400px">
+
+                            <table id="transactionTable" class="table">
+                                <thead class="sticky-header">
+                                    <tr>
+                                        <th class="t-head">PO</th>
+                                        <th class="t-head">Part No.</th>
+                                        <th class="t-head">Type</th>
+                                        <th class="t-head">Action</th>
+                                        <th class="t-head">Qty</th>
+                                        <th class="t-head">Price</th>
+                                        <th class="t-head">Due Date</th>
+                                        <th class="t-head">Message</th>
+                                        <th class="t-head">Created On</th>
+                                        <th class="t-head">Service Type</th>
+                                        <th class="t-head">Track Record</th>
+                                        <th class="t-head">Document</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnTransactionPO" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Action Required -->
+<div id="ActionReqModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor">Action</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Left side with green background color -->
+                    <div class="row">
+                        @*Left side (Table Grid)*@
+                        <div class="col-md-12 table-container" style="height:400px">
+
+                            <table id="ActionTable" class="table table-striped text-sm table-hover">
+                                <thead class="sticky-header">
+                                    <tr>
+                                        <th class="t-head">PO</th>
+                                        <th class="t-head">Part No.</th>
+                                        <th class="t-head">Qty</th>
+                                        <th class="t-head">Price</th>
+                                        <th class="t-head">Due Date</th>
+                                        <th style="display:none" class="t-head">Tracking No.</th>
+                                        <th style="display:none" class="t-head">Service Type</th>
+                                        <th style="display:none" class="t-head">Open URL</th>
+                                        <th style="display:none" class="t-head">Document</th>
+                                        <th style="display:none" class="t-head">GUID</th>
+                                        <th style="display:none" class="t-head">Arrived Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align:center">
+                @{
+                    var Type = HttpContext.Current.Session["UserType"];
+                    string userType = Type != null ? Type.ToString() : null;
+                }
+
+                @if (userType == "Supplier")
+                {
+                    <button id="proposeBtn" type="button" class="btn btn-primary" data-dismiss="modal">Suggest</button>
+                }
+                else
+                {
+                    <button id="acceptBtn" type="button" class="btn btn-hover-save" data-dismiss="modal">Accept</button>
+                    <button style="display:none" id="rejectBtn" type="button" class="btn btn-danger" data-dismiss="modal">Reject</button>
+                    <button id="proposeBtn" type="button" class="btn btnClose" data-dismiss="modal">Suggest</button>
+                    <button id="ActionCloseBtn" type="button" class="btn btnReset" data-dismiss="modal">Close</button>
+                    <button style="display:none" id="holdBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Hold</button>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Propose Modal -->
+<div id="ProposeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <!-- Increased modal width -->
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor" style="padding-left:4px; padding-top:2px" id="showTitle">Suggest</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- Left side with green background color -->
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <!-- Green background -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>PO No:</label>
+                                        @Html.EditorFor(model => model.ProposePONo, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "PO No.", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Part No:</label>
+                                        @Html.EditorFor(model => model.ProposePartNo, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Part No", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Supplier:</label>
+                                        @Html.EditorFor(model => model.ProposeVendorName, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Buyer Name", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <!-- Green background -->
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Qty:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Qty", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Qty", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @Html.EditorFor(model => model.ProposedQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Qty" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Price:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Price", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Price", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @Html.EditorFor(model => model.ProposedPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Price" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Due Date:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Due Date", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Due Date", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @*@Html.EditorFor(model => model.ProposedDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Due Date" } })*@
+                                        @Html.TextBoxFor(model => model.ProposedDueDate, htmlAttributes: new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <label class="required ModalLabelColor" style="padding-left:7px; padding-top:5px">Email :</label>
+                            <input type="text" placeholder="Email" id="ProposeEmailId" class="form-control input-sm">
+                            @*@Html.EditorFor(model => model.EmailId, new { htmlAttributes = new { placeholder = "Email", @id = "ProposeEmailId", @class = "form-control input-sm" } })*@
+                            <label id="lblEmailmsg" style="color:red; font-weight:100"></label>
+                        </div>
+
+                        <div class="col-xs-12">
+                            <label class="ModalLabelColor" style="padding-left:7px">CC Email :</label>
+                            <div id="emailInputContainer" tabindex="0">
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12">
+                            <div class="form-group" style="background-color: #f5f5f5; padding: 15px; border-radius: 5px;">
+                                <label for="ProposeMessage" class="control-label">Message</label>
+                                @Html.TextAreaFor(model => model.ProposeMessage, new
+                                {
+                                    @class = "form-control input-md",
+                                    rows = "5",
+                                    placeholder = "Email Body"
+                                })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <label id="lblMsg1" style="color:red"></label>
+                <button id="btnCancel" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                <button id="btnProposeSend" type="button" class="btn btn-hover-save">Send</button>
+                <label id="VendorId" style="visibility:hidden" hidden></label>
+                <label id="VendorName" style="visibility:hidden" hidden></label>
+                <label id="BuyerId" style="visibility:hidden" hidden></label>
+                <label id="GUID" style="visibility:hidden" hidden></label>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Yes or NO -->
+<div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog centered" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor">Confirmation PO Changes</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor" id="confirmationMessage"></label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="yesButton" type="button" class="btn btn-hover-save" data-dismiss="modal">Yes</button>
+                <button id="noButton" type="button" class="btn btnClose" data-dismiss="modal">No</button>
+                <label id="lblAction" style="visibility:hidden" hidden></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Alert POP UP -->
+<div id="AlertPopUp" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header">
+                <h5 class="custom-modal-title lbl_">Send Email</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="required">Email:</label>
+                                        @Html.EditorFor(model => model.AlertEmailId, new { htmlAttributes = new { placeholder = "Email", @class = "form-control input-sm", disabled = "disabled" } })
+                                        <label id="lblEmailmsg" style="color:red"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>CC Email:</label>
+                                        @Html.EditorFor(model => model.AlertCCEmailId, new { htmlAttributes = new { placeholder = "CC Email", @class = "form-control input-sm" } })
+                                        <label id="lblEmailmsg"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <label>Message</label>
+                                    <br />
+                                    @Html.TextAreaFor(model => model.AlertMessage, new { style = "height: 60px; width: 560px;", htmlAttributes = new { placeholder = "Email Body", @class = "form-control input-lg" } })
+                                    <label id="lblMsg1" style="color:green"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button id="btnAlertPopup" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btnAlertSend" type="button" class="btn btn-hover-save">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Option Page -->
+<div id="OptionFilter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog centered" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_">Purchase Order Filter</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="row" style="margin-top:5px">
+                                <div class="col-md-5">
+                                    <div class='input-group date' style="margin-left:7px" id='dtpFrom'>
+                                        <label class="ModalLabelColor">Due Date From:</label>
+                                        @Html.TextBoxFor(model => model.fromDate, htmlAttributes: new { @class = "form-control" })
+                                        @*<span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>*@
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                </div>
+                                <div class="col-md-5">
+                                    <div class='input-group date' id='dtpTo' style="margin-right:7px;">
+                                        <label class="ModalLabelColor">Due Date To:</label>
+                                        @Html.TextBoxFor(model => model.toDate, htmlAttributes: new { @class = "form-control" })
+                                        @*<span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Part No.:</label>
+                                        @Html.TextBoxFor(model => model.FilterPartNo, htmlAttributes: new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Part Desc.:</label>
+                                        @Html.TextBoxFor(model => model.FilterPartDesc, htmlAttributes: new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Supplier:</label>
+                                            @Html.TextBoxFor(model => model.Vendor, htmlAttributes: new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>*@
+                            @*<div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Status PO:</label>
+                                            @Html.TextBoxFor(model => model.Status, htmlAttributes: new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Status Action:</label>
+                                            @Html.TextBoxFor(model => model.ActionStatus, htmlAttributes: new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnOptionFilterCancel" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                <button id="btnOptionFilterReset" type="button" class="btn btn-danger">Reset</button>
+                <button id="btnOptionFilterSend" type="button" class="btn btn-hover-save">Send</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/Scripts/jquery.dataTables.colResize.js"></script>
+<script src="~/Scripts/Message.js"></script>
+<script src="~/Scripts/DatatableColReorder.js"></script>
+
+<script>
+
+    LoadData();
+(function () {
+  const emailInput = document.getElementById('emailInputContainer');
+
+  // Creates a tag element with the given text
+  function createTag(text) {
+    const tag = document.createElement('span');
+    tag.classList.add('tag');
+    tag.innerText = text;
+
+    const remove = document.createElement('span');
+    remove.classList.add('remove');
+    remove.innerText = "×"; // Cross icon
+    tag.appendChild(remove);
+
+    // Remove the email tag when the cross is clicked
+    remove.addEventListener('click', (event) => {
+      event.currentTarget.parentElement.remove();
+    });
+
+    return tag;
+  }
+
+  // Creates and returns an input element
+  function createNewInput() {
+    const newInput = document.createElement('input');
+    newInput.classList.add('tempinput');
+      newInput.placeholder = 'Press enter to add more';
+
+    // On focus out or Enter key, convert input to a tag if valid
+    newInput.addEventListener('blur', (event) => {
+      handleInput(event.target);
+    });
+
+    newInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        handleInput(event.target);
+      }
+    });
+
+    return newInput;
+  }
+
+  // Handles input validation and tag creation
+  function handleInput(inputElement) {
+    const email = inputElement.value.trim();
+    if (email) {
+      if (validateEmail(email)) {
+        const tag = createTag(email);
+        emailInput.insertBefore(tag, inputElement);
+      } else {
+        alert("Invalid email format!");
+      }
+    }
+    inputElement.value = ''; // Clear the input field
+  }
+
+  // Validates the email format
+  function validateEmail(email) {
+    const regex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+    return regex.test(email);
+  }
+
+  // Adds the click event listener to the input container
+  emailInput.addEventListener('click', (event) => {
+    const target = event.currentTarget;
+    const existingInput = target.querySelector('input.tempinput');
+    if (!existingInput) {
+      const newInput = createNewInput();
+      target.appendChild(newInput);
+      newInput.focus();
+    }
+  });
+})();
+
+(function () {
+        const emailInput = document.getElementById('FirstemailInputContainer');
+
+        // Creates a tag element with the given text
+        function createTag(text) {
+            const tag = document.createElement('span');
+            tag.classList.add('tag');
+            tag.innerText = text;
+
+            const remove = document.createElement('span');
+            remove.classList.add('remove');
+            remove.innerText = "×"; // Cross icon
+            tag.appendChild(remove);
+
+            // Remove the email tag when the cross is clicked
+            remove.addEventListener('click', (event) => {
+                event.currentTarget.parentElement.remove();
+            });
+
+            return tag;
+        }
+
+        // Creates and returns an input element
+        function createNewInput() {
+            const newInput = document.createElement('input');
+            newInput.classList.add('tempinput');
+            newInput.placeholder = 'Press enter to add more';
+
+            // On focus out or Enter key, convert input to a tag if valid
+            newInput.addEventListener('blur', (event) => {
+                handleInput(event.target);
+            });
+
+            newInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleInput(event.target);
+                }
+            });
+
+            return newInput;
+        }
+
+        // Handles input validation and tag creation
+        function handleInput(inputElement) {
+            const email = inputElement.value.trim();
+            if (email) {
+                if (validateEmail(email)) {
+                    const tag = createTag(email);
+                    emailInput.insertBefore(tag, inputElement);
+                } else {
+                    alert("Invalid email format!");
+                }
+            }
+            inputElement.value = ''; // Clear the input field
+        }
+
+        // Validates the email format
+        function validateEmail(email) {
+            const regex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            return regex.test(email);
+        }
+
+        // Adds the click event listener to the input container
+        emailInput.addEventListener('click', (event) => {
+            const target = event.currentTarget;
+            const existingInput = target.querySelector('input.tempinput');
+            if (!existingInput) {
+                const newInput = createNewInput();
+                target.appendChild(newInput);
+                newInput.focus();
+            }
+        });
+    })();
+
+(function () {
+        const emailInput = document.getElementById('SecondemailInputContainer');
+
+        // Creates a tag element with the given text
+        function createTag(text) {
+            const tag = document.createElement('span');
+            tag.classList.add('tag');
+            tag.innerText = text;
+
+            const remove = document.createElement('span');
+            remove.classList.add('remove');
+            remove.innerText = "×"; // Cross icon
+            tag.appendChild(remove);
+
+            // Remove the email tag when the cross is clicked
+            remove.addEventListener('click', (event) => {
+                event.currentTarget.parentElement.remove();
+            });
+
+            return tag;
+        }
+
+        // Creates and returns an input element
+        function createNewInput() {
+            const newInput = document.createElement('input');
+            newInput.classList.add('tempinput');
+            newInput.placeholder = 'Press enter to add more';
+
+            // On focus out or Enter key, convert input to a tag if valid
+            newInput.addEventListener('blur', (event) => {
+                handleInput(event.target);
+            });
+
+            newInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleInput(event.target);
+                }
+            });
+
+            return newInput;
+        }
+
+        // Handles input validation and tag creation
+        function handleInput(inputElement) {
+            const email = inputElement.value.trim();
+            if (email) {
+                if (validateEmail(email)) {
+                    const tag = createTag(email);
+                    emailInput.insertBefore(tag, inputElement);
+                } else {
+                    alert("Invalid email format!");
+                }
+            }
+            inputElement.value = ''; // Clear the input field
+        }
+
+        // Validates the email format
+        function validateEmail(email) {
+            const regex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            return regex.test(email);
+        }
+
+        // Adds the click event listener to the input container
+        emailInput.addEventListener('click', (event) => {
+            const target = event.currentTarget;
+            const existingInput = target.querySelector('input.tempinput');
+            if (!existingInput) {
+                const newInput = createNewInput();
+                target.appendChild(newInput);
+                newInput.focus();
+            }
+        });
+    })();
+
+
+// END CC Email
+
+   
+    function validateFileSize(input) {
+        var file = input.files[0];
+        var maxSize = 1 * 1024 * 1024; // 1MB in bytes
+        var fileSizeError = document.getElementById('fileSizeError');
+
+        if (file.size > maxSize) {
+            fileSizeError.style.display = 'block';
+            input.value = ''; // Clear the input
+        } else {
+            fileSizeError.style.display = 'none';
+        }
+    }
+    $(function () {
+        $("#toDate, #fromDate").datepicker({
+            format: 'yyyy.mm.dd',
+            autoclose: true,
+            todayHighlight: true
+        }).datepicker('update', new Date());
+    });
+
+    //$.fn.dataTable.render.ellipsisAdr = function (cutoff) {
+    //    return function (data, type, row) {
+    //        if (type === 'display') {
+    //            var str = data.toString().replace(/(\r\n|\n|\r|'|)/gm, "");
+
+    //            var header = "Supplier";
+
+    //            return str.length < cutoff ?
+    //                str :
+    //                str.substr(0, cutoff - 1) + '<a href="#" onclick="showModalForZPL(\'' + header + '\', \'' + str + '\')"> More</a>';
+    //        }
+    //        // Search, order and type can use the original data
+    //        return data;
+    //    };
+    //};
+    //$.fn.dataTable.render.ellipsisAdr1 = function (cutoff) {
+    //    return function (data, type, row) {
+    //        if (type === 'display') {
+    //            var str = data.toString().replace(/(\r\n|\n|\r|'|)/gm, "");
+
+    //            var header = "Line Description";
+
+    //            return str.length < cutoff ?
+    //                str :
+    //                str.substr(0, cutoff - 1) + '<a href="#" onclick="showModalForZPL(\'' + header + '\', \'' + str + '\')"> More</a>';
+    //        }
+    //        // Search, order and type can use the original data
+    //        return data;
+    //    };
+    //};
+    // Retrieve and set the selected button's state from local storage on page load
+   $(document).ready(function() {
+       //var urlParams = new URLSearchParams(window.location.search);
+       var selectedStatus = '@Request.QueryString["POStatus"]';
+
+    if (selectedStatus) {
+        $('.btn-badges').removeClass('badge_light'); // Remove 'selected' class from all buttons
+        switch (selectedStatus) {
+            case 'All':
+                $('#AllCard').addClass('badge_light');
+                break;
+            case 'All Open':
+                $('#AllOpenCard').addClass('badge_light');
+                break;
+            case 'Pending':
+                $('#CardPending').addClass('badge_light');
+                break;
+            case 'Late':
+                $('#CardLate').addClass('badge_light');
+                break;
+            case 'Arrived':
+                $('#CardArrived').addClass('badge_light');
+                break;
+            case 'Updated':
+                $('#CardUpdate').addClass('badge_light');
+                break;
+            default:
+                // Handle other cases if needed
+        }
+    }
+});
+    function toggleSelectionAndOpenPage(button, pageUrl) {
+        var isSelected = button.classList.contains('badge_light');
+        $('.btn-badges').removeClass('badge_light'); // Remove 'selected' class from all buttons
+        if (!isSelected) {
+            button.classList.add('badge_light'); // Add 'selected' class to the clicked button
+        }
+        OpenPage(pageUrl); // Call the function to open the page with the specified URL
+    }
+    // Get all the buttons with the class 'btn-badges' and attach a click event listener to each of them
+    document.querySelectorAll('.btn-badges').forEach(button => {
+        button.addEventListener('click', function () {
+            var selectedStatus = '@Request.QueryString["POStatus"]';
+            var PO = '@Session["PO"]';
+            var pageUrl;
+            // Determine the page URL based on the button clicked
+            switch (this.id) {
+                case 'AllCard':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=All';
+                    break;
+                case 'AllOpenCard':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=All Open';
+                    break;
+                case 'CardPending':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Pending';
+                    break;
+                case 'CardLate':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Late';
+                    break;
+                case 'CardArrived':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Arrived';
+                    break;
+                case 'CardUpdate':
+                    pageUrl = '\\NewPO\\SupplierUpdate?POStatus=Update';
+                    break;
+                case 'CardRefresh':
+                    pageUrl = '\\NewPO\\Index?PO=' + PO + '&POStatus=' + selectedStatus + '';
+                    saveRefreshTime(); // Save the refresh time before loading the page
+                    break;
+                default:
+                    // Default case
+                    pageUrl = '\\NewPO\\Index?PO=' + PO+'';  // Set a default page URL if necessary
+            }
+            toggleSelectionAndOpenPage(this, pageUrl); // Toggle the selection and open the page
+            // Store the selected button's ID in local storage
+            localStorage.setItem('selectedButtonId', this.id);
+        });
+    });
+    function toggleSelection(button) {
+        button.classList.toggle('selected'); // Toggle the 'selected' class
+    }
+    // Function to save refresh time in local storage
+    function saveRefreshTime() {
+        var now = new Date();
+        var formattedTime = now.toLocaleString(); // Get the formatted time
+        localStorage.setItem("lastRefreshTimePODtl", formattedTime); // Save to local storage
+    }
+
+    $("#toDate, #fromDate").mouseover(function () {
+        $(this).css('cursor', 'pointer');
+    });
+
+    dateTo();
+    datefrom();
+    function datefrom() {
+        var date = new Date();
+        var newdate = new Date(date);
+        //For To Date
+        newdate.setDate(newdate.getDate());
+        var dd = ('0' + newdate.getDate()).slice(-2);
+        var mm = ('0' + (newdate.getMonth() + 1)).slice(-2);
+        var y = newdate.getFullYear();
+        var someFormattedDate = y + '.' + mm + '.' + dd;
+        document.getElementById('fromDate').value = someFormattedDate;
+    }
+    function dateTo() {
+        var date = new Date();
+        var newdate = new Date(date);
+        //For To Date
+        newdate.setDate(newdate.getDate());
+        var dd = ('0' + newdate.getDate()).slice(-2);
+        var mm = ('0' + (newdate.getMonth() + 1)).slice(-2);
+        var y = newdate.getFullYear();
+        var someFormattedDate = y + '.' + mm + '.' + dd;
+        document.getElementById('toDate').value = someFormattedDate;
+    }
+    function isDate(txtDate) {
+        if (txtDate.length != 10) {
+            return false;
+        }
+        if (txtDate.substring(4, 5) !== '.' || txtDate.substring(7, 8) !== '.') {
+            return false;
+        }
+        return true;
+    }
+    function LoadEmptyGrid() {
+        $('#buttons').empty();
+        LoadData();
+    }
+
+    ToggleDataList(false);
+    function LoadData() {
+        
+
+        $('#option').modal('hide');
+        var isSingleRow = false;
+       // var POStatus = $('#POStatus').val();
+        var POStatus = '@Request.QueryString["POStatus"]';
+        $('#filterString').append('');
+        $('#filterString').val('');
+
+        $.ajax({
+            "processing": true,
+            "serverSide": true,
+            cache: false,
+            type: 'GET',
+            url: '/NewPO/GetList',
+            data: {
+                POStatus: POStatus,
+                PONo:@ViewBag.PurchaseOrder
+            },
+            datatype: JSON,
+            success: function (data) {
+                $('#filterString').append('');
+                $('#filterString').append(data.filterString);
+                $("#lstData").empty();
+
+                var type = '@Session["UserType"]';
+                var IsVisible;
+                if (type === 'Admin') {
+                    IsVisible = true;
+                }
+                else {
+                    IsVisible = false;
+                }
+                //$('#tblBody').empty();
+                //$('#lstPO').DataTable().clear();
+                // Variable to store the selected vendor name
+                var selectedVendorName = "";
+                if (!isSingleRow) {
+                    var columnDef = [
+                        {
+                            data: "Checkbox", title: '<input type="checkbox" id="selectAll" class="select-all-checkbox" />', width: "20px", "className": "notexport", "className": "text-center",
+                            render: function (data, type, row) {
+                                selectedVendorName = row["Vendor_Name"];
+                                if (row["PODetail_OrderQty"] != row["Calculated_ReceivedQty"] && row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
+                                    if (row["CommunicationStatus"] == "New" && row["GUID"] == "") {
+                                        return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
+
+                                    }
+                                    else {
+                                        return data;
+
+                                    }
+                                }
+                                else {
+                                    return data;
+
+                                }
+                            }
+                        },
+                        { "data": "BuyerEmailSent", "title": "BuyerSentEmail", "visible": false, "className": "notexport" },
+                        { "data": "VendorEmailSent", "title": "VendorSentEmail", "visible": false, "className": "notexport" },
+                        { "data": "Resent", "title": "Resend Email", "visible": false, "className": "notexport" },
+                        { "data": "ResentCreatedDate", "title": "Resend CreatedOn", "visible": false, "className": "notexport"  },
+                        { "data": "ResentVendorEmail", "title": "Resend Vendor Email", "visible": false, "className": "notexport"  },
+                        {
+                            "data": "Message", "title": "Message", "width": "120px", "className": "text-center", "className": "text-center notexport",
+                            render: function (data, type, row) {
+                                var url = '';
+
+                                if (row["PODetail_OrderQty"] != row["Calculated_ReceivedQty"]) {
+                                    if (row["CommunicationStatus"] == "Awaiting") {
+                                        if (row["Resent"] != "") {
+                                            if (row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
+
+                                                url = '<a href="#" onclick="Email(\'' + row["Vendor_EMailAddress"] + '\', \'' + row["PurAgent_Name"] + '\', \'' + row["POHeader_PONum"] + '\', \'' + row["PODetail_POLine"] + '\', \'' + row["PORel_PORelNum"] + '\', \'' + row["PODetail_PartNum"] + '\', \'' + (row["PODetail_LineDesc"] || '').replace(/'/g, "\\'").replace(/\r?\n/g, ' ') + '\', \'' + row["PODetail_IUM"] + '\', \'' + row["Calculated_OrderDate"] + '\', \'' + row["Calculated_DueDate"] + '\', \'' + row["PODetail_OrderQty"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["Vendor_VendorID"] + '\', \'' + row["Vendor_Name"] + '\', \'' + row["POHeader_BuyerID"] + '\', \'' + row["GUID"] + '\', \'' + row["Calculated_ArrivedQty"] + '\', \'' + row["Tracking_Number"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["CalculatedExtCost"] + '\', \'' + row["PurAgent_EMailAddress"] + '\', \'' + row["POHeader_Company"] + '\')">Resent Email</a>';
+                                                return url;
+                                            }
+                                            else {
+                                                return url;
+                                            }
+
+                                        }
+                                        else {
+                                            url = '<a href="#" onclick="AwaitingEmail(\'' + row["ResentCreatedDate"] + '\', \'' + row["ResentVendorEmail"] + '\', \'' + row["POHeader_PONum"] + '\', \'' + row["PODetail_POLine"] + '\', \'' + row["PORel_PORelNum"] + '\', \'' + row["GUID"] + '\')">Awaiting Email</a>';
+                                            return url;
+                                        }
+
+
+                                    }
+                                    else if (row["CommunicationStatus"] == "Action") {
+                                        url = '<a href="#" onclick="ActionRequired(\'' + row["PONumber"] + '\', \'' + row["Calculated_ArrivedQty"] + '\')">' + data + ' Action Required</a>';
+                                        return url;
+
+                                    }
+                                    else if (row["CommunicationStatus"] == "New") {
+                                        if (row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
+
+                                            url = '<a href="#" onclick="Email(\'' + row["Vendor_EMailAddress"] + '\', \'' + row["PurAgent_Name"] + '\', \'' + row["POHeader_PONum"] + '\', \'' + row["PODetail_POLine"] + '\', \'' + row["PORel_PORelNum"] + '\', \'' + row["PODetail_PartNum"] + '\', \'' + (row["PODetail_LineDesc"] || '').replace(/'/g, "\\'").replace(/\r?\n/g, ' ') + '\', \'' + row["PODetail_IUM"] + '\', \'' + row["Calculated_OrderDate"] + '\', \'' + row["Calculated_DueDate"] + '\', \'' + row["PODetail_OrderQty"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["Vendor_VendorID"] + '\', \'' + row["Vendor_Name"] + '\', \'' + row["POHeader_BuyerID"] + '\', \'' + row["GUID"] + '\', \'' + row["Calculated_ArrivedQty"] + '\', \'' + row["Tracking_Number"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["CalculatedExtCost"] + '\', \'' + row["PurAgent_EMailAddress"] + '\', \'' + row["POHeader_Company"] + '\')">Email</a>';
+                                            return url;
+                                        }
+                                        else {
+                                            return url;
+                                        }
+                                    }
+                                    else {
+                                        if (row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
+
+                                            url = '<a href="#" onclick="Email(\'' + row["Vendor_EMailAddress"] + '\', \'' + row["PurAgent_Name"] + '\', \'' + row["POHeader_PONum"] + '\', \'' + row["PODetail_POLine"] + '\', \'' + row["PORel_PORelNum"] + '\', \'' + row["PODetail_PartNum"] + '\', \'' + (row["PODetail_LineDesc"] || '').replace(/'/g, "\\'").replace(/\r?\n/g, ' ') + '\', \'' + row["PODetail_IUM"] + '\', \'' + row["Calculated_OrderDate"] + '\', \'' + row["Calculated_DueDate"] + '\', \'' + row["PODetail_OrderQty"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["Vendor_VendorID"] + '\', \'' + row["Vendor_Name"] + '\', \'' + row["POHeader_BuyerID"] + '\', \'' + row["GUID"] + '\', \'' + row["Calculated_ArrivedQty"] + '\', \'' + row["Tracking_Number"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["CalculatedExtCost"] + '\', \'' + row["PurAgent_EMailAddress"] + '\', \'' + row["POHeader_Company"] + '\')">Resent Email</a>';
+                                            return url;
+                                        }
+                                        else {
+                                            return url;
+                                        }
+                                    }
+
+
+                                }
+                                else {
+                                    var url = '';
+                                    return url;
+                                }
+
+                            }
+
+                        },
+                        {
+                            "data": "PDFPO", "title": "PDF", "width": "60px", "className": "notexport", "visible": false,
+                            render: function (data, type, row) {
+                                var url = '';
+                                // Image source for the PDF icon
+                                var pdfIconSrc = '/Content/images/PDFImage.png'; // Replace 'path/to/pdf-icon.png' with the actual path to your PDF icon image
+                                //open POPUP show Email Details.
+                                url = '<a href="#" onclick="OpenPDF(\'' + row["PDFPO"] + '\')">' + '<img src="' + pdfIconSrc + '" alt="PDF">' + '</a>';
+                                return url;
+                            }
+                        },
+
+                        { "data": "Vendor_Name", "title": "Supplier", "width": "200px" },
+
+                        { "data": "PurAgent_Name", "title": "Buyer", "visible": IsVisible, "width": "160px" },
+
+                        //{ "data": "Vendor_Name", "title": "Supplier", "render": $.fn.dataTable.render.ellipsisAdr(15), "width": "110px" },
+                        {
+                            "data": "PONumber", "title": "PO Num", "width": "60px", "className": "text-center",
+                            render: function (data, type, row) {
+                                var url = '';
+                                //open POPUP show Email Details.
+                                url = '<a href="#" onclick="TransactionDtl(\'' + row["PONumber"] + '\')">' + data + '</a>';
+                                return url;
+
+
+                            }
+                        },
+                        { "data": "PODetail_PartNum", "title": "Part No.", "width": "150px", "className": "text-center" },
+                        { "data": "PODetail_LineDesc", "title": "Line Desc.", "width": "300px"},
+                        //{ "data": "PODetail_LineDesc", "title": "Line Desc.", "render": $.fn.dataTable.render.ellipsisAdr1(15), "width": "110px" },
+
+                        { "data": "PODetail_IUM", "title": "IUM", "width": "30px", "className": "notexport", "visible": false  },
+                        { "data": "PODetail_OrderQty", "title": "Order Qty", "width": "80px", "className": "text-center" },
+                        { "data": "Calculated_ReceivedQty", "title": "Rcvd. Qty", "width": "60px", "visible": false, "className": "notexport" },
+                        { "data": "Calculated_ArrivedQty", "title": "Arri. Qty", "width": "80px", "className": "text-center" },
+                        { "data": "Calculated_OurQty", "title": "Rcvd. Qty", "width": "80px", "className": "text-center" },
+                        { "data": "PODetail_UnitCost", "title": "Price", "width": "130px", "className": "text-center", "visible": true },
+                        { "data": "Calculated_OrderDate", "title": "Order Date", "width": "80px", "className": "text-right" },
+                        { "data": "Calculated_DueDate", "title": "Due Date", "width": "40px", "className": "text-right" },
+                        { "data": "Calculated_ArrivedDate", "title": "Arriv. Date", "width": "80px", "className": "text-right" },
+
+                        { "data": "LastCommunication", "title": "Last Comm.", "width": "130px" },
+
+                       /* { "data": "Calculated_BaseTotalAmount", "title": "Amount", "width": "70px" },*/
+                        { "data": "POHeader_PONum", "title": "PO", "width": "50px", "visible": false, "className": "notexport"  },
+                        { "data": "PODetail_POLine", "title": "Line", "width": "50px", "visible": false, "className": "notexport"  },
+                        { "data": "PORel_PORelNum", "title": "Rel", "width": "50px", "visible": false, "className": "notexport"  },
+                        { "data": "Vendor_EMailAddress", "title": "Vendor Email", "width": "50px", "visible": false, "className": "notexport" },
+
+
+                        { "data": "PurAgent_EMailAddress", "title": "Buyer Email", "width": "50px", "visible": false, "className": "notexport" },
+
+                        { "data": "GUID", "title": "GUID", "width": "50px", "visible": false, "className": "notexport" },
+                        { "data": "CommunicationStatus", "title": "Status", "width": "70px", "className": "text-center" },
+                        { "data": "ERPStatus", "title": "ERP Status", "width": "110px", "className": "text-center" },
+                        { "data": "Vendor_VendorID", "title": "Supplier Id", "width": "90px", "visible": false, "className": "notexport" },
+                        { "data": "PODetail_UnitCost", "title": "PODetail UnitCost", "width": "90px", "visible": false, "className": "notexport" },
+                        { "data": "PODetail_ExtCost", "title": "PODetail ExtCost", "width": "90px", "visible": false, "className": "notexport" },
+                        { "data": "POHeader_Company", "title": "Supplier Company", "width": "90px", "visible": false, "className": "notexport" },
+                        { "data": "CalculatedExtCost", "title": "Calculated Ext Cost", "width": "90px", "visible": false, "className": "notexport" },
+
+                        //{ "data": "RowIdent", "title": "RowIdent", "width": "150px", "visible": false },
+
+
+                    ]
+                    ToggleDataList(true);
+                    //MakeDataGrid('lstPO', data.lstPO, 0, columnDef, true, true);
+                   // MakeDataGrid('lstData', data.lstPO, 0, columnDef, true, false, false, false);
+                    MakeDataGridForTraining('lstData', data.lstPO, 0, columnDef, 'buttons', true, true, false, false);
+                    var lastRefresh = localStorage.getItem("lastRefreshTimePODtl"); // Get from local storage
+                    if (lastRefresh) {
+                        document.getElementById("RefreshTime").innerText = "Last Refreshed: " + lastRefresh;
+                    }
+                    // Event handler for checkbox change
+                    $('#lstData tbody').off('change', 'input[type="checkbox"].supplier-checkbox');
+                    $('#lstData tbody').on('change', 'input[type="checkbox"].supplier-checkbox', function () {
+                        var checkbox = $(this);
+                        var vendorName = checkbox.closest('tr').find('td:eq(1)').text(); // Get the vendor name from the row
+
+                        if (checkbox.is(':checked')) {
+                            // If this is a new vendor selection, show an alert if a different vendor is already selected
+                            if (selectedVendors.length > 0 && selectedVendors[0] !== vendorName) {
+                                alert("Vendor has changed! You can uncheck the previous vendor to select a different vendor.");
+                                checkbox.prop('checked', false); // Uncheck the current checkbox
+                            } else {
+                                // Allow selecting the same vendor and add to selected vendors
+                                selectedVendors.push(vendorName);
+                            }
+                        } else {
+                            // If the checkbox is unchecked, remove the vendor from selected vendors
+                            selectedVendors = selectedVendors.filter(function (item) {
+                                return item !== vendorName;
+                            });
+                        }
+                    });
+
+                    // Select All checkbox handler
+                    $('#selectAll').off('change').on('change', function () {
+                        var isChecked = $(this).is(':checked');
+
+                        // If Select All is checked, select checkboxes only for the currently selected vendor
+                        if (isChecked) {
+                            if (selectedVendors.length === 0) {
+                                // If no vendor is selected yet, select checkboxes for the vendor in the first row
+                                selectedVendorName = $('#lstData tbody tr:first').find('td:eq(1)').text();
+                                selectedVendors.push(selectedVendorName);
+                            }
+                            $('#lstData tbody input[type="checkbox"].supplier-checkbox')
+                                .each(function () {
+                                    var vendorName = $(this).closest('tr').find('td:eq(1)').text();
+                                    if (vendorName === selectedVendorName) {
+                                        $(this).prop('checked', true);
+                                    }
+                                });
+                        } else {
+                            // Uncheck all checkboxes
+                            $('#lstData tbody input[type="checkbox"].supplier-checkbox').prop('checked', false);
+                            selectedVendors = []; // Clear the selected vendors list
+                        }
+                        toggleActionButtonVisibility();
+                    });
+
+                    // Toggle action button visibility based on selection
+                    toggleActionButtonVisibility();
+
+                    // Initialize dropdowns
+                    $('.dropdown-toggle').dropdown();
+                }
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+
+
+    }
+    function toggleActionButtonVisibility() {
+        var anyCheckboxChecked = $('input[type="checkbox"].supplier-checkbox:checked').length > 0;
+        $('#actionButton').toggle(anyCheckboxChecked);
+    }
+    function showModalForZPL(head, str) {
+        $('#commentsheader').html(head);
+        $('#commentsbody').html('<text rows="15" cols="78" name="usrtxt" wrap="hard"> "' + str + '" </text> ');
+        $('#comments').modal('show');
+    }
+
+    $(document).on('click', '#selectAll', function () {
+        var isChecked = $(this).prop('checked');
+        $('.supplier-checkbox').prop('checked', isChecked);
+
+        // Call function to toggle action button visibility
+        toggleActionButtonVisibility();
+    });
+
+    // Ensure individual checkboxes also trigger the function
+    $(document).on('click', '.supplier-checkbox', function () {
+        toggleActionButtonVisibility();
+    });
+
+    function Email(email, buyerName, PONum, Line, Rel, partNo, partDesc, UOM, orderDate, dueDate, Qty, Price, vendorId, VendorName, BuyerId, GUID, ArrivedQty, TrackingNumber, UnitCost, ExtCost, BuyerEmail, SupplierCompany) {
+
+        $('#lblMsg1').empty();
+
+        $('#Message').val('');
+        $('#LineNo').empty();
+        $('#ReleaseNo').empty();
+
+        $('#PONo').empty();
+        $('#PartNo').empty();
+        $('#PartDesc').empty();
+        $('#UOM').empty('');
+        $('#OrderDate').empty();
+        $('#DueDate').empty();
+        $('#Price').empty();
+        $('#Qty').empty();
+        $('#BuyerCompany').empty();
+        $('#BuyerName').empty();
+        $('#VendorId').empty();
+        $('#VendorName').empty();
+        $('#BuyerId').empty();
+        $('#GUID').empty();
+        $('#OrderQty').empty();
+        $('#lblEmailmsg').empty();
+        $('#lblCCEmailmsg').empty();
+        $('#TrackingNumber').empty();
+        $('#contactReason').prop('selectedIndex', 0);
+        $('#EmailId').val('');
+        $('#CCEmailId').val('');
+        $('#SupplierName').empty();
+        $('#SupplierId').empty();
+        $('#fileAttachment').val('');
+        $('#UnitCost').empty();
+        $('#ExtCost').empty();
+        $('#BuyerEmail').empty();
+
+        var PO = PONum + '-' + Line + '-' + Rel;
+        var finalOrderQty = Qty - ArrivedQty;
+        $('#PONo').append(PO);
+        $('#PartNo').append(partNo);
+        $('#PartDesc').append(partDesc);
+        $('#UOM').append(UOM);
+        $('#OrderDate').append(orderDate);
+        $('#DueDate').append(dueDate);
+        $('#Qty').append(finalOrderQty);
+        $('#Price').append(Price);
+        $('#BuyerCompany').append(SupplierCompany);
+        $('#BuyerName').append(buyerName);
+        $('#GUID').append(GUID);
+        $('#VendorId').append(vendorId);
+        $('#VendorName').append(VendorName);
+        $('#BuyerId').append(BuyerId);
+        $('#LineNo').append(Line);
+        $('#ReleaseNo').append(Rel);
+        $('#OrderQty').append(Qty);
+        $('#TrackingNumber').append(TrackingNumber);
+        $('#showTitle').empty();
+        $('#showTitle').append("Email");
+
+        $('#EmailEntry').modal('show');
+        $('#SupplierName').append(VendorName);
+        $('#SupplierId').append(vendorId);
+        $('#UnitCost').append(UnitCost);
+        $('#ExtCost').append(ExtCost);
+        $('#BuyerEmail').append(BuyerEmail);
+        $('#GUID').val();
+      /*  var vendorEmail = $('#_VendorEmail').text();*/
+        $('#EmailId').val(email);
+        const emailInputContainer = document.getElementById('FirstemailInputContainer');
+        if (emailInputContainer) {
+            emailInputContainer.innerHTML = ''; // Clears all content inside the container
+        }
+    }
+    function AwaitingEmail(CreatedOn, VendorEmail, PO, Line, Rel, GUID) {
+        $('#CreatedOn').val('');
+        $('#VendorEmail').val('');
+        $('#_PONumber').empty();
+        $('#_POLine').empty();
+        $('#_PORel').empty();
+        $('#_GUID').empty();
+        $('#_VendorEmail').empty();
+
+        $('#CreatedOn').val(CreatedOn);
+        $('#VendorEmail').val(VendorEmail);
+        $('#_PONumber').append(PO);
+        $('#_POLine').append(Line);
+        $('#_PORel').append(Rel);
+        $('#_GUID').append(GUID);
+        $('#_VendorEmail').append(VendorEmail);
+        $('#AwaitingDtl').modal('show');
+    }
+    function TransactionDtl(PoNo) {
+        $('#TransactionModal').modal('show');
+
+        $.ajax({
+            url: '/NewPO/GetTransactionDtl', // Replace 'YourControllerURL' with the actual URL of your controller endpoint
+            cache: false,
+            type: 'GET',
+            data: {
+                PONo: PoNo,
+            },
+            datatype: JSON,
+            success: function (data) {
+                var lstPOTransaction = [];
+                lstPOTransaction = data.lstPOTran;
+                $('#transactionTable tbody').empty();
+                // Iterate over selected rows and append to table
+                for (var i = 0; i < lstPOTransaction.length; i++) {
+
+                    var row = lstPOTransaction[i];
+                    var attachFileCell = '';
+                    if (row['AttachFile']) {
+                        var base64StringChunks = row['AttachFile'];
+                        // Convert array elements to characters and concatenate into a string
+                        var str = base64StringChunks.map(function (code) {
+                            return String.fromCharCode(code);
+                        }).join('');
+
+                        // Encode string to base64
+                        var base64String = btoa(str);
+
+                        console.log(base64String);
+                         attachFileCell = '<a href="javascript:openImage(\'' + base64String + '\',\'' + row['FileExt'] + '\' )">Download</a>';
+
+                    } else {
+                        attachFileCell = '';
+                    }
+
+                    var serviveUrlOpen = '';
+                    var serviceType = row['ServiceType'];
+                    if (serviceType == 'Select' || serviceType == '') {
+                        row['ServiceType'] = '';
+                        serviveUrlOpen = '';
+                    }
+                    else {
+
+                         serviveUrlOpen = '<a href="javascript:OpenURL(\'' + row['ServiceURL'] + '\' )">Open</a>';
+                    }
+
+                    var rowDataHtml = '<tr>' +
+                        '<td>' + row['PONo'] + '</td>' +
+                        '<td>' + row['PartNo'] + '</td>' +
+                        '<td>' + row['Type'] + '</td>' +
+                        '<td>' + row['HasAction'] + '</td>' +
+                        '<td>' + row['Qty'] + '</td>' +
+                        '<td>' + row['Price'] + '</td>' +
+                        '<td>' + row['DueDate'] + '</td>' +
+                        '<td>' + row['Message'] + '</td>' +
+                        '<td>' + row['CreatedOn'] + '</td>' +
+                        '<td>' + row['ServiceType'] + '</td>' +
+                        '<td>' + serviveUrlOpen + '</td>' +
+                        '<td>' + attachFileCell + '</td>' +
+                        // Add more columns as needed
+                        '</tr>';
+
+                    $('#transactionTable tbody').append(rowDataHtml);
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle error response
+                console.error('Error sending data:', error);
+            }
+        });
+
+    }
+    function OpenPDF(PoNo) {
+        $.ajax({
+            url: '/NewPO/OpenPDF',
+            cache: false,
+            type: 'POST',
+            data: {
+                PoNo: PoNo,
+            },
+            success: function (response) {
+                if (response.success) {
+                    var base64StringChunks = response.dataChunks;
+
+                    // Convert each chunk to a Uint8Array
+                    var uint8Arrays = base64StringChunks.map(function (chunk) {
+                        return Uint8Array.from(atob(chunk), c => c.charCodeAt(0));
+                    });
+
+                    // Concatenate Uint8Arrays
+                    var binaryData = new Uint8Array(uint8Arrays.reduce(function (acc, chunk) {
+                        return acc.concat(Array.from(chunk));
+                    }, []));
+
+                    // Create a Blob from the Uint8Array data
+                    var blob = new Blob([binaryData], { type: 'application/pdf' });
+
+                    // Create a URL for the Blob
+                    var url = URL.createObjectURL(blob);
+
+                    // Open the PDF in a new tab/window
+                    window.open(url);
+                } else {
+                    console.error('Error:', response.error);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error sending data:', error);
+            }
+        });
+    }
+
+    function ResendEmail() {
+        
+        var PONo = $('#_PONumber').text();
+        var Line = $('#_POLine').text();
+        var Rel = $('#_PORel').text();
+        var GUID = $('#_GUID').text();
+
+        $.ajax({
+            url: '/NewPO/GetResendEmail',
+            cache: false,
+            type: 'GET',
+            data: {
+                PONo: PONo,
+                Line: Line,
+                Rel: Rel,
+            },
+            datatype: JSON,
+            success: function (data) {
+                // Calling Email method on Awaiting Modal
+                Email('', data.SelectedlstPO[0]['PurAgent_Name'], data.SelectedlstPO[0]['POHeader_PONum']
+                    , data.SelectedlstPO[0]['PODetail_POLine'], data.SelectedlstPO[0]['PORel_PORelNum']
+                    , data.SelectedlstPO[0]['PODetail_PartNum'], data.SelectedlstPO[0]['PODetail_LineDesc']
+                    , data.SelectedlstPO[0]['PODetail_IUM'], data.SelectedlstPO[0]['Calculated_OrderDate']
+                    , data.SelectedlstPO[0]['Calculated_DueDate'], data.SelectedlstPO[0]['PODetail_OrderQty']
+                    , '', data.SelectedlstPO[0]['Vendor_VendorID']
+                    , data.SelectedlstPO[0]['Vendor_Name'], data.SelectedlstPO[0]['POHeader_BuyerID']
+                    , GUID, data.SelectedlstPO[0]['Calculated_ArrivedQty']
+                    , data.SelectedlstPO[0]['Tracking_Number'], data.SelectedlstPO[0]['PODetail_UnitCost']
+                    , data.SelectedlstPO[0]['CalculatedExtCost'], data.SelectedlstPO[0]['PurAgent_EMailAddress']
+                    , data.SelectedlstPO[0]['POHeader_Company']);
+
+                    },
+            error: function (xhr, status, error) {
+                // Handle error response
+                console.error('Error sending data:', error);
+            }
+        });
+
+    }
+
+
+
+    //////////////// Vendor Form
+
+    function ActionRequired(PoNo, ArrivedQty) {
+        $('#ActionReqModal').modal('show');
+
+        $.ajax({
+            url: '/NewPO/GetActionReq', // Replace 'YourControllerURL' with the actual URL of your controller endpoint
+            cache: false,
+            type: 'GET',
+            data: {
+                PONo: PoNo,
+            },
+            datatype: JSON,
+            success: function (data) {
+                var lstVendorUpdate = [];
+                lstVendorUpdate = data.lstUpdate;
+                $('#ActionTable tbody').empty();
+                // Iterate over selected rows and append to table
+                for (var i = 0; i < lstVendorUpdate.length; i++) {
+                    var row = lstVendorUpdate[i];
+                    var attachFileCell = '';
+
+
+                    var rowDataHtml = '<tr>' +
+                        '<td>' + row['PONo'] + '</td>' +
+                        '<td>' + row['PartNo'] + '</td>' +
+                        '<td>' + row['CommitQty'] + '</td>' +
+                        '<td>' + row['CommitPrice'] + '</td>' +
+                        '<td>' + row['CommitDueDate'] + '</td>' +
+                        '<td style="display:none">' + row['TrackingNo'] + '</td>' +
+                        '<td style="display:none">' + row['ServiceType'] + '</td>' +
+                        '<td style="display:none">' + row['ServiceURL'] + '</td>' +
+                        '<td style="display:none">' + row['AttachFile'] + '</td>' +
+                        '<td style="display:none">' + row['GUID'] + '</td>' +
+                        '<td style="display:none">' + ArrivedQty + '</td>' +
+                        '<td style="display:none">' + row['CurrentQty'] + '</td>' +
+                        '<td style="display:none">' + row['VendorName'] + '</td>' +
+                        '<td style="display:none">' + row['CurrentPrice'] + '</td>' +
+                        '<td style="display:none">' + row['CurrentDueDate'] + '</td>' +
+                        '<td style="display:none">' + row['FileExt'] + '</td>' +
+
+                        // Add more columns as needed
+                        '</tr>';
+
+                    $('#ActionTable tbody').append(rowDataHtml);
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle error response
+                console.error('Error sending data:', error);
+            }
+        });
+
+    }
+
+    function openImage(attachFile, fileExtension) {
+        // Decode base64 string to binary data
+        var contentType;
+
+        switch (fileExtension) {
+            case ".doc":
+            case ".docx":
+                contentType = "application/vnd.ms-word";
+                break;
+            case ".xls":
+            case ".xlsx":
+                contentType = "application/vnd.ms-excel";
+                break;
+            case ".jpg":
+                contentType = "image/jpeg";
+                break;
+            case ".png":
+                contentType = "image/png";
+                break;
+            case ".gif":
+                contentType = "image/gif";
+                break;
+            case ".pdf":
+                contentType = "application/pdf";
+                break;
+            default:
+                contentType = "application/octet-stream"; // Default to generic binary type
+                break;
+        }
+
+
+        var binaryData = atob(attachFile);
+
+        // Create array buffer from binary data
+        var arrayBuffer = new ArrayBuffer(binaryData.length);
+        var uint8Array = new Uint8Array(arrayBuffer);
+        for (var i = 0; i < binaryData.length; i++) {
+            uint8Array[i] = binaryData.charCodeAt(i);
+        }
+
+        // Create Blob from array buffer
+        var blob = new Blob([uint8Array], { type: contentType });
+
+        // Create a URL for the Blob and open it in a new tab
+        var url = URL.createObjectURL(blob);
+        window.open(url);
+    }
+
+    function OpenURL(ServiceURL) {
+
+        window.open(ServiceURL);
+    }
+    // Action Button accept Events
+    $('#acceptBtn').click(function () {
+        var action = "Accept";
+        $('#lblAction').val(action);
+        var confirmationMessage = "Are you sure you want to " + action + " the Updates?";
+        $("#confirmationMessage").text(confirmationMessage);
+        // Show the modal popup
+
+        $('#confirmationModal').modal('show');
+
+    });
+    // Action Button Reject Events
+    $('#rejectBtn').click(function () {
+        var action = "Reject";
+        $('#lblAction').val(action);
+        var confirmationMessage = "Are you sure you want to " + action + " this PO?";
+        $("#confirmationMessage").text(confirmationMessage);
+        // Show the modal popup
+
+        $('#confirmationModal').modal('show');
+
+    });
+    // Action Button Reject Events
+    $('#holdBtn').click(function () {
+        var action = "Hold";
+        $('#lblAction').val(action);
+        var confirmationMessage = "Are you sure you want to " + action + " this PO?";
+        $("#confirmationMessage").text(confirmationMessage);
+        // Show the modal popup
+
+        $('#confirmationModal').modal('show');
+    });
+
+    $("#yesButton").click(function () {
+
+
+        // Perform action based on the button clicked
+        var action = $('#lblAction').val();
+
+        // Initialize variables to store the values
+        var guidValue;
+        var PONum;
+        var partNo;
+        var DueDate;
+        var Qty;
+        var Price;
+        var ArrivedQty;
+
+        var columnIndex = $('#ActionTable th').filter(function () {
+            return $(this).text() === "GUID";
+        }).index();
+
+        // Check if the "GUID" column exists
+        if (columnIndex !== -1) {
+            // Get the value of the "GUID" cell in the first row
+            guidValue = $('#ActionTable tbody tr:first td').eq(columnIndex).text();
+        }
+        // Find the index of the columns by their names
+        var columns = {};
+        $('#ActionTable th').each(function (index) {
+            columns[$(this).text()] = index;
+        });
+
+        // Check if the "GUID" column exists
+        if ("GUID" in columns) {
+            // Get the value of the "GUID" cell in the first row
+            guidValue = $('#ActionTable tbody tr:first td').eq(columns["GUID"]).text();
+        }
+
+        // Retrieve values using column names
+        PONum = $('#ActionTable tbody tr:first td').eq(columns["PO"]).text();
+        partNo = $('#ActionTable tbody tr:first td').eq(columns["Part No."]).text();
+        DueDate = $('#ActionTable tbody tr:first td').eq(columns["Due Date"]).text();
+        Qty = $('#ActionTable tbody tr:first td').eq(columns["Qty"]).text();
+        Price = $('#ActionTable tbody tr:first td').eq(columns["Price"]).text();
+        ArrivedQty = $('#ActionTable tbody tr:first td').eq(columns["Arrived Qty"]).text();
+        // Call the function with the retrieved values
+        handleactionahr(guidValue, action, PONum, partNo, DueDate, Qty, Price, ArrivedQty);
+    });
+
+    // Handle click event for the No button in the popup
+    $("#noButton").click(function () {
+        // Hide the popup
+        $('#confirmationModal').modal('hide');
+    });
+
+    function handleactionahr(guid, action, PONum, PartNo, DueDate, Qty, Price, ArrivedQty) {
+        var selectedStatus = '@Request.QueryString["POStatus"]';
+        var PurchaseOrder = PONum.split('-')[0]; // Extract value before first '-'
+       
+        $.ajax({
+
+            cache: false,
+            type: 'get',
+            url: '/NewPO/UpdateHasAction',
+            data: {
+                ActionAHR: action,
+                GUID: guid,
+                PONum: PONum,
+                PartNo: PartNo,
+                DueDate: DueDate,
+                Qty: Qty,
+                Price: Price,
+                ArrivedQty: ArrivedQty
+
+            },
+            success: function (data) {
+                
+                if (data.Status == 'Updated') {
+                    MsgToast("Success!", "Record has been updated!", "success");
+                    OpenPage('\\NewPO\\Index?PO=' + PurchaseOrder + '&POStatus=' + selectedStatus + '');
+                }
+                else {
+                    MsgToast("Oops!", data.Message, "error");
+                }
+            }
+
+        })
+    }
+
+    // Action Button Propose Events
+    $('#proposeBtn').click(function () {
+        // Create an array to store all table data
+        var tableData = [];
+
+        // Loop through each row in the table body
+        $('#ActionTable tbody tr').each(function () {
+            var rowData = [];
+
+            // Loop through each cell in the row
+            $(this).find('td').each(function () {
+                // Get the text content of each cell and push it to the rowData array
+                rowData.push($(this).text());
+            });
+
+            // Push the rowData array to the tableData array
+            tableData.push(rowData);
+        });
+
+        var GUID = tableData[0][9];
+        var Action = "Suggest";
+        var PONo = tableData[0][0];
+        var Vendor = tableData[0][12];
+        var PartNo = tableData[0][1];
+        var CurrentQty = tableData[0][10];
+        var CommitQty = tableData[0][2];
+
+        var CurrentPrice = tableData[0][13];
+        var CommitPrice = tableData[0][3];
+        var CurrentDueDate = tableData[0][14];
+        var CommitDueDate = tableData[0][4];
+
+
+
+        handleAction(PONo, PartNo, Vendor, CurrentQty, CurrentPrice, CurrentDueDate, CommitQty, CommitPrice, CommitDueDate, GUID, Action);
+
+
+    });
+
+
+    $('#ActionCloseBtn').click(function () {
+        $('#ActionReqModal').modal('hide');
+    });
+
+    function handleAction(PONo, partNo, vendor, currentQty, currentPrice, currentDueDate, commitQty, commitPrice, commitDueDate, GUID, action) {
+
+        $('#ProposePONo').val(PONo);
+        $('#ProposeVendorName').val(vendor);
+        $('#ProposePartNo').val(partNo);
+
+        $('#CurrentQty').val(currentQty);
+        $('#CommitQty').val(commitQty);
+
+        $('#CurrentPrice').val(currentPrice);
+        $('#CommitPrice').val(commitPrice);
+        $('#ProposedPrice').val(commitPrice);
+
+        $('#CurrentDueDate').val(currentDueDate);
+        $('#CommitDueDate').val(commitDueDate);
+        $("#ProposeEmailId").val('');
+
+        $('#GUID').val(GUID);
+
+        $.ajax({
+            url: `/NewPO/GetSuggestEmail?id=${GUID}`,
+            type: 'GET',
+            success: function (response) {
+                if (response.success) {
+                    $("#ProposeEmailId").val(response.email);
+                    $("#ProposeEmailId").text(response.email);
+                }
+            },
+            error: function (error) {
+                console.error("Error fetching email:", error);
+                alert("An error occurred while fetching the email.");
+            }
+        });
+
+
+        //$('#showTitle').empty();
+        //$('#showTitle').append(action);
+        $('#ProposeModal').modal('show');
+
+
+    }
+    dateTo();
+    $("#ProposedDueDate").mouseover(function () {
+        $(this).css('cursor', 'pointer');
+    });
+    function dateTo() {
+        var date = new Date();
+        var newdate = new Date(date);
+        //For To Date
+        newdate.setDate(newdate.getDate());
+        var dd = ('0' + newdate.getDate()).slice(-2);
+        var mm = ('0' + (newdate.getMonth() + 1)).slice(-2);
+        var y = newdate.getFullYear();
+        var someFormattedDate = y + '.' + mm + '.' + dd;
+        document.getElementById('ProposedDueDate').value = someFormattedDate;
+    }
+
+    $("#ProposedDueDate").datepicker({
+        format: 'yyyy.mm.dd',
+        autoclose: true,
+        startDate: 'd',
+        endDate: null
+    });
+
+
+
+
+        // Example function to get emails
+    function SecondgetEmails() {
+        const emailInput = document.getElementById('SecondemailInputContainer');
+        const activeInput = emailInput.querySelector('input.tempinput');
+        if (activeInput && activeInput.value.trim()) {
+            handleInput(activeInput);
+        }
+
+        const emailTags = emailInput.getElementsByClassName('tag');
+        const emails = [];
+        for (let tag of emailTags) {
+            emails.push(tag.innerText.replace('×', '').trim());
+        }
+        return emails;
+    }
+    function FirstgetEmails() {
+        const emailInput = document.getElementById('FirstemailInputContainer');
+        const activeInput = emailInput.querySelector('input.tempinput');
+        if (activeInput && activeInput.value.trim()) {
+            handleInput(activeInput);
+        }
+
+        const emailTags = emailInput.getElementsByClassName('tag');
+        const emails = [];
+        for (let tag of emailTags) {
+            emails.push(tag.innerText.replace('×', '').trim());
+        }
+        return emails;
+    }
+    function getEmails() {
+        const emailInput = document.getElementById('emailInputContainer');
+            const activeInput = emailInput.querySelector('input.tempinput');
+            if (activeInput && activeInput.value.trim()) {
+                handleInput(activeInput);
+            }
+
+            const emailTags = emailInput.getElementsByClassName('tag');
+            const emails = [];
+            for (let tag of emailTags) {
+                emails.push(tag.innerText.replace('×', '').trim());
+            }
+            return emails;
+        }
+    function handleInput(inputElement) {
+            const email = inputElement.value.trim();
+            if (email) {
+                const tag = document.createElement('span');
+                tag.classList.add('tag');
+                tag.innerText = email;
+
+                const remove = document.createElement('span');
+                remove.classList.add('remove');
+                remove.innerText = "×";
+                tag.appendChild(remove);
+
+                remove.addEventListener('click', () => tag.remove());
+
+                emailInput.appendChild(tag);
+            }
+            inputElement.remove();
+        }
+
+
+    $('#btnProposeSend').click(function () {
+
+
+        var GUID = $('#GUID').val();
+        var Qty = $('#ProposedQty').val();
+        var Price = $('#ProposedPrice').val();
+        var DueDate = $('#ProposedDueDate').val();
+        var Message = $('#ProposeMessage').val();
+        var PONo = $('#ProposePONo').val();
+        var PartNo = $('#ProposePartNo').val();
+        var ProposeEmailId = $('#ProposeEmailId').text();
+        var CCemails = getEmails();
+
+
+
+
+        $('#lblMsg1').empty();
+        if (Qty == '') {
+            MsgToast("Oops!", "Please enter Qty!", "error");
+            return false;
+        }
+
+        if (DueDate == '') {
+            MsgToast("Oops!", "Please enter Due Date!", "error");
+            return false;
+        }
+        if (ProposeEmailId == '' || ProposeEmailId == null) {
+            MsgToast("Oops!", "Please enter Email Address!", "error");
+            return false;
+        }
+
+        var Email = ProposeEmailId;
+
+        $.ajax({
+
+            cache: false,
+            type: 'POST',
+            url: '/NewPO/ProposeUpdate',
+            data: {
+                GUID: GUID,
+                Qty: Qty,
+                Price: Price,
+                DueDate: DueDate,
+                Message: Message,
+                PONo: PONo,
+                PartNo: PartNo,
+                ProposeEmailId: Email,
+                CCemails: CCemails,
+            },
+            datatype: JSON,
+            success: function (data) {
+                if (data == "Updated") {
+                    MsgToast("Success!", "Email has been sent!", "success");
+                    $('#ProposeModal').modal('hide');
+                    LoadData();
+                }
+                else {
+                    MsgToast("Oops!", "An error occurred!", "error");
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+
+    });
+
+    $('#btnAlertSend').click(function () {
+
+
+        var EmailAddress = $('#AlertEmailId').val();
+        var ccEMailAddress = $('#AlertCCEmailId').val();
+        var Message = $('#AlertMessage').val();
+
+
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/NewPO/SendAlertEmail',
+            data: {
+                EmailAddress: EmailAddress,
+                ccEMailAddress: ccEMailAddress,
+                Message: Message,
+
+            },
+            datatype: JSON,
+            success: function (data) {
+                if (data == "Updated") {
+                    $('#AlertPopUp').modal('hide');
+                    MsgToast("Success!", "Email has been sent!", "success");
+                }
+                else {
+                    MsgToast("Oops!", "An error occurred!", "error");
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+
+    });
+
+    function AlertPopup(EmailAddress) {
+
+        $('#msgAlert').empty();
+
+        $('#AlertEmailId').val('');
+        $('#AlertEmailId').val(EmailAddress);
+      /*  $('#msgAlert').append(message);*/
+        $('#AlertPopUp').modal('show');
+
+    }
+
+    $('#btnCancel').click(function () {
+        $('#lblMsg').empty();
+        $('#EmailEntry').modal('hide');
+    });
+
+    $('#actionButton').click(function () {
+        // Show the modal
+        $('#MultiEmail').modal('show');
+    });
+
+    $('#dataTable').find('tbody').on('click', '.due-date-input', function () {
+        $(this).datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true
+        });
+    });
+
+    $(document).ready(function () {
+        // Hide the new due date column initially
+        $('#dataTable th.new-due-date, #dataTable td.new-due-date').hide();
+
+        $('#contactReasonMulti').change(function () {
+            var selectedReason = $(this).val();
+            if (selectedReason === 'Change') {
+                // Show the new due date column if the selected reason is "Change"
+                $('#dataTable th.new-due-date, #dataTable td.new-due-date').show();
+
+                // Add new column header for new due date if not already added
+                if ($('#dataTable thead th.new-due-date').length === 0) {
+                    $('#dataTable thead tr').append('<th class="t-head new-due-date">New Due Date</th>');
+                }
+
+                // Add date picker to new column for each row if not already added
+                $('#dataTable tbody tr').each(function () {
+                    if ($(this).find('.new-due-date').length === 0) {
+                        var today = new Date();
+                        var dd = String(today.getDate()).padStart(2, '0');
+                        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        var yyyy = today.getFullYear();
+                        today = mm + '/' + dd + '/' + yyyy;
+
+                        var datePicker = $('<td><input type="text" class="form-control new-due-date" value="' + today + '" readonly/></td>');
+                        $(this).append(datePicker);
+                        datePicker.find('.new-due-date').datepicker({
+                            autoclose: true,
+                            todayHighlight: true,
+                            startDate: today // Only allow selection of future dates
+                        }); // Initialize date picker
+                    }
+                });
+            } else {
+                // Hide the new due date column if the selected reason is not "Change"
+                $('#dataTable th.new-due-date, #dataTable td.new-due-date').hide();
+
+                // Remove the new column for new due date
+                $('#dataTable th.new-due-date').remove();
+
+                // Remove the date picker from each row
+                $('#dataTable tbody tr').each(function () {
+                    $(this).find('.new-due-date').parent().remove();
+                });
+            }
+        });
+
+        // Trigger change event to handle default selection
+        $('#contactReasonMulti').trigger('change');
+    });
+
+    // Event handler for when the modal is fully shown
+    $('#MultiEmail').on('shown.bs.modal', function () {
+        // Get the DataTable instance
+        $('#contactReasonMulti').prop('selectedIndex', 0);
+        var table = $('#lstData').DataTable();
+
+        var selectedRows = [];
+
+        // Unbind any previously bound event handler to prevent multiple executions
+        $('#lstData').off('change', '.supplier-checkbox').on('change', '.supplier-checkbox', function () {
+            // Clear selected rows array
+            selectedRows = [];
+
+            // Iterate over checked checkboxes
+            $('#lstData .supplier-checkbox:checked').each(function () {
+                var rowData = table.row($(this).closest('tr')).data();
+                selectedRows.push(rowData);
+            });
+
+            passRowsToTable(selectedRows);  // Debug selected rows
+        });
+
+        // Initially check for checked checkboxes
+        $('#lstData .supplier-checkbox:checked').trigger('change');
+    });
+    function passRowsToTable(selectedRows) {
+        // Clear previous rows from the table
+        $('#dataTable tbody').empty();
+
+        // Iterate over selected rows and append to table
+        for (var i = 0; i < selectedRows.length; i++) {
+            var row = selectedRows[i];
+            var VendorEmail = row['Vendor_EMailAddress'];
+            var Qty = row['PODetail_OrderQty'] - row['Calculated_ArrivedQty'];
+            var rowDataHtml = '<tr>' +
+                '<td>' + row['PONumber'] + '</td>' +
+                '<td>' + row['PODetail_PartNum'] + '</td>' +
+                '<td>' + row['Vendor_Name'] + '</td>' +
+                '<td>' + row['Vendor_EMailAddress'] + '</td>' +
+                '<td>' + Qty +'</td>' +
+                '<td>' + row['PODetail_UnitCost'] + '</td>' +
+                '<td>' + row['Calculated_DueDate'] + '</td>' +
+                '<td style="display:none">' + row['PODetail_LineDesc'] + '</td>' +
+                '<td style="display:none">' + row['PODetail_IUM'] + '</td>' +
+                '<td style="display:none">' + row['Calculated_OrderDate'] + '</td>' +
+                '<td style="display:none">' + row['Vendor_VendorID'] + '</td>' +
+                '<td style="display:none">' + row['POHeader_BuyerID'] + '</td>' +
+                '<td style="display:none">' + row['GUID'] + '</td>' +
+                '<td style="display:none">' + row['PODetail_OrderQty'] + '</td>' +
+                '<td style="display:none">' + row['PurAgent_EMailAddress'] + '</td>' +
+                '<td style="display:none">' + row['POHeader_Company'] + '</td>' +
+                // Add more columns as needed
+                '</tr>';
+
+            $('#dataTable tbody').append(rowDataHtml);
+            $('#MultipleEmailId').val(VendorEmail);
+
+        }
+    }
+
+    $('#btnMultiSend').click(function () {
+        // Collect data from the table
+        var tableData = collectTableData();
+
+        // Send data to the controller using AJAX
+        sendDataToController(tableData);
+    });
+    var CCemails = '';
+    function collectTableData() {
+        var tableData = [];
+        var Reason = $('#contactReasonMulti :selected').text();
+        // Loop through each row in the table body
+        CCemails = SecondgetEmails();
+        var commaSeparatedEmails = '';
+        if (CCemails.length > 0) {
+             commaSeparatedEmails = CCemails.join(', ');
+        }
+
+        var SupplierEmail = $('#MultipleEmailId').val();
+        $('#dataTable tbody tr').each(function () {
+            var rowData = {
+                PONumber: $(this).find('td:nth-child(1)').text(),
+                PODetail_PartNum: $(this).find('td:nth-child(2)').text(),
+                Vendor_Name: $(this).find('td:nth-child(3)').text(),
+                Vendor_Email: $(this).find('td:nth-child(4)').text(),
+                POQty: $(this).find('td:nth-child(5)').text(),
+                PODetail_UnitCost: $(this).find('td:nth-child(6)').text(),
+                PORel_DueDate: $(this).find('td:nth-child(7)').text(),
+                PODetail_LineDesc: $(this).find('td:nth-child(8)').text(),
+                PODetail_IUM: $(this).find('td:nth-child(9)').text(),
+                POHeader_OrderDate: $(this).find('td:nth-child(10)').text(),
+                Vendor_VendorID: $(this).find('td:nth-child(11)').text(),
+                POHeader_BuyerID: $(this).find('td:nth-child(12)').text(),
+                GUID: $(this).find('td:nth-child(13)').text(),
+                PODetail_OrderQty: $(this).find('td:nth-child(14)').text(),
+                PurAgent_EMailAddress: $(this).find('td:nth-child(15)').text(),
+                POHeader_Company: $(this).find('td:nth-child(16)').text(),
+                // Add more columns add before new due date and change index number
+                NewDueDate: $(this).find('td:nth-child(17)').find('input.new-due-date').val(), // Get value from input in the 8th column
+
+                Reason: Reason,
+                SupplierEmail: SupplierEmail,
+                CCemails: commaSeparatedEmails,
+                // Add more fields as needed
+            };
+            tableData.push(rowData);
+        });
+
+        return tableData;
+    }
+
+    function sendDataToController(data) {
+
+       // var CCemails = SecondgetEmails();
+        $.ajax({
+            url: '/NewPO/MultipleEmail',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response == "Updated") {
+                    MsgToast("Success!", "Email has been sent!", "success");
+                    $('#MultiEmail').modal('hide');
+                    LoadData();
+
+
+                }
+                else {
+                    MsgToast("Oops!", "An error occurred!", "error");
+                }
+            }
+        });
+    }
+
+    function Newduedate() {
+        var date = new Date();
+        var newdate = new Date(date);
+        //For From Date
+        newdate.setDate(newdate.getDate() - 1);
+        var dd = (newdate.getFullYear(newdate.getMonth()), '0' + 1);
+        var mm = ('0' + (newdate.getMonth() + 1)).slice(-2);
+        var y = newdate.getFullYear();
+        var someFormattedDate = y + '.' + mm + '.' + dd;
+        document.getElementById('newDueDate').value = someFormattedDate;
+    }
+    Newduedate();
+    $("#newDueDate").datepicker({
+        format: 'yyyy.mm.dd',
+        autoclose: true,
+        todayHighlight: true,
+        startDate: '0d',
+        endDate: null // Allows selecting dates indefinitely into the future
+            }).datepicker('update', new Date());
+
+    $('#newDueDate').click(function () {
+            $('#newDueDate').datepicker('show');
+        });
+
+    $('#newDueDate').on('changeDate', function () {
+        var newDueDate = $(this).val();
+        console.log(newDueDate); // You can do whatever you want with the newDueDate value here
+    });
+
+    $("#contactReason").change(function () {
+        var selectedValue = $(this).val();
+        if (selectedValue === "Change") {
+            $("#NewDueDate").show();
+        } else {
+            $("#NewDueDate").hide();
+        }
+    });
+
+    $('#btnSend').click(function () {
+
+        var formData = new FormData(); // Use FormData for file upload
+
+        var PONo = $('#PONo').text();
+        var Line = $('#LineNo').text();
+        var Release = $('#ReleaseNo').text();
+        var PartNo = $('#PartNo').text();
+        var PartDesc = $('#PartDesc').text();
+        var UOM = $('#UOM').text();
+        var OrderDate = $('#OrderDate').text();
+        var DueDate = $('#DueDate').text();
+        var Qty = $('#Qty').text();
+        var Price = $('#Price').text();
+        var BuyerId = $('#BuyerId').text();
+        var VendorId = $('#VendorId').text();
+        var VendorName = $('#VendorName').text();
+        var Receiveremail = $('#EmailId').val();
+        var GUID = $('#GUID').text();
+        var contactReason = $('#contactReason :selected').text();
+        var NewDueDate = $('#newDueDate').val();
+        var message = $('#Message').val();
+        var OrderQty = $('#OrderQty').text();
+        var ccEmail = '';
+        var TrackingNo = $('#TrackingNumber').text();
+        var BuyerEmail = $('#BuyerEmail').text();
+        var SupplierCompany = $('#BuyerCompany').text();
+        var file = $('#fileAttachment')[0].files[0]; // Get the attached file
+        var CCemails = FirstgetEmails();
+
+        $('#lblEmailmsg').empty();
+        $('#lblCCEmailmsg').empty();
+
+        if (Receiveremail == '') {
+            $('#lblEmailmsg').append('Please Enter Email Address');
+            return;
+        }
+
+        if (!validateEmail(Receiveremail)) {
+            $('#lblEmailmsg').append('Please Enter Valid Email Address');
+            return;
+        }
+
+        //if (!ccEmail == '') {
+        //    if (!validateEmail(ccEmail)) {
+        //        $('#lblCCEmailmsg').append('Please Enter Valid CC Email Address');
+        //        return;
+        //    }
+        //}
+
+
+
+        // Append all data fields
+        formData.append("PONo", PONo);
+        formData.append("Line", Line);
+        formData.append("Release", Release);
+        formData.append("PartNo", PartNo);
+        formData.append("PartDesc", PartDesc);
+        formData.append("UOM", UOM);
+        formData.append("OrderDate", OrderDate);
+        formData.append("DueDate", DueDate);
+        formData.append("Qty", Qty);
+        formData.append("Price", Price);
+        formData.append("VendorId", VendorId);
+        formData.append("VendorName", VendorName);
+        formData.append("BuyerId", BuyerId);
+        formData.append("Receiveremail", Receiveremail);
+        formData.append("contactReason", contactReason);
+        formData.append("message", message);
+        formData.append("GUID", GUID);
+        formData.append("NewDueDate", NewDueDate);
+        formData.append("OrderQty", OrderQty);
+        formData.append("ccEmail", ccEmail);
+        formData.append("TrackingNo", TrackingNo);
+        formData.append("BuyerEmail", BuyerEmail);
+        formData.append("SupplierCompany", SupplierCompany);
+        formData.append("CCEmail", CCemails);
+        CCemails.forEach((email) => {
+            formData.append("CCemails", email);
+        });
+        formData.append("Attachfile", file); // Append the file
+
+        $.ajax({
+            url: '/NewPO/SendEmail',
+            type: 'POST',
+            data: formData,
+            processData: false,  // Important for file upload
+            contentType: false,  // Important for file upload
+            success: function (data) {
+                if (data == "Send") {
+                    MsgToast("Success!", "Email has been sent!", "success");
+                    $('#EmailEntry').modal('hide');
+                    LoadData();
+                } else {
+                    MsgToast("Oops!", "an error occurred please check your internet connection!", "error");
+                }
+            },
+            error: function (r) {
+                console.log(r);
+            },
+            failure: function (r) {
+                console.log(r);
+            }
+        });
+    });
+
+  function validateEmail(emailInput) {
+    // Regex
+    var emailReg = /^[\w-]+(\.[\w-]+)*@@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+
+    // Test
+    return emailReg.test(emailInput);
+}
+
+    $('#btnUpdate').click(function () {
+
+        OpenPage('\\NewPO\\SupplierUpdate?menuTitle= Update' + '&rptCode=' + '@Request.QueryString["rptCode"]');
+        //OpenView('PO\\SupplierUpdate?menuTitle=update','_blank');
+        //window.open('/PO/SupplierUpdate?menuTitle=update','_blank');
+
+    });
+
+    $('#btnOptionFilter').click(function () {
+        $('#OptionFilter').modal('show');
+    });
+
+    $('#btnOptionFilterSend').click(function () {
+
+        $('#OptionFilter').modal('hide');
+        var isSingleRow = false;
+       // var POStatus = $('#POStatus').val();
+        var POStatus = '@Request.QueryString["POStatus"]';
+        $('#filterString').append('');
+        $('#filterString').val('');
+
+        var fDate = $('#fromDate').val();
+        var tDate = $('#toDate').val();
+        var partNo = $('#FilterPartNo').val();
+        var partDesc = $('#FilterPartDesc').val();
+
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/NewPO/GetFilterList',
+            data: {
+                POStatus: POStatus,
+                fDate: fDate,
+                tDate: tDate,
+                partNo: partNo,
+                partDesc: partDesc
+            },
+            datatype: JSON,
+            success: function (data) {
+                $('#filterString').append('');
+                $('#filterString').append(data.filterString);
+                $("#lstData").empty();
+                //$('#tblBody').empty();
+                //$('#lstPO').DataTable().clear();
+                // Variable to store the selected vendor name
+                  var type = '@Session["UserType"]';
+                var IsVisible;
+                if (type === 'Admin') {
+                    IsVisible = true;
+                }
+                else {
+                    IsVisible = false;
+                }
+                var selectedVendorName = "";
+                if (!isSingleRow) {
+                    var columnDef = [
+                        {
+                            data: "Checkbox", title: '<input type="checkbox" id="selectAll" class="select-all-checkbox" />', width: "20px", "className": "notexport", "className": "text-center",
+                            render: function (data, type, row) {
+                                selectedVendorName = row["Vendor_Name"];
+                                if (row["PODetail_OrderQty"] != row["Calculated_ReceivedQty"] && row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
+                                    if (row["CommunicationStatus"] == "New" && row["GUID"] == "") {
+                                        return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
+
+                                    }
+                                    else {
+                                        return data;
+
+                                    }
+                                }
+                                else {
+                                    return data;
+
+                                }
+                            }
+                        },
+                        { "data": "BuyerEmailSent", "title": "BuyerSentEmail", "visible": false, "className": "notexport" },
+                        { "data": "VendorEmailSent", "title": "VendorSentEmail", "visible": false, "className": "notexport" },
+                        { "data": "Resent", "title": "Resend Email", "visible": false, "className": "notexport" },
+                        { "data": "ResentCreatedDate", "title": "Resend CreatedOn", "visible": false, "className": "notexport" },
+                        { "data": "ResentVendorEmail", "title": "Resend Vendor Email", "visible": false, "className": "notexport" },
+                        {
+                            "data": "Message", "title": "Message", "width": "120px", "className": "text-center", "className": "text-center notexport",
+                            render: function (data, type, row) {
+                                var url = '';
+
+                                if (row["PODetail_OrderQty"] != row["Calculated_ReceivedQty"]) {
+                                    if (row["CommunicationStatus"] == "Awaiting") {
+                                        if (row["Resent"] != "") {
+                                            if (row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
+
+                                                url = '<a href="#" onclick="Email(\'' + row["Vendor_EMailAddress"] + '\', \'' + row["PurAgent_Name"] + '\', \'' + row["POHeader_PONum"] + '\', \'' + row["PODetail_POLine"] + '\', \'' + row["PORel_PORelNum"] + '\', \'' + row["PODetail_PartNum"] + '\', \'' + (row["PODetail_LineDesc"] || '').replace(/'/g, "\\'").replace(/\r?\n/g, ' ') + '\', \'' + row["PODetail_IUM"] + '\', \'' + row["Calculated_OrderDate"] + '\', \'' + row["Calculated_DueDate"] + '\', \'' + row["PODetail_OrderQty"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["Vendor_VendorID"] + '\', \'' + row["Vendor_Name"] + '\', \'' + row["POHeader_BuyerID"] + '\', \'' + row["GUID"] + '\', \'' + row["Calculated_ArrivedQty"] + '\', \'' + row["Tracking_Number"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["CalculatedExtCost"] + '\', \'' + row["PurAgent_EMailAddress"] + '\', \'' + row["POHeader_Company"] + '\')">Resent Email</a>';
+                                                return url;
+                                            }
+                                            else {
+                                                return url;
+                                            }
+
+                                        }
+                                        else {
+                                            url = '<a href="#" onclick="AwaitingEmail(\'' + row["ResentCreatedDate"] + '\', \'' + row["ResentVendorEmail"] + '\', \'' + row["POHeader_PONum"] + '\', \'' + row["PODetail_POLine"] + '\', \'' + row["PORel_PORelNum"] + '\', \'' + row["GUID"] + '\')">Awaiting Email</a>';
+                                            return url;
+                                        }
+
+
+                                    }
+                                    else if (row["CommunicationStatus"] == "Action") {
+                                        url = '<a href="#" onclick="ActionRequired(\'' + row["PONumber"] + '\', \'' + row["Calculated_ArrivedQty"] + '\')">' + data + ' Action Required</a>';
+                                        return url;
+
+                                    }
+                                    else if (row["CommunicationStatus"] == "New") {
+                                        if (row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
+
+                                            url = '<a href="#" onclick="Email(\'' + row["Vendor_EMailAddress"] + '\', \'' + row["PurAgent_Name"] + '\', \'' + row["POHeader_PONum"] + '\', \'' + row["PODetail_POLine"] + '\', \'' + row["PORel_PORelNum"] + '\', \'' + row["PODetail_PartNum"] + '\', \'' + (row["PODetail_LineDesc"] || '').replace(/'/g, "\\'").replace(/\r?\n/g, ' ') + '\', \'' + row["PODetail_IUM"] + '\', \'' + row["Calculated_OrderDate"] + '\', \'' + row["Calculated_DueDate"] + '\', \'' + row["PODetail_OrderQty"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["Vendor_VendorID"] + '\', \'' + row["Vendor_Name"] + '\', \'' + row["POHeader_BuyerID"] + '\', \'' + row["GUID"] + '\', \'' + row["Calculated_ArrivedQty"] + '\', \'' + row["Tracking_Number"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["CalculatedExtCost"] + '\', \'' + row["PurAgent_EMailAddress"] + '\', \'' + row["POHeader_Company"] + '\')">Email</a>';
+                                            return url;
+                                        }
+                                        else {
+                                            return url;
+                                        }
+                                    }
+                                    else {
+                                        if (row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
+
+                                            url = '<a href="#" onclick="Email(\'' + row["Vendor_EMailAddress"] + '\', \'' + row["PurAgent_Name"] + '\', \'' + row["POHeader_PONum"] + '\', \'' + row["PODetail_POLine"] + '\', \'' + row["PORel_PORelNum"] + '\', \'' + row["PODetail_PartNum"] + '\', \'' + (row["PODetail_LineDesc"] || '').replace(/'/g, "\\'").replace(/\r?\n/g, ' ') + '\', \'' + row["PODetail_IUM"] + '\', \'' + row["Calculated_OrderDate"] + '\', \'' + row["Calculated_DueDate"] + '\', \'' + row["PODetail_OrderQty"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["Vendor_VendorID"] + '\', \'' + row["Vendor_Name"] + '\', \'' + row["POHeader_BuyerID"] + '\', \'' + row["GUID"] + '\', \'' + row["Calculated_ArrivedQty"] + '\', \'' + row["Tracking_Number"] + '\', \'' + row["PODetail_UnitCost"] + '\', \'' + row["CalculatedExtCost"] + '\', \'' + row["PurAgent_EMailAddress"] + '\', \'' + row["POHeader_Company"] + '\')">Resent Email</a>';
+                                            return url;
+                                        }
+                                        else {
+                                            return url;
+                                        }
+                                    }
+
+
+                                }
+                                else {
+                                    var url = '';
+                                    return url;
+                                }
+
+                            }
+
+                        },
+                        {
+                            "data": "PDFPO", "title": "PDF", "width": "60px", "className": "notexport", "visible": false,
+                            render: function (data, type, row) {
+                                var url = '';
+                                // Image source for the PDF icon
+                                var pdfIconSrc = '/Content/images/PDFImage.png'; // Replace 'path/to/pdf-icon.png' with the actual path to your PDF icon image
+                                //open POPUP show Email Details.
+                                url = '<a href="#" onclick="OpenPDF(\'' + row["PDFPO"] + '\')">' + '<img src="' + pdfIconSrc + '" alt="PDF">' + '</a>';
+                                return url;
+                            }
+                        },
+
+                        { "data": "Vendor_Name", "title": "Supplier", "width": "200px" },
+
+                        { "data": "PurAgent_Name", "title": "Buyer", "visible": IsVisible, "width": "160px" },
+
+                        //{ "data": "Vendor_Name", "title": "Supplier", "render": $.fn.dataTable.render.ellipsisAdr(15), "width": "110px" },
+                        {
+                            "data": "PONumber", "title": "PO Num", "width": "60px", "className": "text-center",
+                            render: function (data, type, row) {
+                                var url = '';
+                                //open POPUP show Email Details.
+                                url = '<a href="#" onclick="TransactionDtl(\'' + row["PONumber"] + '\')">' + data + '</a>';
+                                return url;
+
+
+                            }
+                        },
+                        { "data": "PODetail_PartNum", "title": "Part No.", "width": "150px", "className": "text-center" },
+                        { "data": "PODetail_LineDesc", "title": "Line Desc.", "width": "300px" },
+                        //{ "data": "PODetail_LineDesc", "title": "Line Desc.", "render": $.fn.dataTable.render.ellipsisAdr1(15), "width": "110px" },
+
+                        { "data": "PODetail_IUM", "title": "IUM", "width": "30px", "className": "notexport", "visible": false },
+                        { "data": "PODetail_OrderQty", "title": "Order Qty", "width": "80px", "className": "text-center" },
+                        { "data": "Calculated_ReceivedQty", "title": "Rcvd. Qty", "width": "60px", "visible": false, "className": "notexport" },
+                        { "data": "Calculated_ArrivedQty", "title": "Arri. Qty", "width": "80px", "className": "text-center" },
+                        { "data": "Calculated_OurQty", "title": "Rcvd. Qty", "width": "80px", "className": "text-center" },
+                        { "data": "PODetail_UnitCost", "title": "Price", "width": "130px", "className": "text-center", "visible": true },
+                        { "data": "Calculated_OrderDate", "title": "Order Date", "width": "80px", "className": "text-right" },
+                        { "data": "Calculated_DueDate", "title": "Due Date", "width": "40px", "className": "text-right" },
+                        { "data": "Calculated_ArrivedDate", "title": "Arriv. Date", "width": "80px", "className": "text-right" },
+
+                        { "data": "LastCommunication", "title": "Last Comm.", "width": "130px" },
+
+                        /* { "data": "Calculated_BaseTotalAmount", "title": "Amount", "width": "70px" },*/
+                        { "data": "POHeader_PONum", "title": "PO", "width": "50px", "visible": false, "className": "notexport" },
+                        { "data": "PODetail_POLine", "title": "Line", "width": "50px", "visible": false, "className": "notexport" },
+                        { "data": "PORel_PORelNum", "title": "Rel", "width": "50px", "visible": false, "className": "notexport" },
+                        { "data": "Vendor_EMailAddress", "title": "Vendor Email", "width": "50px", "visible": false, "className": "notexport" },
+
+
+                        { "data": "PurAgent_EMailAddress", "title": "Buyer Email", "width": "50px", "visible": false, "className": "notexport" },
+
+                        { "data": "GUID", "title": "GUID", "width": "50px", "visible": false, "className": "notexport" },
+                        { "data": "CommunicationStatus", "title": "Status", "width": "70px", "className": "text-center" },
+                        { "data": "ERPStatus", "title": "ERP Status", "width": "110px", "className": "text-center" },
+                        { "data": "Vendor_VendorID", "title": "Supplier Id", "width": "90px", "visible": false, "className": "notexport" },
+                        { "data": "PODetail_UnitCost", "title": "PODetail UnitCost", "width": "90px", "visible": false, "className": "notexport" },
+                        { "data": "PODetail_ExtCost", "title": "PODetail ExtCost", "width": "90px", "visible": false, "className": "notexport" },
+                        { "data": "POHeader_Company", "title": "Supplier Company", "width": "90px", "visible": false, "className": "notexport" },
+                        { "data": "CalculatedExtCost", "title": "Calculated Ext Cost", "width": "90px", "visible": false, "className": "notexport" },
+
+                        //{ "data": "RowIdent", "title": "RowIdent", "width": "150px", "visible": false },
+
+
+                    ]
+
+                    ToggleDataList(true);
+                    //MakeDataGrid('lstPO', data.lstPO, 0, columnDef, true, true);
+                   // MakeDataGrid('lstData', data.lstPO, 0, columnDef, true, false, false, false);
+                    MakeDataGridForTraining('lstData', data.lstPO, 0, columnDef, 'buttons', true, true, false, false);
+                    // Event handler for checkbox change
+                    $('#lstData tbody').off('change', 'input[type="checkbox"].supplier-checkbox');
+                    $('#lstData tbody').on('change', 'input[type="checkbox"].supplier-checkbox', function () {
+                        toggleActionButtonVisibility();
+                        var checkbox = $(this);
+                        var vendorName = checkbox.closest('tr').find('td:eq(1)').text(); // Assuming the vendor name is in the second column (index 1)
+
+                        if (checkbox.is(':checked')) {
+                            return;
+                            //// Uncheck all other checkboxes for different vendors
+                            //$('input[type="checkbox"].supplier-checkbox').not(checkbox).prop('checked', false);
+                            //// Update the selected vendor name
+                            //selectedVendorName = vendorName;
+                        } else {
+                            // If the checkbox is unchecked, update the selected vendor name to empty
+                            selectedVendorName = "";
+                        }
+                    });
+                    toggleActionButtonVisibility();
+                     $('.dropdown-toggle').dropdown();
+                }
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+    });
+
+    $('#btnOptionFilterReset').click(function () {
+
+        $('#fromDate').val("");
+        $('#toDate').val("");
+
+        $('#FilterPartNo').val("");
+        $('#FilterPartDesc').val("");
+    });
+
+    function MakeDataGridForTraining(tableId, data, tableHeight, columns, buttonId, search, isScrollX, footerFunction, isFramed, detailed, reportTitleId, rowSelection, lstHeight) {
+        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+        var isFramed = isFramed === undefined || isFramed === false ? false : true;
+        var isDetailed = detailed === undefined ? false : true;
+        var reportTitle = '';
+
+        if (reportTitleId === undefined)
+            reportTitle = $('.box-title').text();
+        else
+            reportTitle = reportTitleId;
+
+        var gridHeight = 0;
+
+        isScrollX = isScrollX === undefined ? false : true;
+        if (search === undefined) { search = true; }
+
+        var gridButtonsClass = '';
+        var gridSearchBoxClass = '';
+        if (isDetailed === true) {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'bg-white';
+            gridButtonSize = 30;
+        }
+        else {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+            gridButtonSize = 30;
+        }
+
+        var boxtool;
+        if (search === true) {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search..">
+        </div>`;
+                $('#trHeadSearch').append(boxtool);
+            } else {
+                $('#' + buttonId).empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch${tableId}" type="text" placeholder="Search..">
+        </div>`;
+                $('#' + buttonId).append(boxtool);
+            }
+        }
+        else {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = '<input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+                $('#trHeadSearch').append(boxtool);
+            }
+            else {
+                $('#' + buttonId).empty();
+
+            }
+        }
+
+        var table = $('#' + tableId).DataTable({
+            order: [],
+            createdRow: rowSelection,
+            data: data,
+            columns: columns,
+            paging: true,
+            ordering: true,
+            searching: search,
+            deferRender: true,
+            destroy: true,
+            pagingType: 'full',
+            pageLength: 20,
+            scrollCollapse: false,
+            scrollX: isScrollX,
+            colReorder: true,
+            orderClasses: false,
+            deferRender: true,
+            select: true,
+            colResize: true,
+            //scrollY: gridHeight,
+
+            footerCallback: footerFunction,
+            language: {
+                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                oPaginate: {
+                    sNext: '<i class="fa fa-angle-right"></i>',
+                    sPrevious: '<i class="fa fa-angle-left"></i>',
+                    sFirst: '<i class="fa fa-angle-double-left"></i>',
+                    sLast: '<i class="fa fa-angle-double-right"></i>'
+                }
+            },
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5 dataTables_info' i><'col-sm-6 ms-3 dataTables_paginate' p>>",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Copy',
+                    title: reportTitle,
+                    filename: 'DataExport',
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)' // Excluding columns while exporting
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Export to excel',
+                    title: reportTitle,
+                    filename: 'DataExport', //Added By Tahir
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Print',
+                    title: '',
+                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                    filename: 'DataExport',
+                    exportOptions: {
+                        // columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                }
+            ],
+            select: true
+        });
+        table.buttons().container()
+            .appendTo('#buttons');
+
+        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+        table.button(0).nodes().addClass(gridButtonsClass);
+
+        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(1).nodes().addClass(gridButtonsClass);
+
+        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(2).nodes().addClass(gridButtonsClass);
+
+        var dsgndby = $('.modal-footer > #designedby ').html();
+
+        if (dsgndby === "") {
+            $('#designedBy').html($('.desgndBy').html());
+        }
+
+        var layoutHeader = $('nav').innerHeight();
+        var cardHeader = $('.box-header').innerHeight();
+        var tableHeader = $('.dataTables_scrollHead').innerHeight();
+        var tableFooter = 0;
+        var cardFooterH = 30;
+
+        if (isFooter === true)
+            tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+        var parentHeight = $('#' + lstHeight).innerHeight();
+        if (parentHeight == undefined)
+            parentHeight = window.innerHeight;
+        else
+            parentHeight = $('#' + lstHeight).innerHeight();
+
+        if (isFooter === true)
+            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+        var browserHeight = parentHeight;
+        if (tableHeight === 0) {
+            if (layoutHeader === undefined)
+                gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+            else
+                gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+        }
+        else { gridHeight = tableHeight; }
+
+        var topHeader = $('#topHeader').innerHeight();
+        if (topHeader > 0)
+            gridHeight = gridHeight - (topHeader + 1);
+
+        gridHeight = gridHeight - 6;
+
+        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+        table.columns.adjust().draw();
+
+        $('#txtFrameSearch' + tableId).on('keyup change', function () {
+            table.search(this.value).draw();
+        });
+        $('.dataTables_filter').hide();
+        table.columns.adjust().draw();
+
+
+        //return table;
+    }
+    function MsgToast(msg, title, type) {
+
+        toastr.options = {
+            closeButton: true,
+            debug: false,
+            newestOnTop: false,
+            progressBar: true,
+            positionClass: 'toast-top-right',
+            preventDuplicates: true,
+            onclick: null
+        };
+
+
+
+        var $toast = toastr[type](title, msg); // Wire up an event handler to a button in the toast, if it exists
+        $toastlast = $toast;
+
+        if (typeof $toast === 'undefined') {
+            return;
+        }
+
+
+    }
+</script>

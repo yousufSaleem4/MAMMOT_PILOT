@@ -1,0 +1,1105 @@
+﻿@model PlusCP.Models.NewPO
+@{
+    ViewBag.Title = "Update";
+    Layout = null;
+}
+<style>
+    .custom-modal-width {
+        max-width: 90%; /* Adjust width as needed */
+        width: 90%;
+    }
+
+    .table.dataTable {
+        font-family: "Segoe UI", "Roboto";
+        clear: both;
+      /*  border-collapse: separate;*/
+        border-spacing: 0;
+        font-size: 16px;
+    }
+
+    .dataTables_wrapper,
+    .dataTables_length,
+    .dataTables_filter,
+    .dataTables_info,
+    .dataTables_paginate,
+    table.dataTable thead th,
+    table.dataTable tbody td {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+    }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: left !important;
+            float: none !important;
+            display: flex;
+            justify-content: left;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                font-size: 15px !important; /* Increase font size */
+                padding: 8px 12px; /* Increase button padding */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_paginate {
+            margin-left: 60px !important; /* Adjust this value as needed */
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button i {
+                font-size: 15px !important; /* Increase icon size */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_info {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+            font-size: 16px !important; /* Adjust size */
+            color: #333 !important; /* Darker text */
+            margin-left: 5px;
+        }
+    /* Change odd row background color */
+    table.dataTable tbody tr:nth-child(odd) {
+        background-color: #ECEDEF; /* Change to your desired color */
+    }
+
+    /* Change even row background color */
+    table.dataTable tbody tr:nth-child(even) {
+        background-color: #ffffff; /* Change to your desired color */
+    }
+
+    table.dataTable tbody tr.selected {
+        background-color: #D6EFE8; /* Orange color */
+        /*color: white;*/ /* Change text color if needed */
+    }
+    /* Search icon inside input */
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        transform: translateY(-50%);
+        color: darkgrey;
+        font-size: 14px;
+        pointer-events: none; /* Prevents clicking on the icon */
+    }
+
+    .search-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .txtSearch-frame {
+        margin-top: 5px;
+        height: 28px;
+        width: 150px;
+        border: none;
+        color: #003B59;
+        border: 2px solid #003B59 !important;
+        width: 200px;
+        padding-left: 30px; /* Space for the icon */
+    }
+
+    table.table thead th {
+        background-color: #003B59 !important; /* Change to your desired color */
+        color: white; /* Change to desired text color */
+        font-size: 15px;
+        font-family: 'Poppins', sans-serif;
+        height: 40px;
+    }
+
+    table.table tbody td, lbl_ {
+        /*background-color: white !important; /* Change to your desired color */
+        font-size: 15px;
+        color: #003B59 !important;
+    }
+
+    table.table tbody tr {
+        height: 50px; /* Adjust height as needed */
+    }
+
+        /* Hover effect */
+        table.table tbody tr:hover {
+            background-color: #f5f5f5 !important; /* Light gray background on hover */
+            transition: background-color 0.8s ease-in-out;
+            cursor: pointer;
+        }
+
+
+
+
+    table th {
+        /*padding: 1rem 0.5rem !important;*/
+        border: 1px solid white;
+        border-bottom: 1px solid white;
+        /*padding: 8px;*/
+        text-align: left;
+    }
+
+    table td {
+        padding: 1rem 0.5rem !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        vertical-align: middle;
+    }
+
+    table {
+       /* border-collapse: separate;*/
+        border-spacing: 0 10px; /* Adjust the second value to increase/decrease the vertical gap */
+        width: 100%;
+    }
+
+        table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td {
+            border-bottom-width: 1px;
+        }
+
+
+    .lblHeading {
+        font-size: 19px;
+        color: #003B59 !important;
+    }
+
+    .Message {
+        height: 200px;
+        width: 500px
+    }
+
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 1.5rem;
+        clear: both;
+        font-weight: 400;
+        color: #212529;
+        text-align: inherit;
+        white-space: nowrap;
+        background-color: transparent;
+        border: 0;
+        text-decoration: none;
+    }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background-color: #f8f9fa;
+        }
+
+   
+
+
+    .table-container {
+        height: 200px; /* Set the desired fixed height */
+        overflow-y: auto;
+    }
+
+    
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2;
+    }
+
+    #btnSend:hover {
+        background-color: #023160 !important;
+        color: white !important;
+    }
+
+    .t-head {
+        color: #023160;
+    }
+
+   
+    .box-header {
+        background-color: #f8f9fc !important;
+        color: #003B59 !important;
+        border-bottom: 2px solid #f8f9fc;
+        box-shadow: 0px 5px #ededed;
+    }
+
+   
+
+    .btn-box-tool {
+        color: #325FAB !important;
+    }
+
+
+
+    /*/Badges/*/
+
+    .btn-badges {
+        color: #003B59 !important;
+        border-radius: 25px !important;
+        margin-left: 5px !important;
+        height: 25px !important;
+        padding: 2px 12px !important;
+    }
+
+        .btn-badges:hover {
+            background-color: #003B59 !important;
+            color: white !important;
+        }
+
+            .btn-badges:hover .badge_light {
+                background-color: white !important;
+                color: #003B59 !important;
+            }
+
+    .badge_light {
+        background-color: #003B59 !important;
+        color: white !important;
+    }
+
+    .btn-badges-Sent {
+        border-radius: 25px !important;
+        height: 25px !important;
+        width: 60px;
+    }
+
+    .selected {
+        background-color: deepskyblue;
+        color: black;
+    }
+    .ModalHeaderColor {
+        background-color: #D6EFE8;
+        color: #003B59
+    }
+
+    .ModalLabelColor {
+        color: #003B59;
+    }
+    .txtSearch {
+        border: 2px solid #003B59 !important;
+    }
+    .btnClose {
+        background-color: whitesmoke; /* Make background transparent on hover */
+        color: #003B59; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnClose:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: #003B59; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+        }
+</style>
+<div id="parent" class="container-fluid">
+    <input id="rptCode" type="hidden" value="019" />
+    <input id="rptTitle" type="hidden" value="@ViewBag.ReportTitle" />
+    <div id="dataLists" class="box panel panel-default">
+        <div class="box-header with-border">
+
+            <h5 class="box-title ModalLabelColor "><strong>@ViewBag.ReportTitle  </strong><strong id="filterString"></strong></h5>
+            <div id="buttons" class="box-tools pull-right">
+
+            </div>
+            <button id="AllCard" class="btn btn-badges">
+                All @*<span id="AllCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAll"></span></span>*@
+            </button>
+            <!--<button id="AllOpenCard" class="btn btn-badges">
+                Idle--> @*<span id="AllOpenCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAllOpen"></span></span>*@
+            <!--</button>-->
+            <button id="CardPending" class="btn btn-badges">
+                In Process @*<span id="badgeCount" class="badge badge_light"><span id="lblPending"></span></span>*@
+            </button>
+            <button id="CardLate" class="btn btn-badges">
+                Late @*<span id="badgeCount" class="badge badge_light"><span id="lblLate"></span></span>*@
+            </button>
+            <button id="CardArrived" class="btn btn-badges">
+                Early @*<span id="badgeCount" class="badge badge_light"><span id="lblArrived"></span></span>*@
+            </button>
+            <button id="CardUpdate" class="btn btn-badges">
+                Completed @*<span id="badgeCount" class="badge badge_light"><span id="lblUpdate"></span></span>*@
+            </button>
+            <button id="CardRefresh" type="button" class="btn btn-badges" title="Refresh Page">
+                @*<span class="fas fa-redo-alt fa-lg">Refresh</span>*@
+                Refresh
+            </button>
+        </div>
+
+        <div class="box-body" id="lstP">
+            <table id="lstUpdate" class="table table-bordered table-striped text-sm table-hover" style="width:100%">
+                <thead class="sorted-asc">
+                    <tr>
+                        <th></th>
+
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                @*<tbody id="tblBody"></tbody>*@
+                <tfoot>
+                    <tr>
+                        @*<th>Total :</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>*@
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+</div>
+<div id="alertContainer"></div>
+
+
+<!-- Modal -->
+<div id="ActionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <!-- Increased modal width -->
+        <div class="modal-content">
+            <div class="modal-header ModalHeaderColor">
+                <h5 class="modal-title ModalLabelColor" style="padding-left:4px; padding-top:2px" id="showTitle">Propose</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- Left side with green background color -->
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <!-- Green background -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">PO No:</label>
+                                        @Html.EditorFor(model => model.PONo, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "PO No.", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Part No:</label>
+                                        @Html.EditorFor(model => model.PartNo, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Part No", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Vendor Name:</label>
+                                        @Html.EditorFor(model => model.Vendor, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Buyer Name", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <!-- Green background -->
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Qty:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Qty", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Qty", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @Html.EditorFor(model => model.ProposedQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Qty" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Price:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Price", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Price", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @Html.EditorFor(model => model.ProposedPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Price" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Due Date:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Due Date", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Due Date", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @*@Html.EditorFor(model => model.ProposedDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Due Date" } })*@
+                                        @Html.TextBoxFor(model => model.ProposedDueDate, htmlAttributes: new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <label>Message</label>
+                            @Html.TextAreaFor(model => model.Message, new { style = "height: 20%; width: 100%;", htmlAttributes = new { placeholder = "Email Body", @class = "form-control input-lg" } })
+                            <label id="lblMsg1" style="color:green"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancel" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btnSend" type="button" class="btn btn-primary">Save</button>
+                <label id="VendorId" style="visibility:hidden" hidden></label>
+                <label id="VendorName" style="visibility:hidden" hidden></label>
+                <label id="BuyerId" style="visibility:hidden" hidden></label>
+                <label id="GUID" style="visibility:hidden" hidden></label>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Transaction -->
+<div id="TransactionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg custom-modal-width" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor" style="padding-left: 10px; padding-top: 2px; padding-bottom:2px">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor">Communication History</h5>
+              
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Left side with green background color -->
+                    <div class="row">
+                        @*Left side (Table Grid)*@
+                        <div class="col-md-12 table-container" style="height:400px">
+
+                            <table id="transactionTable" class="table table-striped text-sm table-hover">
+                                <thead class="sticky-header">
+                                    <tr>
+                                        <th class="t-head">PO</th>
+                                        <th class="t-head">Part No.</th>
+                                        <th class="t-head">Type</th>
+                                        <th class="t-head">Action</th>
+                                        <th class="t-head">Qty</th>
+                                        <th class="t-head">Price</th>
+                                        <th class="t-head">Due Date</th>
+                                        <th class="t-head">Message</th>
+                                        <th class="t-head">Created On</th>
+                                        <th class="t-head">Service Type</th>
+                                        <th class="t-head">Track Record</th>
+                                        <th class="t-head">Document</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnTransactionPO" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function() {
+       //var urlParams = new URLSearchParams(window.location.search);
+    
+        $('#CardUpdate').addClass('badge_light');
+   
+});
+    function toggleSelectionAndOpenPage(button, pageUrl) {
+        var isSelected = button.classList.contains('badge_light');
+        $('.btn-badges').removeClass('badge_light'); // Remove 'selected' class from all buttons
+        if (!isSelected) {
+            button.classList.add('badge_light'); // Add 'selected' class to the clicked button
+        }
+        OpenPage(pageUrl); // Call the function to open the page with the specified URL
+    }
+    // Get all the buttons with the class 'btn-badges' and attach a click event listener to each of them
+    document.querySelectorAll('.btn-badges').forEach(button => {
+        button.addEventListener('click', function () {
+             var selectedStatus = '@Request.QueryString["POStatus"]';
+            var pageUrl;
+            // Determine the page URL based on the button clicked
+            switch (this.id) {
+                case 'AllCard':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=All';
+                    break;
+                case 'AllOpenCard':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=All Open';
+                    break;
+                case 'CardPending':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Pending';
+                    break;
+                case 'CardLate':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Late';
+                    break;
+                case 'CardArrived':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Arrived';
+                    break;
+                case 'CardUpdate':
+                    pageUrl = '\\NewPO\\SupplierUpdate';
+                    break;
+                default:
+                    // Default case
+                    pageUrl = '\\NewPO\\SupplierUpdate'; // Set a default page URL if necessary
+            }
+            toggleSelectionAndOpenPage(this, pageUrl); // Toggle the selection and open the page
+            // Store the selected button's ID in local storage
+            localStorage.setItem('selectedButtonId', this.id);
+        });
+    });
+
+    function toggleSelection(button) {
+        button.classList.toggle('selected'); // Toggle the 'selected' class
+    }
+
+    ToggleDataList(false);
+
+    LoadData();
+    function LoadData() {
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/Dashboard/GetWidgetData',
+            data: {
+
+            },
+            datatype: JSON,
+            success: function (data) {
+                var AllPO = data.AllPO;
+                var AllOpen = data.AllOpen;
+                var Pending = data.Pending;
+                var Late = data.Late;
+                var Pending = data.Pending;
+                var Arrived = data.Arrived;
+                var Update = data.Update;
+
+                //$('#lblAll').text(AllPO);
+                //$("#lblAllOpen").text(AllOpen);
+                //$('#lblPending').text(Pending);
+                //$('#lblLate').text(Late);
+                //$('#lblArrived').text(Arrived);
+                //$('#lblUpdate').text(Update);
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+
+
+        $('#tblBody').empty();
+        $('#lstUpdate').DataTable().clear();
+        $('#lstUpdate').DataTable().destroy();
+
+        $('#option').modal('hide');
+        var isSingleRow = false;
+
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/NewPO/GetUpdateData',
+            data: {
+
+            },
+            datatype: JSON,
+            success: function (data) {
+                $('#filterString').append(data.filterString);
+                $('#tblBody').empty();
+                $('#lstUpdate').DataTable().clear();
+                $('#lstUpdate').DataTable().destroy();
+
+                if (!isSingleRow) {
+                    var columnDef = [
+                        { "data": "GUID", "title": "GUID", "width": "100px", "visible": false },
+                        {
+                            "data": "Accept", "title": "Actions", "width": "50px", "visible": false,
+                            render: function (data, type, row) {
+                                return '<div class="dropdown">' +
+                                    '<button class="btn btn-secondary dropdown-toggle" type="button" id="ddlAction" style="font-size:12px" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                                    'Choose an Action' +
+                                    '</button>' +
+                                    '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' +
+                                    '<a class="dropdown-item" href="#" onclick="handleActionAHR(\'' + row["GUID"] + '\', \'Accept\')">Accept</a>' +
+                                    '<a class="dropdown-item" href="#" onclick="handleAction(\'' + row["PONo"] + '\', \'' + row["PartNo"] + '\', \'' + row["VendorName"] + '\', \'' + row["CurrentQty"] + '\', \'' + row["CurrentPrice"] + '\', \'' + row["CurrentDueDate"] + '\', \'' + row["CommitQty"] + '\', \'' + row["CommitPrice"] + '\', \'' + row["CommitDueDate"] + '\', \'' + row["GUID"] + '\', \'Propose\')">Propose</a>' +
+                                    '<a class="dropdown-item" href="#" onclick="handleActionAHR(\'' + row["GUID"] + '\', \'Hold\')">Hold</a>' +
+                                    '<a class="dropdown-item" href="#" onclick="handleActionAHR(\'' + row["GUID"] + '\', \'Reject\')">Reject</a>' +
+                                    '</div>' +
+                                    '</div>';
+                            }
+                        },
+                        {
+                            "data": "PONo", "title": "PO No.", "width": "100px", "className": "text-center",
+                            render: function (data, type, row) {
+                                var url = '';
+                                //open POPUP show Email Details.
+                                url = '<a href="#" onclick="TransactionDtl(\'' + row["PONo"] + '\')">' + data + '</a>';
+                                return url;
+                            },
+                        },
+                        { "data": "PartNo", "title": "Part No.", "width": "90px", "className": "text-center" },
+                        { "data": "PartDesc", "title": "Line Desc." },
+                        { "data": "VendorName", "title": "Supplier", "width": "180px" },
+                        { "data": "OrderQty", "title": "Order Qty", "width": "90px", "visible": false },
+                        { "data": "CurrentQty", "title": "Buyer Qty", "width": "80px", "className": "text-center" },
+                        { "data": "CurrentPrice", "title": "Buyer Price", "width": "100px", "className": "text-center" },
+                        { "data": "CurrentDueDate", "title": "Buyer Due Date", "width": "110px", "className": "text-center" },
+                        { "data": "CommitQty", "title": "Supplier Qty", "width": "80px", "className": "text-center" },
+                        { "data": "CommitPrice", "title": "Supplier Price", "width": "100px", "className": "text-center" },
+                        { "data": "CommitDueDate", "title": "Supplier Due Date", "width": "140px", "className": "text-center" },
+                        { "data": "LastCommunication", "title": "Last Communication", "width": "140px", "className": "text-center" },
+                        { "data": "CompletedBy", "title": "Compl. By", "width": "90px", "className": "text-center" },
+                    ];
+
+
+                    ToggleDataList(true);
+                    MakeDataGridForTraining('lstUpdate', data.lstUpdate, 0, columnDef, 'buttons', true, true, false, false);
+                }
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+    }
+
+
+    function TransactionDtl(PoNo) {
+        $('#TransactionModal').modal('show');
+
+        $.ajax({
+            url: '/NewPO/GetTransactionDtl', // Replace 'YourControllerURL' with the actual URL of your controller endpoint
+            cache: false,
+            type: 'GET',
+            data: {
+                PONo: PoNo,
+            },
+            datatype: JSON,
+            success: function (data) {
+                var lstPOTransaction = [];
+                lstPOTransaction = data.lstPOTran;
+                $('#transactionTable tbody').empty();
+                // Iterate over selected rows and append to table
+                for (var i = 0; i < lstPOTransaction.length; i++) {
+                    var row = lstPOTransaction[i];
+                    var attachFileCell = '';
+                    if (row['AttachFile']) {
+                        var base64StringChunks = row['AttachFile'];
+                        // Convert array elements to characters and concatenate into a string
+                        var str = base64StringChunks.map(function (code) {
+                            return String.fromCharCode(code);
+                        }).join('');
+
+                        // Encode string to base64
+                        var base64String = btoa(str);
+
+                        console.log(base64String);
+                        attachFileCell = '<a href="javascript:openImage(\'' + base64String + '\',\'' + row['FileExt'] + '\' )">Download</a>';
+
+                    } else {
+                        attachFileCell = '';
+                    }
+                    var serviveUrlOpen = '';
+                    var serviceType = row['ServiceType'];
+                    if (serviceType == 'Select' || serviceType == '') {
+                        row['ServiceType'] = '';
+                        serviveUrlOpen = '';
+                    }
+                    else {
+
+                        serviveUrlOpen = '<a href="javascript:OpenURL(\'' + row['ServiceURL'] + '\' )">Open</a>';
+                    }
+                    var rowDataHtml = '<tr>' +
+                        '<td>' + row['PONo'] + '</td>' +
+                        '<td>' + row['PartNo'] + '</td>' +
+                        '<td>' + row['Type'] + '</td>' +
+                        '<td>' + row['HasAction'] + '</td>' +
+                        '<td>' + row['Qty'] + '</td>' +
+                        '<td>' + row['Price'] + '</td>' +
+                        '<td>' + row['DueDate'] + '</td>' +
+                        '<td>' + row['Message'] + '</td>' +
+                        '<td>' + row['CreatedOn'] + '</td>' +
+                        '<td>' + row['ServiceType'] + '</td>' +
+                        '<td>' + serviveUrlOpen + '</td>' +
+                        '<td>' + attachFileCell + '</td>' +
+                        // Add more columns as needed
+                        '</tr>';
+
+                    $('#transactionTable tbody').append(rowDataHtml);
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle error response
+                console.error('Error sending data:', error);
+            }
+        });
+
+    }
+
+    // Click event handler for dropdown items
+    function handleAction(PONo, partNo, vendor, currentQty, currentPrice, currentDueDate, commitQty, commitPrice, commitDueDate, GUID, action) {
+
+        $('#PONo').val(PONo);
+        $('#Vendor').val(vendor);
+        $('#PartNo').val(partNo);
+
+        $('#CurrentQty').val(currentQty);
+        $('#CommitQty').val(commitQty);
+
+        $('#CurrentPrice').val(currentPrice);
+        $('#CommitPrice').val(commitPrice);
+
+        $('#CurrentDueDate').val(currentDueDate);
+        $('#CommitDueDate').val(commitDueDate);
+
+
+        $('#GUID').val(GUID);
+        $('#showTitle').empty();
+        $('#showTitle').append(action);
+        $('#ActionModal').modal('show');
+
+
+    }
+
+    function handleActionAHR(GUID, Action) {
+
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/NewPO/UpdateHasAction',
+            data: {
+                ActionAHR: Action,
+                GUID: GUID,
+
+            },
+            datatype: JSON,
+            success: function (data) {
+                ToggleDataList(false);
+                if (data == 'Updated') {
+
+                    alert('Record has been updated');
+                    showAlert('Success! AJAX request was successful.', 'success');
+                }
+            }
+
+        })
+    }
+
+    dateTo();
+    // Function to display alert message
+    function showAlert(message, type) {
+        var alertContainer = document.getElementById('alertContainer');
+        var alertHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">';
+        alertHTML += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
+        alertHTML += '<span aria-hidden="true">&times;</span></button>';
+        alertHTML += message + '</div>';
+        alertContainer.innerHTML = alertHTML;
+    }
+    $("#ProposedDueDate").mouseover(function () {
+        $(this).css('cursor', 'pointer');
+    });
+    $('#btnSend').click(function () {
+        $('#lblMsg1').empty();
+
+        var GUID = $('#GUID').val();
+        var Qty = $('#ProposedQty').val();
+        var Price = $('#ProposedPrice').val();
+        var DueDate = $('#ProposedDueDate').val();
+        var Message = $('#Message').val();
+        var PONo = $('#PONo').val();
+        var PartNo = $('#PartNo').val();
+
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/NewPO/ProposeUpdate',
+            data: {
+                GUID: GUID,
+                Qty: Qty,
+                Price: Price,
+                DueDate: DueDate,
+                Message: Message,
+                PONo: PONo,
+                PartNo: PartNo,
+            },
+            datatype: JSON,
+            success: function (data) {
+                if (data == "Updated") {
+                    $('#lblMsg1').append('Email has been sent');
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+
+    });
+    function dateTo() {
+        var date = new Date();
+        var newdate = new Date(date);
+        //For To Date
+        newdate.setDate(newdate.getDate());
+        var dd = ('0' + newdate.getDate()).slice(-2);
+        var mm = ('0' + (newdate.getMonth() + 1)).slice(-2);
+        var y = newdate.getFullYear();
+        var someFormattedDate = y + '.' + mm + '.' + dd;
+        document.getElementById('ProposedDueDate').value = someFormattedDate;
+    }
+
+    $("#ProposedDueDate").datepicker({
+        format: 'yyyy.mm.dd',
+        autoclose: true,
+        startDate: 'd',
+        endDate: null
+    });
+    function MakeDataGridForTraining(tableId, data, tableHeight, columns, buttonId, search, isScrollX, footerFunction, isFramed, detailed, reportTitleId, rowSelection, lstHeight) {
+        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+        var isFramed = isFramed === undefined || isFramed === false ? false : true;
+        var isDetailed = detailed === undefined ? false : true;
+        var reportTitle = '';
+
+        if (reportTitleId === undefined)
+            reportTitle = $('.box-title').text();
+        else
+            reportTitle = reportTitleId;
+
+        var gridHeight = 0;
+
+        isScrollX = isScrollX === undefined ? false : true;
+        if (search === undefined) { search = true; }
+
+        var gridButtonsClass = '';
+        var gridSearchBoxClass = '';
+        if (isDetailed === true) {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'bg-white';
+            gridButtonSize = 30;
+        }
+        else {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+            gridButtonSize = 30;
+        }
+
+        var boxtool;
+        if (search === true) {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search..">
+        </div>`;
+                $('#trHeadSearch').append(boxtool);
+            } else {
+                $('#' + buttonId).empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch${tableId}" type="text" placeholder="Search..">
+        </div>`;
+                $('#' + buttonId).append(boxtool);
+            }
+        }
+        else {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = '<input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+                $('#trHeadSearch').append(boxtool);
+            }
+            else {
+                $('#' + buttonId).empty();
+
+            }
+        }
+
+        var table = $('#' + tableId).DataTable({
+            order: [],
+            createdRow: rowSelection,
+            data: data,
+            columns: columns,
+            paging: true,
+            ordering: true,
+            searching: search,
+            deferRender: true,
+            destroy: true,
+            pagingType: 'full',
+            pageLength: 20,
+            scrollCollapse: false,
+            scrollX: isScrollX,
+            colReorder: true,
+            orderClasses: false,
+            deferRender: true,
+            select: true,
+            colResize: true,
+            //scrollY: gridHeight,
+
+            footerCallback: footerFunction,
+            language: {
+                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                oPaginate: {
+                    sNext: '<i class="fa fa-angle-right"></i>',
+                    sPrevious: '<i class="fa fa-angle-left"></i>',
+                    sFirst: '<i class="fa fa-angle-double-left"></i>',
+                    sLast: '<i class="fa fa-angle-double-right"></i>'
+                }
+            },
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5 dataTables_info' i><'col-sm-6 ms-3 dataTables_paginate' p>>",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Copy',
+                    title: reportTitle,
+                    filename: 'DataExport',
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)' // Excluding columns while exporting
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Export to excel',
+                    title: reportTitle,
+                    filename: 'DataExport', //Added By Tahir
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Print',
+                    title: '',
+                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                    filename: 'DataExport',
+                    exportOptions: {
+                        // columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                }
+            ],
+            select: true
+        });
+        table.buttons().container()
+            .appendTo('#buttons');
+
+        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+        table.button(0).nodes().addClass(gridButtonsClass);
+
+        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(1).nodes().addClass(gridButtonsClass);
+
+        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(2).nodes().addClass(gridButtonsClass);
+
+        var dsgndby = $('.modal-footer > #designedby ').html();
+
+        if (dsgndby === "") {
+            $('#designedBy').html($('.desgndBy').html());
+        }
+
+        var layoutHeader = $('nav').innerHeight();
+        var cardHeader = $('.box-header').innerHeight();
+        var tableHeader = $('.dataTables_scrollHead').innerHeight();
+        var tableFooter = 0;
+        var cardFooterH = 30;
+
+        if (isFooter === true)
+            tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+        var parentHeight = $('#' + lstHeight).innerHeight();
+        if (parentHeight == undefined)
+            parentHeight = window.innerHeight;
+        else
+            parentHeight = $('#' + lstHeight).innerHeight();
+
+        if (isFooter === true)
+            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+        var browserHeight = parentHeight;
+        if (tableHeight === 0) {
+            if (layoutHeader === undefined)
+                gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+            else
+                gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+        }
+        else { gridHeight = tableHeight; }
+
+        var topHeader = $('#topHeader').innerHeight();
+        if (topHeader > 0)
+            gridHeight = gridHeight - (topHeader + 1);
+
+        gridHeight = gridHeight - 6;
+
+        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+        table.columns.adjust().draw();
+
+        $('#txtFrameSearch' + tableId).on('keyup change', function () {
+            table.search(this.value).draw();
+        });
+        $('.dataTables_filter').hide();
+        table.columns.adjust().draw();
+
+
+        //return table;
+    }
+</script>
+
+

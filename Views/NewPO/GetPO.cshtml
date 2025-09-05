@@ -1,0 +1,1996 @@
+﻿@model PlusCP.Models.NewPO
+@{
+    ViewBag.Title = "Get PO";
+    Layout = null;
+
+    var UserType = @Session["UserType"];
+}
+
+<link href="~/Content/css/jquery.dataTables.colResize.css" rel="stylesheet" />
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<style>
+    /* Scoped styles for TransactionModal only */
+    /* Additional styling for perfect alignment */
+    .text-dark {
+        color: #003B59 !important;
+    }
+
+    #TransactionModal .modal-header {
+        border-bottom: none;
+        background-color: #1f3b8d;
+        color: white;
+    }
+
+    #TransactionModal .status-badge {
+        padding: 0.35rem 0.75rem;
+        font-size: 1.2rem;
+    }
+
+    #TransactionModal .close {
+        font-size: 1.8rem; /* Slightly larger close button */
+        padding: 0.5rem; /* Better click area */
+    }
+
+        #TransactionModal .close:hover {
+            color: #fff;
+            opacity: 0.8;
+        }
+
+    /*#TransactionModal .modal-header {
+            background-color: #1f3b8d;
+            border-bottom: none;
+        }*/
+
+    /*    #TransactionModal .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+        }
+    */
+    /* Status colors */
+    #TransactionModal .status-new {
+        background-color: #007bff;
+        color: white;
+    }
+
+    #TransactionModal .status-sent {
+        background-color: #fd7e14;
+        color: white;
+    }
+
+    #TransactionModal .status-received {
+        background-color: #28a745;
+        color: white;
+    }
+
+    #TransactionModal .ok-btn {
+        min-width: 80px;
+        background-color: #003B59;
+        color: white;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+        #TransactionModal .ok-btn:hover {
+            background-color: white !important;
+            color: #003B59 !important;
+            border: 2px solid #003B59 !important;
+        }
+    .status-rejected,
+    .status-new,
+    .status-sent,
+    .status-received {
+        color: white;
+        padding: 5px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .status-new {
+        background-color: #007bff; /* Bootstrap primary blue */
+    }
+
+        .status-new:hover {
+            background-color: #0056b3; /* darker blue */
+            color: #fff;
+        }
+
+    .status-sent {
+        background-color: #fd7e14; /* Bootstrap orange */
+    }
+
+        .status-sent:hover {
+            background-color: #e8590c; /* darker orange */
+            color: #fff;
+        }
+
+    .status-received {
+        background-color: #28a745; /* Bootstrap green */
+    }
+
+        .status-received:hover {
+            background-color: #1e7e34; /* darker green */
+            color: #fff;
+        }
+
+    .status-rejected {
+        background-color: crimson;
+    }
+
+        .status-rejected:hover {
+            background-color: firebrick;
+            color: #fff;
+        }
+
+
+    .custom-modal-width {
+        max-width: 90%; /* Adjust width as needed */
+        width: 90%;
+    }
+
+    .table.dataTable {
+        font-family: "Segoe UI", "Roboto";
+        clear: both;
+        /* border-collapse: separate;*/
+        border-spacing: 0;
+        font-size: 16px;
+        margin-top: 1px;
+    }
+
+    .dataTables_wrapper,
+    .dataTables_length,
+    .dataTables_filter,
+    .dataTables_info,
+    .dataTables_paginate,
+    table.dataTable thead th,
+    table.dataTable tbody td {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+    }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: left !important;
+            float: none !important;
+            display: flex;
+            justify-content: left;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                font-size: 15px !important; /* Increase font size */
+                padding: 8px 12px; /* Increase button padding */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_paginate {
+            margin-left: 60px !important; /* Adjust this value as needed */
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button i {
+                font-size: 15px !important; /* Increase icon size */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_info {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+            font-size: 16px !important; /* Adjust size */
+            color: #333 !important; /* Darker text */
+            margin-left: 5px;
+        }
+    /* Change odd row background color */
+    table.dataTable tbody tr:nth-child(odd) {
+        background-color: #ECEDEF; /* Change to your desired color */
+    }
+
+    /* Change even row background color */
+    table.dataTable tbody tr:nth-child(even) {
+        background-color: #ffffff; /* Change to your desired color */
+    }
+
+    table.dataTable tbody tr.selected {
+        background-color: #D6EFE8; /* Orange color */
+        /*color: white;*/ /* Change text color if needed */
+    }
+    /* Search icon inside input */
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        transform: translateY(-50%);
+        color: darkgrey;
+        font-size: 14px;
+        pointer-events: none; /* Prevents clicking on the icon */
+    }
+
+    .search-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .txtSearch-frame {
+        margin-top: 5px;
+        height: 28px;
+        width: 150px;
+        border: none;
+        color: #003B59;
+        border: 2px solid #003B59 !important;
+        width: 200px;
+        padding-left: 30px; /* Space for the icon */
+    }
+
+    table.table thead th {
+        background-color: #003B59 !important; /* Change to your desired color */
+        color: white; /* Change to desired text color */
+        font-size: 15px;
+        font-family: 'Poppins', sans-serif;
+        height: 40px;
+    }
+
+    table.table tbody td, lbl_ {
+        /*background-color: white !important; /* Change to your desired color */
+        font-size: 15px;
+        color: #003B59 !important;
+    }
+
+    table.table tbody tr {
+        height: 50px; /* Adjust height as needed */
+    }
+
+        /* Hover effect */
+        table.table tbody tr:hover {
+            background-color: #f5f5f5 !important; /* Light gray background on hover */
+            transition: background-color 0.8s ease-in-out;
+            cursor: pointer;
+        }
+
+
+
+
+    table th {
+        /*padding: 1rem 0.5rem !important;*/
+        border: 1px solid white;
+        border-bottom: 1px solid white;
+        /*padding: 8px;*/
+        text-align: left;
+    }
+
+    table td {
+        padding: 1rem 0.5rem !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        vertical-align: middle;
+    }
+
+    table {
+        /* border-collapse: separate;*/
+        border-spacing: 0 10px; /* Adjust the second value to increase/decrease the vertical gap */
+        width: 100%;
+    }
+
+        table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td {
+            border-bottom-width: 1px;
+        }
+
+
+    .lblHeading {
+        font-size: 19px;
+        color: #003B59 !important;
+    }
+
+
+    .po-icon {
+        color: #007bff;
+        margin-right: 5px;
+    }
+
+    .po-hover {
+        text-decoration: none;
+        font-weight: bold;
+        color: #007bff;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .po-hover:hover {
+            text-shadow: 0 0 8px #007bff;
+            transform: scale(1.05);
+        }
+
+    .po-preview {
+        display: none;
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        width: 220px;
+        font-size: 12px;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+        .po-preview strong {
+            color: #333;
+        }
+
+        .po-preview i {
+            color: #007bff;
+            margin-right: 5px;
+        }
+
+
+
+    #SecondemailInputContainer {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 5px;
+        border-radius: 4px;
+        min-height: 40px;
+        cursor: text;
+    }
+
+    #FirstemailInputContainer {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 5px;
+        border-radius: 4px;
+        min-height: 40px;
+        cursor: text;
+    }
+
+    #emailInputContainer {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 5px;
+        border-radius: 4px;
+        min-height: 40px;
+        cursor: text;
+    }
+
+    .tag {
+        background-color: #003B59;
+        color: #fff;
+        padding: 5px 10px;
+        margin: 3px;
+        border-radius: 15px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+    }
+
+        .tag .remove {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+    .tempinput {
+        border: none;
+        outline: none;
+        padding: 5px;
+        font-size: 12px;
+        min-width: 100px;
+        flex-grow: 1;
+    }
+
+
+
+
+
+    .required:after {
+        content: " *";
+        color: red;
+    }
+
+    .datepicker td, th {
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .Message {
+        height: 200px;
+        width: 500px
+    }
+
+    .custom-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .custom-modal-title {
+        margin: 0;
+    }
+
+    /*   .custom-modal-header .close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 1.5rem;
+            line-height: 1;
+        }*/
+
+
+
+    .pad {
+        padding-bottom: 15px;
+        padding: 2px;
+        padding-top: 10px;
+    }
+
+
+
+    .table-container {
+        height: 200px; /* Set the desired fixed height */
+        overflow-y: auto;
+    }
+
+
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2;
+    }
+
+
+
+    .t-head {
+        color: #023160;
+    }
+
+
+
+
+
+
+    .btn-box-tool {
+        color: #003B59 !important;
+    }
+
+
+    .table-container {
+        height: 500px; /* Set the desired fixed height */
+        overflow-y: auto;
+    }
+    /* Set a fixed height for the scrollable table body */
+    .fixed-table-container {
+        max-height: 500px; /* Adjust the height as needed */
+        overflow-y: auto; /* Enable vertical scrolling */
+        border: 1px solid #ddd; /* Optional: Add a border */
+    }
+
+    /* Make the table header sticky */
+    .fixed-header th {
+        position: sticky;
+        top: 0;
+        background: white; /* Ensures header stays visible */
+        z-index: 1000; /* Ensures it stays above content */
+        border-bottom: 2px solid #ddd; /* Optional: Adds a bottom border */
+    }
+    /* Center align table body */
+    #dataTable td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2;
+    }
+
+
+
+    .t-head {
+        color: #023160;
+    }
+
+
+
+    .box-header {
+        background-color: #f8f9fc !important;
+        color: #003B59 !important;
+        border-bottom: 2px solid #f8f9fc;
+        box-shadow: 0px 5px #ededed;
+    }
+
+
+
+
+
+
+    /*/Badges/*/
+
+    .btn-badges {
+        color: #003B59 !important;
+        border-radius: 25px !important;
+        margin-left: 5px !important;
+        height: 25px !important;
+        padding: 2px 12px !important;
+    }
+
+        .btn-badges:hover {
+            background-color: #003B59 !important;
+            color: white !important;
+        }
+
+            .btn-badges:hover .badge_light {
+                background-color: white !important;
+                color: #003B59 !important;
+            }
+
+    .badge_light {
+        background-color: #003B59 !important;
+        color: white !important;
+    }
+
+    .btn-badges-Sent {
+        border-radius: 25px !important;
+        height: 25px !important;
+        width: 60px;
+    }
+    /* Refresh Button */
+    .btn-refresh {
+        background-color: #003B59 !important; /* Distinct orange color */
+        color: white !important;
+        border-radius: 30px !important;
+        margin-left: 5px !important;
+        height: 25px !important;
+        padding: 0px 12px !important;
+        border: 2px solid #003B59 !important;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .btn-refresh:hover {
+            background-color: white !important;
+            color: #003B59 !important;
+            border: 2px solid #003B59 !important;
+        }
+
+    .selected {
+        background-color: deepskyblue;
+        color: black;
+    }
+    /* Modal Styling */
+    .modal-dialog {
+        margin: 30px auto;
+    }
+
+        .modal-dialog.centered {
+            display: flex;
+            min-height: calc(100vh - 60px);
+            align-content: stretch;
+            flex-wrap: wrap;
+            align-items: stretch;
+            flex-direction: column;
+            justify-content: center;
+            width: 32%;
+        }
+
+    .ModalHeaderColor {
+        background-color: #D6EFE8;
+        color: #003B59
+    }
+
+    .ModalLabelColor {
+        color: #003B59;
+    }
+
+    .btn-hover-save {
+        background-color: #003B59; /* Default background color */
+        border-color: #003B59; /* Default border color */
+        color: #fff; /* Default text color */
+    }
+
+        .btn-hover-save:hover {
+            background-color: transparent; /* Make background transparent on hover */
+            border-color: #003B59; /* Dark border color on hover */
+            color: #003B59; /* Dark font color on hover */
+        }
+
+
+    .btnClose {
+        background-color: whitesmoke; /* Make background transparent on hover */
+        color: #003B59; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnClose:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: #003B59; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+        }
+
+    .btnReset {
+        background-color: crimson; /* Make background transparent on hover */
+        color: white; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnReset:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: white; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            background-color: #d44646;
+        }
+
+    .RedColor {
+        color: red;
+    }
+
+    .GreenColor {
+        color: green;
+    }
+</style>
+<div id="parentDiv" class="container-fluid">
+    <input id="rptCode" type="hidden" value="019" />
+    <input id="rptTitle" class="lbl_" style="font-size:14px !important;" type="hidden" value="@ViewBag.ReportTitle" />
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <div id="dataList" class="box panel panel-default">
+            <div class="box-header with-border">
+                <button type="button" class="btn btn-box-tool" title="Option Page" id="btnOptionFilter">
+                    <span class="fa fa-filter fa-lg blue"></span>
+                </button>
+
+
+                <h6 class="box-title lbl_"><strong style="font-size:14px !important;">@ViewBag.ReportTitle  </strong><strong id="filterString"></strong></h6>
+                <button id="btnUpdate" style="margin-left:100px; display:none" type="button" class="btn btn-secondary">Update</button>
+
+                <div id="buttons" class="box-tools pull-right">
+
+                </div>
+                <button id="AllCard" class="btn btn-badges">
+                    All @*<span id="AllCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAll"></span></span>*@
+                </button>
+                <!--<button id="AllOpenCard" class="btn btn-badges">
+                Idle-->
+                @*<span id="AllOpenCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAllOpen"></span></span>*@
+                <!--</button>-->
+                <button id="CardPending" class="btn btn-badges">
+                    In Process @*<span id="badgeCount" class="badge badge_light"><span id="lblPending"></span></span>*@
+                </button>
+                <button id="CardLate" class="btn btn-badges">
+                    Late @*<span id="badgeCount" class="badge badge_light"><span id="lblLate"></span></span>*@
+                </button>
+                <button id="CardArrived" class="btn btn-badges">
+                    Early @*<span id="badgeCount" class="badge badge_light"><span id="lblArrived"></span></span>*@
+                </button>
+                <button id="CardUpdate" class="btn btn-badges">
+                    Completed @*<span id="badgeCount" class="badge badge_light"><span id="lblUpdate"></span></span>*@
+                </button>
+                <button id="CardRefresh" type="button" class="btn btn-badges btn-refresh" title="Refresh Page">
+                    @*<span class="fas fa-redo-alt fa-lg">Refresh</span>*@
+                    Refresh
+                </button>
+                <button id="actionButton" style="margin-left:6px" type="button" class="btn-hover-save">Send</button>
+                <h5 class="box-title"><strong id="RefreshTime" style="font-size: 14px !important; margin-left: 5px; "></strong></h5>
+            </div>
+            <div class="box-body bg-light card mt-4" id="lstP">
+                <table id="lstData" class="table table-bordered table-striped text-sm table-hover" width="100%">
+                    <thead class="sorted-asc fw-light small">
+                        <tr style="background-color: white">
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th class="notexport"></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tfoot>
+                        <tr>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal Multiple Email -->
+<div id="MultiEmail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg custom-modal-width" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor">Multiple PO's</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Left side with green background color -->
+                    <div class="row">
+                        <!-- Left side (Table Grid) -->
+                        <div class="col-md-12 table-container">
+                            <div class="table-responsive fixed-table-container">
+                                <table id="dataTable" class="table table-striped text-sm table-hover">
+                                    <thead class="fixed-header">
+                                        <tr>
+                                            <th class="t-head">PO</th>
+                                            <th class="t-head">Supplier</th>
+                                            <th class="t-head">Supplier Email</th>
+                                            <th class="t-head">Status</th>
+                                            @if (UserType.ToString() == "Admin")
+                                            {
+                                                <th class="t-head">Buyer</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Table rows will be dynamically added here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnMultiPO" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                <button id="btnMultiSend" type="button" class="btn btn-hover-save">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<!--<div class="modal fade" id="TransactionModal" tabindex="-1" role="dialog" aria-labelledby="poModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">-->
+
+            <!-- Fixed Modal Header -->
+            <!--<div class="modal-header" style="display: flex; background-color: #D6EFE8; color: #003B59; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; ">
+                <h4 class="modal-title mb-0" id="lblPOHead" style="flex: 1;">PO Details</h4>
+                <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close" style="margin-left: auto; font-size: 1.8rem; line-height: 1; opacity: 1; padding: 0.25rem;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>-->
+
+            <!-- Modal Body -->
+            <!--<div class="modal-body">
+                <div class="mb-3">
+                    <strong>Status:</strong>
+                    <span class="status-badge badge fs-6" id="lblPOStatus"></span>
+                </div>
+                <hr>
+                <div class="mb-2">
+                    <strong>Sent On:</strong> <span id="lblSentOn" class="fw-normal"></span>
+                </div>
+                <div>
+                    <strong>Received On:</strong> <span id="lblRcvdOn" class="fw-normal"></span>
+                </div>
+            </div>-->
+
+            <!-- Modal Footer -->
+            <!--<div class="modal-footer">
+
+                <button type="button" class="btn btn-success received-btn" data-dismiss="modal">Received</button>
+                <button type="button" class="btn btn-danger reset-btn" data-dismiss="modal">Reset</button>
+                <button type="button" class="btn ok-btn" data-dismiss="modal">OK</button>
+                <label id="lblPO" style="visibility:hidden" hidden></label>
+            </div>
+
+        </div>
+    </div>
+</div>-->
+
+<!-- Modal Yes or NO -->
+<div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog centered" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor">Confirmation</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor" id="confirmationMessage"> Refreshing will download the latest data. This may take a few moments. Do you want to continue?</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="yesButton" type="button" class="btn btn-hover-save" data-dismiss="modal">Yes</button>
+                <button id="noButton" type="button" class="btn btnClose" data-dismiss="modal">No</button>
+                <label id="lblAction" style="visibility:hidden" hidden></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Option Page -->
+<div id="OptionFilter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog centered" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_">Purchase Order Filter</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <!-- Buyer Dropdown -->
+                            <div class="row" id="buyerDropdownRow">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Buyer:</label>
+                                        @Html.DropDownList("BuyerList", new SelectList(Enumerable.Empty<SelectListItem>()), "Select Buyer", new { @class = "form-control", id = "ddlBuyer" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Supplier Dropdown -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Supplier:</label>
+                                        @Html.DropDownList("SupplierList", new SelectList(Enumerable.Empty<SelectListItem>()), "Select Supplier", new { @class = "form-control", id = "ddlSupplier" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="ModalLabelColor">Part No.:</label>
+                                        @Html.TextBoxFor(model => model.FilterPartNo, htmlAttributes: new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:5px">
+                                <div class="col-md-5">
+                                    <div class='input-group date' style="margin-left:7px" id='dtpFrom'>
+                                        <label class="ModalLabelColor">Due Date From:</label>
+                                        @Html.TextBoxFor(model => model.fromDate, htmlAttributes: new { @class = "form-control" })
+                                        @*<span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>*@
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                </div>
+                                <div class="col-md-5">
+                                    <div class='input-group date' id='dtpTo' style="margin-right:7px;">
+                                        <label class="ModalLabelColor">Due Date To:</label>
+                                        @Html.TextBoxFor(model => model.toDate, htmlAttributes: new { @class = "form-control" })
+                                        @*<span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnOptionFilterCancel" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                <button id="btnOptionFilterReset" type="button" class="btn btn-danger">Reset</button>
+                <button id="btnOptionFilterSend" type="button" class="btn btn-hover-save">OK</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Transaction -->
+<div id="TransactionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg custom-modal-width" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header ModalHeaderColor">
+                <h5 class="custom-modal-title lbl_ ModalLabelColor">Communication History</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="row">
+                        <div class="col-md-12 table-container" style="height:400px">
+
+                            <table id="transactionTable" class="table">
+                                <thead class="sticky-header">
+                                    <tr>
+                                        <th hidden class="t-head">Id</th>
+                                        <th class="t-head">PO</th>
+                                        <th class="t-head">Status</th>
+                                        <th class="t-head">User Type</th>
+                                        <th hidden class="t-head">Vendor</th>
+                                        <th class="t-head">Vendor Email</th>
+
+                                        <th hidden class="t-head">Buyer</th>
+                                        <th class="t-head">Created On</th>
+                                       
+
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button id="btnTransactionPO" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+       $(document).ready(function() {
+       //var urlParams = new URLSearchParams(window.location.search);
+       var selectedStatus = '@Request.QueryString["POStatus"]';
+
+    if (selectedStatus) {
+        $('.btn-badges').removeClass('badge_light'); // Remove 'selected' class from all buttons
+        switch (selectedStatus) {
+            case 'All':
+                $('#AllCard').addClass('badge_light');
+                break;
+            case 'All Open':
+                $('#AllOpenCard').addClass('badge_light');
+                break;
+            case 'Pending':
+                $('#CardPending').addClass('badge_light');
+                break;
+            case 'Late':
+                $('#CardLate').addClass('badge_light');
+                break;
+            case 'Arrived':
+                $('#CardArrived').addClass('badge_light');
+                break;
+            case 'Updated':
+                $('#CardUpdate').addClass('badge_light');
+                break;
+            default:
+                // Handle other cases if needed
+        }
+    }
+});
+    function toggleSelectionAndOpenPage(button, pageUrl) {
+        var isSelected = button.classList.contains('badge_light');
+        $('.btn-badges').removeClass('badge_light'); // Remove 'selected' class from all buttons
+        if (!isSelected) {
+            button.classList.add('badge_light'); // Add 'selected' class to the clicked button
+        }
+        OpenPage(pageUrl); // Call the function to open the page with the specified URL
+    }
+    // Get all the buttons with the class 'btn-badges' and attach a click event listener to each of them
+    document.querySelectorAll('.btn-badges').forEach(button => {
+        button.addEventListener('click', function () {
+             var selectedStatus = '@Request.QueryString["POStatus"]';
+            var pageUrl;
+            // Determine the page URL based on the button clicked
+            switch (this.id) {
+                case 'AllCard':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=All';
+                    break;
+                case 'AllOpenCard':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=All Open';
+                    break;
+                case 'CardPending':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Pending';
+                    break;
+                case 'CardLate':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Late';
+                    break;
+                case 'CardArrived':
+                    pageUrl = '\\NewPO\\GetPO?POStatus=Arrived';
+                    break;
+                case 'CardUpdate':
+                    pageUrl = '\\NewPO\\SupplierUpdate?POStatus=Update';
+                    break;
+                case 'CardRefresh':
+                    // Open Bootstrap modal instead of navigating immediately
+                    refreshClickedElement = this;
+                    $('#confirmationModal').modal('show');
+                    return; // Skip further processing for now
+                    break;
+                default:
+                    // Default case
+                    pageUrl = '\\NewPO\\GetPO?POStatus='+selectedStatus+''; // Set a default page URL if necessary
+            }
+            toggleSelectionAndOpenPage(this, pageUrl); // Toggle the selection and open the page
+            // Store the selected button's ID in local storage
+            localStorage.setItem('selectedButtonId', this.id);
+        });
+    });
+    // When user confirms refresh in the modal
+    document.getElementById('yesButton').addEventListener('click', function () {
+        $('#confirmationModal').modal('hide'); // Hide modal
+        var pageUrl = '\\NewPO\\GetPO?POStatus=Refresh';
+        if (typeof saveRefreshTime === 'function') saveRefreshTime(); // Call your custom function
+        toggleSelectionAndOpenPage(refreshClickedElement, pageUrl); // Navigate
+        localStorage.setItem('selectedButtonId', refreshClickedElement.id);
+    });
+    // Handle click event for the No button in the popup
+    $("#noButton").click(function () {
+        // Hide the popup
+        $('#confirmationModal').modal('hide');
+    });
+
+    function toggleSelection(button) {
+        button.classList.toggle('selected'); // Toggle the 'selected' class
+    }
+    // Function to save refresh time in local storage
+    function saveRefreshTime() {
+        var now = new Date();
+        var formattedTime = now.toLocaleString(); // Get the formatted time
+        localStorage.setItem("lastRefreshTime", formattedTime); // Save to local storage
+    }
+    $('#btnOptionFilterReset').click(function () {
+
+        $('#fromDate').val("");
+        $('#toDate').val("");
+        $('#FilterPartNo').val("");
+
+        document.getElementById("ddlBuyer").selectedIndex = 0;
+        document.getElementById("ddlSupplier").selectedIndex = 0;
+    });
+    $(function () {
+        $("#toDate, #fromDate").datepicker({
+            format: 'yyyy.mm.dd',
+            autoclose: true,
+            todayHighlight: true
+        }).datepicker('update', new Date());
+    });
+    $("#toDate, #fromDate").mouseover(function () {
+        $(this).css('cursor', 'pointer');
+    });
+
+    dateTo();
+    datefrom();
+    function datefrom() {
+        var date = new Date();
+        var newdate = new Date(date);
+        //For To Date
+        newdate.setDate(newdate.getDate());
+        var dd = ('0' + newdate.getDate()).slice(-2);
+        var mm = ('0' + (newdate.getMonth() + 1)).slice(-2);
+        var y = newdate.getFullYear();
+        var someFormattedDate = y + '.' + mm + '.' + dd;
+        document.getElementById('fromDate').value = someFormattedDate;
+    }
+    function dateTo() {
+        var date = new Date();
+        var newdate = new Date(date);
+        //For To Date
+        newdate.setDate(newdate.getDate());
+        var dd = ('0' + newdate.getDate()).slice(-2);
+        var mm = ('0' + (newdate.getMonth() + 1)).slice(-2);
+        var y = newdate.getFullYear();
+        var someFormattedDate = y + '.' + mm + '.' + dd;
+        document.getElementById('toDate').value = someFormattedDate;
+    }
+    $('#btnOptionFilter').click(function () {
+        loadDropdowns();
+            var userType = '@Session["UserType"]';
+        $('#OptionFilter').modal('show');
+            if (userType.toLowerCase() === 'buyer') {
+                $('#buyerDropdownRow').hide();
+            } else {
+                $('#buyerDropdownRow').show();
+        }
+
+            $('#fromDate').val(localStorage.getItem('filter_fromDate'));
+            $('#toDate').val(localStorage.getItem('filter_toDate'));
+
+    });
+
+function loadDropdowns() {
+    $.ajax({
+        url: '@Url.Action("GetDropdownData", "NewPO")',
+        type: 'GET',
+        success: function (response) {
+            // --- Buyers ---
+            var ddlBuyer = $('#ddlBuyer');
+            ddlBuyer.empty().append($('<option>', { value: '', text: 'Select Buyer' }));
+            $.each(response.Buyers, function (i, item) {
+                ddlBuyer.append($('<option>', { value: item.Value, text: item.Text }));
+            });
+            var savedBuyer = localStorage.getItem('filter_buyer');
+            if (savedBuyer) ddlBuyer.val(savedBuyer);
+
+            // --- Suppliers ---
+            var ddlSupplier = $('#ddlSupplier');
+            ddlSupplier.empty().append($('<option>', { value: '', text: 'Select Supplier' }));
+            $.each(response.Suppliers, function (i, item) {
+                ddlSupplier.append($('<option>', { value: item.Value, text: item.Text }));
+            });
+            var savedSupplier = localStorage.getItem('filter_supplier');
+            if (savedSupplier) ddlSupplier.val(savedSupplier);
+        }
+    });
+}
+
+
+    $('#btnOptionFilterSend').click(function () {
+        debugger
+        $('#OptionFilter').modal('hide');
+        localStorage.setItem('filter_buyer', $('#ddlBuyer').val());
+        localStorage.setItem('filter_supplier', $('#ddlSupplier').val());
+        localStorage.setItem('filter_fromDate', $('#fromDate').val());
+        localStorage.setItem('filter_toDate', $('#toDate').val());
+        localStorage.setItem('filter_FilterPartNo', $('#FilterPartNo').val());
+
+        var isSingleRow = false;
+        var buyer = $('#ddlBuyer').val();
+        var supplier = $('#ddlSupplier').val();
+        var fromDate = $('#fromDate').val();
+        var toDate = $('#toDate').val();
+        var PartNo = $('#FilterPartNo').val();
+
+        //let summary = 'Filters: ';
+        //if (buyer) summary += 'Buyer: ' + $('#ddlBuyer option:selected').text() + ' ';
+        //if (supplier) summary += '| Supplier: ' + $('#ddlSupplier option:selected').text() + ' ';
+        //if (fromDate && toDate) summary += '| Date Range: ' + fromDate + ' to ' + toDate;
+
+        //$('#filterString').text(summary);
+
+        var POStatus = '@Request.QueryString["POStatus"]';
+        $.ajax({
+            url: '/NewPO/FilterPOData',
+            type: 'POST',
+            data: {
+                buyerEmail: buyer,
+                supplierEmail: supplier,
+                dueFrom: fromDate,
+                dueTo: toDate,
+                POStatus: POStatus,
+                PartNo: PartNo
+            },
+            success: function (data) {
+                $('#filterString').append('');
+                $('#filterString').append(data.filterString);
+                $("#lstData").empty();
+
+                var type = '@Session["UserType"]';
+                var IsVisible;
+                if (type === 'Admin') {
+                    IsVisible = true;
+                }
+                else {
+                    IsVisible = false;
+                }
+
+                var selectedVendor = "";
+                if (!isSingleRow) {
+                    var columnDef = [
+                        {
+                            data: "Checkbox",
+                            title: '<input type="checkbox" id="selectAll" class="select-all-checkbox" />',
+                            width: "20px",
+                            className: "notexport text-center",
+                            render: function (data, type, row) {
+                                selectedVendor = row["Vendor_VendorID"];
+                                // Only show checkbox if PO is approved AND status is New
+                                if (row["POHeader_Approve"] === true && row["POStatus"] == "New") {
+                                    return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
+                                }
+                                return ''; // Return empty string if conditions not met
+                            }
+                        },
+                        { "data": "POHeader_OrderDate", "title": "Order Date", "width": "190px", "className": "text-center" },
+                        {
+                            "data": "POHeader_PONum", "title": "PO. No", "width": "190px", "className": "text-center",
+                            "render": function (data, type, row) {
+                                return '<a href="#" class="po-hover" onclick="OpenPOForm(\'' + row["POHeader_PONum"] + '\')"' +
+                                    ' data-po-number="' + row["POHeader_PONum"] + '" data-supplier="' + row["Vendor_Name"] + '"' +
+                                    ' data-date="' + row["POHeader_OrderDate"] + '">' +
+                                    '<i class="fas fa-file-invoice po-icon"></i> ' + data +
+                                    '</a>';
+                            }
+                        },
+                        {
+                            "data": "POHeader_Approve",
+                            "title": "PO Approved?",
+                            "width": "190px",
+                            "className": "text-center",
+                            "render": function (data, type, row) {
+                                if (data === true || data === "True") {
+                                    return '<span class="GreenColor">' + data + '</span>';
+                                } else {
+                                    return '<span class="RedColor">' + data + '</span>';
+                                }
+                            }
+                        },
+                        { "data": "PODetail_PartNum", "title": "Part No.", "width": "220px", "className": "text-center" },
+                        { "data": "Vendor_VendorID", "title": "Supplier Id", "width": "190px", "className": "text-center" },
+                        { "data": "Vendor_Name", "title": "Supplier", "className": "text-center", "width": "190px" },
+                        { "data": "Vendor_EMailAddress", "title": "Supplier Email", "className": "text-center" },
+                        { "data": "POHeader_BuyerID", "title": "Buyer Id", "width": "70px", "visible": false },
+                        { "data": "PurAgent_Name", "title": "Buyer", "width": "190px", "visible": IsVisible, "className": "text-center" },
+                        {
+                            "data": "View", "title": "History", "width": "140px", "className": "text-center",
+                            render: function (data, type, row) {
+                                var url = '';
+                                //open POPUP show Email Details.
+                                url = '<a href="#" onclick="TransactionDtl(\'' + row["POHeader_PONum"] + '\')">View</a>';
+                                return url;
+
+
+                            }
+                        },
+                        {
+                            data: "POStatus",
+                            title: "Status",
+                            width: "90px",
+                            className: "text-center",
+                            render: function (data, type, row) {
+                                let colorClass = "";
+                                if (data === "New") {
+                                    colorClass = "status-new";
+                                } else if (data === "Sent") {
+                                    colorClass = "status-sent";
+                                } else if (data === "Received") {
+                                    colorClass = "status-received";
+                                }
+                                return '<a href="#" class="' + colorClass + '" onclick="TransactionDtl(\'' + row["POHeader_PONum"] + '\')">' + data + '</a>';
+                            }
+                        },
+                        { "data": "PurAgent_EMailAddress", "title": "Buyer Email", "width": "90px", "visible": false }
+                    ];
+                    ToggleDataList(true);
+                    MakeDataGridForTraining('lstData', data.lstPurchaseOrders, 0, columnDef, 'buttons', true, true, false, false);
+
+                    var lastRefresh = localStorage.getItem("lastRefreshTime"); // Get from local storage
+                    if (lastRefresh) {
+                        document.getElementById("RefreshTime").innerText = "Last Refreshed: " + lastRefresh;
+                    }
+                    // Event handler for checkbox change
+                    $('#lstData tbody').off('change', 'input[type="checkbox"].supplier-checkbox');
+                    $('#lstData tbody').on('change', 'input[type="checkbox"].supplier-checkbox', function () {
+                        toggleActionButtonVisibility();
+                        var checkbox = $(this);
+                        var vendorName = checkbox.closest('tr').find('td:eq(1)').text(); // Assuming the vendor name is in the second column (index 1)
+
+                        if (checkbox.is(':checked')) {
+                            return;
+                            //// Uncheck all other checkboxes for different vendors
+                            //$('input[type="checkbox"].supplier-checkbox').not(checkbox).prop('checked', false);
+                            //// Update the selected vendor name
+                            //selectedVendorName = vendorName;
+                        } else {
+                            // If the checkbox is unchecked, update the selected vendor name to empty
+                            selectedVendorName = "";
+                        }
+                    });
+                    toggleActionButtonVisibility();
+                    $('.dropdown-toggle').dropdown();
+                }
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+    });
+
+     LoadData();
+    ToggleDataList(false);
+    function LoadData() {
+
+        localStorage.removeItem('filter_buyer');
+        localStorage.removeItem('filter_supplier');
+        localStorage.removeItem('filter_fromDate');
+        localStorage.removeItem('filter_toDate');
+        // Store selected values in localStorage
+
+        var isSingleRow = false;
+
+        var POStatus = '@Request.QueryString["POStatus"]';
+        $('#filterString').append('');
+        $('#filterString').val('');
+
+        $.ajax({
+            "processing": true,
+            "serverSide": true,
+            cache: true,
+            type: 'GET',
+            url: '/NewPO/GetPOList',
+            data: {
+                POStatus: POStatus,
+            },
+            datatype: JSON,
+            success: function (data) {
+                $('#filterString').append('');
+                $('#filterString').append(data.filterString);
+                $("#lstData").empty();
+
+                var type = '@Session["UserType"]';
+                var IsVisible;
+                if (type === 'Admin') {
+                    IsVisible = true;
+                }
+                else {
+                    IsVisible = false;
+                }
+
+                var selectedVendor = "";
+                if (!isSingleRow) {
+                    var columnDef = [
+                        {
+                            data: "Checkbox",
+                            title: '<input type="checkbox" id="selectAll" class="select-all-checkbox" />',
+                            width: "20px",
+                            className: "notexport text-center",
+                            render: function (data, type, row) {
+                                selectedVendor = row["Vendor_VendorID"];
+                                // Only show checkbox if PO is approved AND status is New
+                                if (row["POHeader_Approve"] === true && row["POStatus"] == "New" || row["POStatus"] == "Reject") {
+                                    return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
+                                }
+                                return ''; // Return empty string if conditions not met
+                            }
+                        },
+                        { "data": "POHeader_OrderDate", "title": "Order Date", "width": "190px", "className": "text-center" },
+                        {
+                            "data": "POHeader_PONum", "title": "PO. No", "width": "190px", "className": "text-center",
+                            "render": function (data, type, row) {
+                                return '<a href="#" class="po-hover" onclick="OpenPOForm(\'' + row["POHeader_PONum"] + '\')"' +
+                                    ' data-po-number="' + row["POHeader_PONum"] + '" data-supplier="' + row["Vendor_Name"] + '"' +
+                                    ' data-date="' + row["POHeader_OrderDate"] + '">' +
+                                    '<i class="fas fa-file-invoice po-icon"></i> ' + data +
+                                    '</a>';
+                            }
+                        },
+                        {
+                            "data": "POHeader_Approve",
+                            "title": "PO Approved?",
+                            "width": "190px",
+                            "className": "text-center",
+                            "render": function (data, type, row) {
+                                if (data === true || data === "True") {
+                                    return '<span class="GreenColor">' + data + '</span>';
+                                } else {
+                                    return '<span class="RedColor">' + data + '</span>';
+                                }
+                            }
+                        },
+                        { "data": "PODetail_PartNum", "title": "Part No.", "width": "220px", "className": "text-center" },
+                        { "data": "Vendor_VendorID", "title": "Supplier Id", "width": "190px", "className": "text-center" },
+                        { "data": "Vendor_Name", "title": "Supplier", "className": "text-center", "width": "190px" },
+                        { "data": "Vendor_EMailAddress", "title": "Supplier Email", "className": "text-center" },
+                        { "data": "POHeader_BuyerID", "title": "Buyer Id", "width": "70px", "visible": false },
+                        { "data": "PurAgent_Name", "title": "Buyer", "width": "190px", "visible": IsVisible, "className": "text-center" },
+                        {
+                            "data": "View", "title": "History", "className": "text-center",
+                            render: function (data, type, row) {
+                                var url = '';
+                                //open POPUP show Email Details.
+                                url = '<a href="#" onclick="TransactionDtl(\'' + row["POHeader_PONum"] + '\')">View</a>';
+                                return url;
+
+
+                            }
+                        },
+                        {
+                            data: "POStatus",
+                            title: "Status",
+                            className: "text-center",
+                            render: function (data, type, row) {
+                                let colorClass = "";
+                                if (data === "New") {
+                                    colorClass = "status-new";
+                                } else if (data === "Sent") {
+                                    colorClass = "status-sent";
+                                } else if (data === "Received") {
+                                    colorClass = "status-received";
+                                }
+                                else if (data === "Reject") {
+                                    colorClass = "status-rejected";
+                                }
+                                return '<a href="#" class="' + colorClass + '" onclick="TransactionDtl(\'' + row["POHeader_PONum"] + '\')">' + data + '</a>';
+                            }
+                        },
+                        { "data": "PurAgent_EMailAddress", "title": "Buyer Email", "width": "90px", "visible": false }
+                    ];
+                    ToggleDataList(true);
+                    MakeDataGridForTraining('lstData', data.lstPurchaseOrders, 0, columnDef, 'buttons', true, true, false, false);
+
+                    var lastRefresh = localStorage.getItem("lastRefreshTime"); // Get from local storage
+                    if (lastRefresh) {
+                        document.getElementById("RefreshTime").innerText = "Last Refreshed: " + lastRefresh;
+                    }
+                    // Event handler for checkbox change
+                    $('#lstData tbody').off('change', 'input[type="checkbox"].supplier-checkbox');
+                    $('#lstData tbody').on('change', 'input[type="checkbox"].supplier-checkbox', function () {
+                        toggleActionButtonVisibility();
+                        var checkbox = $(this);
+                        var vendorName = checkbox.closest('tr').find('td:eq(1)').text(); // Assuming the vendor name is in the second column (index 1)
+
+                        if (checkbox.is(':checked')) {
+                            return;
+                            //// Uncheck all other checkboxes for different vendors
+                            //$('input[type="checkbox"].supplier-checkbox').not(checkbox).prop('checked', false);
+                            //// Update the selected vendor name
+                            //selectedVendorName = vendorName;
+                        } else {
+                            // If the checkbox is unchecked, update the selected vendor name to empty
+                            selectedVendorName = "";
+                        }
+                    });
+                    toggleActionButtonVisibility();
+                    $('.dropdown-toggle').dropdown();
+                }
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+
+
+    }
+
+    function TransactionDtl(PoNo) {
+        $('#TransactionModal').modal('show');
+
+        $.ajax({
+            url: '/NewPO/GetPOTransactionDtl',
+            cache: false,
+            type: 'GET',
+            data: {
+                PONo: PoNo,
+            },
+            datatype: JSON,
+            success: function (data) {
+                var lstPOTransaction = [];
+                lstPOTransaction = data.lstPOHeadTran; debugger
+                $('#transactionTable tbody').empty();
+                // Iterate over selected rows and append to table
+                for (var i = 0; i < lstPOTransaction.length; i++) {
+
+                    var row = lstPOTransaction[i];
+
+                    var rowDataHtml = '<tr>' +
+                        '<td hidden>' + row['Id'] + '</td>' +
+                        '<td>' + row['PONumber'] + '</td>' +
+                        '<td>' + row['Status'] + '</td>' +
+                        '<td>' + row['UserType'] + '</td>' +
+                        '<td hidden>' + row['Vendor'] + '</td>' +
+                        '<td>' + row['VendorEmail'] + '</td>' +
+                        '<td hidden>' + row['Buyer'] + '</td>' +
+                        '<td>' + formatDate(row['InsertedOn']) + '</td>';
+
+                  '</tr>';
+
+                    $('#transactionTable tbody').append(rowDataHtml);
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle error response
+                console.error('Error sending data:', error);
+            }
+        });
+
+    }
+    function formatDate(msDate) {
+        if (!msDate) return '';
+
+        var timestamp = parseInt(msDate.replace(/[^0-9]/g, ''));
+        var date = new Date(timestamp);
+
+        var year = date.getFullYear();
+        var month = ('0' + (date.getMonth() + 1)).slice(-2);
+        var day = ('0' + date.getDate()).slice(-2);
+        var hours = ('0' + date.getHours()).slice(-2);
+        var minutes = ('0' + date.getMinutes()).slice(-2);
+        var seconds = ('0' + date.getSeconds()).slice(-2);
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+    //function TransactionDtl(PoNo) {
+    //    $('#lblPO').val(PoNo);
+    //    $('#TransactionModal').modal('show');
+
+    //    $.ajax({
+    //        url: '/NewPO/GetPOTransactionDtl',
+    //        cache: false,
+    //        type: 'GET',
+    //        data: {
+    //            PONo: PoNo,
+    //        },
+    //        datatype: JSON,
+    //        success: function (response) {
+    //            if (response.Success) {
+    //                var status = response.Status;
+    //                var insertedOn = response.InsertedOn;
+    //                var updatedOn = response.UpdatedOn;
+
+    //                var lblPOStatus = $('#lblPOStatus');
+
+    //                // Set status text
+    //                lblPOStatus.text(status);
+
+    //                // Remove old status classes
+    //                lblPOStatus.removeClass('status-new status-sent status-received');
+
+    //                // Add new status class
+    //                if (status.toLowerCase() === 'new') {
+    //                    lblPOStatus.addClass('status-new');
+    //                    $('.received-btn').hide();
+    //                    $('.reset-btn').hide();
+    //                }
+    //                else if (status.toLowerCase() === 'sent') {
+    //                    lblPOStatus.addClass('status-sent');
+    //                    $('.received-btn').show();
+    //                    $('.reset-btn').show();
+    //                }
+    //                else if (status.toLowerCase() === 'received') {
+    //                    lblPOStatus.addClass('status-received');
+    //                    $('.received-btn').show();
+    //                    $('.reset-btn').show();
+    //                }
+
+    //                $('#lblSentOn').text(insertedOn);
+    //                $('#lblRcvdOn').text(updatedOn);
+    //                $('#lblPOHead').text('PO No. ' + PoNo + ' - History');
+    //            }
+    //        },
+    //        error: function (xhr, status, error) {
+    //            // Handle error response
+    //            console.error('Error sending data:', error);
+    //        }
+    //    });
+
+    //}
+    $('#TransactionModal .ok-btn').click(function () {
+        // Additional logic if needed before closing
+        $('#TransactionModal').modal('hide');
+    });
+    $('#TransactionModal .reset-btn').click(function () {
+        var PoNo = $('#lblPO').val();
+
+        $.ajax({
+            url: '/NewPO/ResetStatus',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ PoNo: PoNo }),
+            success: function (response) {
+                if (response.success) {
+                    MsgToast("Success!", "Record has been updated.", "success");
+                    $('#TransactionModal').modal('hide');
+                    LoadData();
+                } else {
+                    MsgToast("Oops!", "Record was not saved.", "error");
+                }
+            },
+            error: function (xhr, status, error) {
+                MsgToast("Error!", "Failed to send emails: " + error, "error");
+            }
+        });
+    });
+
+    $('#TransactionModal .received-btn').click(function () {
+        var PoNo = $('#lblPO').val();
+        $.ajax({
+            url: '/NewPO/ReceivedStatus',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ PoNo: PoNo }),
+            success: function (response) {
+                if (response.success) {
+                    MsgToast("Success!", "Record has been updated.", "success");
+                    $('#TransactionModal').modal('hide');
+                    LoadData();
+                }
+                else {
+                    MsgToast("Oops!", "Record was not saved.", "error");
+                }
+            },
+            error: function (xhr, status, error) {
+                MsgToast("Error!", "Failed to send emails: " + error, "error");
+            }
+        });
+
+    });
+
+    function toggleActionButtonVisibility() {
+        var anyCheckboxChecked = $('input[type="checkbox"].supplier-checkbox:checked').length > 0;
+        $('#actionButton').toggle(anyCheckboxChecked);
+    }
+
+    $(document).on('click', '#selectAll', function () {
+        var isChecked = $(this).prop('checked');
+        $('.supplier-checkbox').prop('checked', isChecked);
+
+        // Call function to toggle action button visibility
+        toggleActionButtonVisibility();
+    });
+
+    // Ensure individual checkboxes also trigger the function
+    $(document).on('click', '.supplier-checkbox', function () {
+        toggleActionButtonVisibility();
+    });
+
+
+
+    /////// Start Multiple Email
+    $('#actionButton').click(function () {
+        // Show the modal
+        $('#MultiEmail').modal('show');
+    });
+    $('#MultiEmail').on('shown.bs.modal', function () {
+        var table = $('#lstData').DataTable();
+        var selectedRows = [];
+
+        // Unbind any previously bound event handler to prevent multiple executions
+        $('#lstData').off('change', '.supplier-checkbox').on('change', '.supplier-checkbox', function () {
+            // Clear selected rows array
+            selectedRows = [];
+
+            // Iterate over checked checkboxes
+            $('#lstData .supplier-checkbox:checked').each(function () {
+                var rowData = table.row($(this).closest('tr')).data();
+                selectedRows.push(rowData);
+            });
+
+            passRowsToTable(selectedRows);
+        });
+
+        // Initially check for checked checkboxes
+        $('#lstData .supplier-checkbox:checked').trigger('change');
+    });
+
+    function passRowsToTable(selectedRows) {
+        // Clear previous rows from the table
+        $('#dataTable tbody').empty();
+
+        // Iterate over selected rows and append to table
+        for (var i = 0; i < selectedRows.length; i++) {
+            var row = selectedRows[i];
+            var type = '@Session["UserType"]';
+            var IsVisible;
+            if (type === 'Admin') {
+                IsVisible = true;
+            }
+            else {
+                IsVisible = false;
+            }
+            var rowDataHtml = '<tr>' +
+                '<td>' + row['POHeader_PONum'] + '</td>' +
+                '<td>' + row['Vendor_Name'] + '</td>' +
+                '<td><input type="email" class="form-control editable-email" value="' + (row['Vendor_EMailAddress'] || '') + '" /></td>' +
+                '<td>' + row['POStatus'] + '</td>' +
+                '<td style="display:none">' + row['Vendor_VendorID'] + '</td>' +
+                '<td style="display:none">' + row['POHeader_Approve'] + '</td>' +
+                (IsVisible ? '<td>' + row['PurAgent_Name'] + '</td>' : '') +
+
+                '</tr>';
+
+            $('#dataTable tbody').append(rowDataHtml);
+        }
+    }
+
+    $('#btnMultiSend').click(function () {
+        // Collect data from the table
+        var tableData = collectTableData();
+
+        // Send data to the controller using AJAX
+        sendDataToController(tableData);
+    });
+
+    function collectTableData() {
+        var tableData = [];
+
+        $('#dataTable tbody tr').each(function () {
+            var rowData = {
+                PONumber: $(this).find('td:nth-child(1)').text(),
+                Vendor_Name: $(this).find('td:nth-child(2)').text(),
+                Vendor_EMailAddress: $(this).find('td:nth-child(3) input').val(), // Changed to get input value
+                POStatus: $(this).find('td:nth-child(4)').text(),
+                Vendor_VendorID: $(this).find('td:nth-child(5)').text(),
+                POHeader_Approve: $(this).find('td:nth-child(6)').text(),
+            };
+            tableData.push(rowData);
+        });
+
+        return tableData;
+    }
+
+    function sendDataToController(data) {
+        $.ajax({
+            url: '/NewPO/MultipleEmailPO',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    MsgToast("Success!", response.message + ' Total PO: ' + response.approvedCount, "success");
+                    $('#MultiEmail').modal('hide');
+                    LoadData();
+                }
+                else {
+                    MsgToast("Oops!", response.message + ' Total PO: ' + response.notApprovedCount, "error");
+                }
+            },
+            error: function (xhr, status, error) {
+                MsgToast("Error!", "Failed to send emails: " + error, "error");
+            }
+        });
+    }
+
+    ////////////////// End Multi Email
+
+    function OpenPOForm(poNumber) {
+    var rptCode = '21'; // Ensure this works properly in Razor
+    var menuTitle = "PO Details";
+    var POStatus = '@Request.QueryString["POStatus"]';
+        OpenPage('\\NewPO\\Index?PO=' + poNumber + '&menuTitle=' + menuTitle + '&rptCode=' + rptCode + '&POStatus=' + POStatus);
+}
+
+    $(document).ready(function () {
+        $('.po-counter').each(function () {
+            var $this = $(this);
+            var finalValue = parseInt($this.attr("data-value"));
+
+            $({ countNum: 0 }).animate({ countNum: finalValue }, {
+                duration: 800,
+                easing: 'swing',
+                step: function () {
+                    $this.text(Math.floor(this.countNum));
+                },
+                complete: function () {
+                    $this.text(this.countNum);
+                }
+            });
+        });
+    });
+    $(document).ready(function () {
+        $("body").append('<div id="poPreview" class="po-preview"></div>');
+
+        $(document).on("mouseenter", ".po-hover", function (event) {
+
+            $("#poPreview").html('<strong>Click to view PO details and release info!</strong>');
+            $("#poPreview").css({ top: event.pageY + 10, left: event.pageX + 10 }).fadeIn();
+        });
+
+        $(document).on("mouseleave", ".po-hover", function () {
+            $("#poPreview").fadeOut();
+        });
+    });
+
+    function MakeDataGridForTraining(tableId, data, tableHeight, columns, buttonId, search, isScrollX, footerFunction, isFramed, detailed, reportTitleId, rowSelection, lstHeight) {
+        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+        var isFramed = isFramed === undefined || isFramed === false ? false : true;
+        var isDetailed = detailed === undefined ? false : true;
+        var reportTitle = '';
+
+        if (reportTitleId === undefined)
+            reportTitle = $('.box-title').text();
+        else
+            reportTitle = reportTitleId;
+
+        var gridHeight = 0;
+
+        isScrollX = isScrollX === undefined ? false : true;
+        if (search === undefined) { search = true; }
+
+        var gridButtonsClass = '';
+        var gridSearchBoxClass = '';
+        if (isDetailed === true) {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'bg-white';
+            gridButtonSize = 30;
+        }
+        else {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+            gridButtonSize = 30;
+        }
+
+        var boxtool;
+        if (search === true) {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search..">
+        </div>`;
+                $('#trHeadSearch').append(boxtool);
+            } else {
+                $('#' + buttonId).empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch${tableId}" type="text" placeholder="Search..">
+        </div>`;
+                $('#' + buttonId).append(boxtool);
+            }
+        }
+        else {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = '<input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+                $('#trHeadSearch').append(boxtool);
+            }
+            else {
+                $('#' + buttonId).empty();
+
+            }
+        }
+
+        var table = $('#' + tableId).DataTable({
+            order: [],
+            createdRow: rowSelection,
+            data: data,
+            columns: columns,
+            paging: true,
+            ordering: true,
+            searching: search,
+            deferRender: true,
+            destroy: true,
+            pagingType: 'full',
+            pageLength: 20,
+            scrollCollapse: false,
+            scrollX: isScrollX,
+            colReorder: true,
+            orderClasses: false,
+            deferRender: true,
+            select: true,
+            colResize: true,
+            //scrollY: gridHeight,
+
+            footerCallback: footerFunction,
+            language: {
+                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                oPaginate: {
+                    sNext: '<i class="fa fa-angle-right"></i>',
+                    sPrevious: '<i class="fa fa-angle-left"></i>',
+                    sFirst: '<i class="fa fa-angle-double-left"></i>',
+                    sLast: '<i class="fa fa-angle-double-right"></i>'
+                }
+            },
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5 dataTables_info' i><'col-sm-6 ms-3 dataTables_paginate' p>>",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Copy',
+                    title: reportTitle,
+                    filename: 'DataExport',
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)' // Excluding columns while exporting
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Export to excel',
+                    title: reportTitle,
+                    filename: 'DataExport', //Added By Tahir
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Print',
+                    title: '',
+                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                    filename: 'DataExport',
+                    exportOptions: {
+                        // columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                }
+            ],
+            select: true
+        });
+        table.buttons().container()
+            .appendTo('#buttons');
+
+        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+        table.button(0).nodes().addClass(gridButtonsClass);
+
+        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(1).nodes().addClass(gridButtonsClass);
+
+        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(2).nodes().addClass(gridButtonsClass);
+
+        var dsgndby = $('.modal-footer > #designedby ').html();
+
+        if (dsgndby === "") {
+            $('#designedBy').html($('.desgndBy').html());
+        }
+
+        var layoutHeader = $('nav').innerHeight();
+        var cardHeader = $('.box-header').innerHeight();
+        var tableHeader = $('.dataTables_scrollHead').innerHeight();
+        var tableFooter = 0;
+        var cardFooterH = 30;
+
+        if (isFooter === true)
+            tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+        var parentHeight = $('#' + lstHeight).innerHeight();
+        if (parentHeight == undefined)
+            parentHeight = window.innerHeight;
+        else
+            parentHeight = $('#' + lstHeight).innerHeight();
+
+        if (isFooter === true)
+            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+        var browserHeight = parentHeight;
+        if (tableHeight === 0) {
+            if (layoutHeader === undefined)
+                gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+            else
+                gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+        }
+        else { gridHeight = tableHeight; }
+
+        var topHeader = $('#topHeader').innerHeight();
+        if (topHeader > 0)
+            gridHeight = gridHeight - (topHeader + 1);
+
+        gridHeight = gridHeight - 6;
+
+        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+        table.columns.adjust().draw();
+
+        $('#txtFrameSearch' + tableId).on('keyup change', function () {
+            table.search(this.value).draw();
+        });
+        $('.dataTables_filter').hide();
+        table.columns.adjust().draw();
+
+
+        //return table;
+    }
+</script>

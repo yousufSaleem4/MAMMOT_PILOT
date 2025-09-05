@@ -1,0 +1,816 @@
+﻿@model PlusCP.Models.UserRoleX
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+
+}
+<style>
+
+    .table.dataTable {
+        font-family: "Segoe UI", "Roboto";
+        clear: both;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 16px;
+    }
+
+    .dataTables_wrapper,
+    .dataTables_length,
+    .dataTables_filter,
+    .dataTables_info,
+    .dataTables_paginate,
+    table.dataTable thead th,
+    table.dataTable tbody td {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+    }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: left !important;
+            float: none !important;
+            display: flex;
+            justify-content: left;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                font-size: 15px !important; /* Increase font size */
+                padding: 8px 12px; /* Increase button padding */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_paginate {
+            margin-left: 60px !important; /* Adjust this value as needed */
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button i {
+                font-size: 15px !important; /* Increase icon size */
+                color: #003B59 !important;
+            }
+
+        .dataTables_wrapper .dataTables_info {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif !important;
+            font-size: 16px !important; /* Adjust size */
+            color: #333 !important; /* Darker text */
+            margin-left: 5px;
+        }
+    /* Change odd row background color */
+    table.dataTable tbody tr:nth-child(odd) {
+        background-color: #ECEDEF; /* Change to your desired color */
+    }
+
+    /* Change even row background color */
+    table.dataTable tbody tr:nth-child(even) {
+        background-color: #ffffff; /* Change to your desired color */
+    }
+
+    table.dataTable tbody tr.selected {
+        background-color: #D6EFE8; /* Orange color */
+        /*color: white;*/ /* Change text color if needed */
+    }
+    /* Search icon inside input */
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        transform: translateY(-50%);
+        color: darkgrey;
+        font-size: 14px;
+        pointer-events: none; /* Prevents clicking on the icon */
+    }
+
+    .search-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .txtSearch-frame {
+        margin-top: 5px;
+        height: 28px;
+        width: 150px;
+        border: none;
+        color: #003B59;
+        border: 2px solid #003B59 !important;
+        width: 200px;
+        padding-left: 30px; /* Space for the icon */
+    }
+
+    table.table thead th {
+        background-color: #003B59 !important; /* Change to your desired color */
+        color: white; /* Change to desired text color */
+        font-size: 15px;
+        font-family: 'Poppins', sans-serif;
+        height: 40px;
+    }
+
+    table.table tbody td, lbl_ {
+        /*background-color: white !important; /* Change to your desired color */
+        font-size: 15px;
+        color: #003B59 !important;
+    }
+
+    table.table tbody tr {
+        height: 50px; /* Adjust height as needed */
+    }
+
+        /* Hover effect */
+        table.table tbody tr:hover {
+            background-color: #f5f5f5 !important; /* Light gray background on hover */
+            transition: background-color 0.8s ease-in-out;
+            cursor: pointer;
+        }
+
+
+
+
+    table th {
+        /*padding: 1rem 0.5rem !important;*/
+        border: 1px solid black;
+        border-bottom: 1px solid black;
+        /*padding: 8px;*/
+        text-align: left;
+    }
+
+    table td {
+        padding: 1rem 0.5rem !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        vertical-align: middle;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0 10px; /* Adjust the second value to increase/decrease the vertical gap */
+        width: 100%;
+    }
+
+        table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td {
+            border-bottom-width: 1px;
+        }
+
+
+    .lblHeading {
+        font-size: 19px;
+        color: #003B59 !important;
+    }
+
+
+    .dropdown-list {
+        width: 140px;
+    }
+
+    a {
+        cursor: pointer;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+    /* .margin {
+                        margin: 4px;
+                        padding-top: 5px;
+                        color: white;
+                    }*/
+
+    /* .dropdown {
+            background-color: #29373D;
+            color: white;
+        }*/
+    .btn-success {
+        width: 115px;
+        height: 25px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    #lbl {
+        font-family: 'Helvetica Neue', Helvetica;
+    }
+
+    .Msg {
+        color: red;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    [data-tip] {
+        position: relative;
+    }
+
+        [data-tip]:before {
+            content: '';
+            /* hides the tooltip when not hovered */
+            display: none;
+            content: '';
+            display: none;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #1a1a1a;
+            position: absolute;
+            top: 30px;
+            left: 35px;
+            z-index: 8;
+            font-size: 0;
+            line-height: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+            top: 30px;
+            left: 35px;
+            z-index: 8;
+            font-size: 0;
+            line-height: 0;
+            width: 0;
+            height: 0;
+        }
+
+        [data-tip]:after {
+            display: none;
+            content: attr(data-tip);
+            position: absolute;
+            top: 35px;
+            left: 0px;
+            padding: 0px 0px;
+            background-color: white;
+            color: black;
+            z-index: 9;
+            font-size: 10px;
+            height: 18px;
+            line-height: 18px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 1px;
+            border: 2px;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+
+        [data-tip]:hover:before,
+        [data-tip]:hover:after {
+            display: block;
+        }
+
+    .optionMsgGreen {
+        color: darkgreen !important;
+    }
+
+   
+
+    .pad {
+        padding-bottom: 15px;
+        padding: 2px;
+        padding-top: 10px;
+    }
+
+
+
+    .table-container {
+        height: 200px; /* Set the desired fixed height */
+        overflow-y: auto;
+    }
+
+   
+
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2;
+    }
+    /* Modal Styling */
+    .modal-dialog {
+        margin: 30px auto;
+    }
+
+        .modal-dialog.centered {
+            display: flex;
+            min-height: calc(100vh - 60px);
+            align-content: stretch;
+            flex-wrap: wrap;
+            align-items: stretch;
+            flex-direction: column;
+            justify-content: center;
+            width: 32%;
+        }
+    .ModalHeaderColor {
+        background-color: #D6EFE8;
+        color: #003B59
+    }
+
+    .ModalLabelColor {
+        color: #003B59;
+    }
+
+    .btn-hover-save {
+        background-color: #003B59; /* Default background color */
+        border-color: #003B59; /* Default border color */
+        color: #fff; /* Default text color */
+    }
+
+        .btn-hover-save:hover {
+            background-color: transparent; /* Make background transparent on hover */
+            border-color: #003B59; /* Dark border color on hover */
+            color: #003B59; /* Dark font color on hover */
+        }
+
+    .btnClose {
+        background-color: whitesmoke; /* Make background transparent on hover */
+        color: #003B59; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnClose:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: #003B59; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+        }
+
+    .txtSearch {
+        border: 2px solid #003B59 !important;
+    }
+</style>
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="~/Scripts/bootstrap-dropdown.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>*@
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+            <div id="dataList" class="box panel panel-default">
+                <div class="box-header with-border" style=" background-color: #f8f9fc; color: #003B59 !important">
+                    <span class="fa fa-list fa-lg" style="color: #003B59"></span>
+                    <h5 class="box-title ModalLabelColor"><strong>Users</strong></h5>
+
+                    <p id="btnAddNew" class="btn btn-success btn-sm" style="font-size:10px">Add New User <span class="fas fa-plus"></span></p>
+                    <!--<span>&ensp;Status:</span>
+                    <select style="background-color: #0089db;" id="isActiveEmp">
+                        <option value="-1" style="text-align:left;">All</option>
+                        <option value="1" style="text-align:left;">Active</option>
+                        <option value="0" style="text-align:left;">Inactive</option>
+                    </select>-->
+
+                    <div id="buttons" class="box-tools pull-right">
+
+                    </div>
+
+                </div>
+                <div class="box-body">
+                    <table id="lstData" class="table table-bordered table-striped text-sm table-hover" style="width:100%">
+                        <thead class="sorted-asc">
+                            <tr>
+                                <th class="notexport"></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4" id="rghtPanel">
+            <h4 style="padding-top:300px; padding-left:50px;">Click on the edit button in the left section to load data.</h4>
+        </div>
+    </div>
+</div>
+
+<!-- Add New User -->
+<div id="AddUserModal" class="modal fade" role="dialog">
+    <div class="modal-dialog centered">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header ModalHeaderColor">            
+                <h5 class="modal-title ModalLabelColor">Invitation Form</h5>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12" style="background-color:#F5F5F5">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="ModalLabelColor" for="Type">Type :</label>
+                                    <select class="form-control" id="ddlType" style="height:30px">
+                                        <option value="Buyer" style="text-align:left;">Buyer</option>
+                                        @*<option value="Supplier" style="text-align:left;">Supplier</option>*@
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="ModalLabelColor">Email address:</label>
+                                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Email" } })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnAddNewCancel" type="button" class="btn btnClose" data-dismiss="modal">Close</button>
+                <button id="btnAddNewSend" type="button" class="btn btn-hover-save">Send</button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@*@using (Html.BeginForm("newUser", "UserRoleX"))
+    {
+
+    }*@
+
+
+<script src="~/Scripts/Message.js"></script>
+<script>
+    $('#btnAddNew').click(function () {
+        $('#ddlType').prop('selectedIndex', 0);
+        $('#Email').val('');
+        $('#AddUserModal').modal('show');
+    });
+
+    $('#btnAddNewSend').click(function () {
+
+        var Type = $('#ddlType :selected').text();
+        var Email = $('#Email').val();
+       
+
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/UserRoleX/SendInvite',
+            data: {
+                Type: Type,
+                Email: Email
+            },
+            datatype: JSON,
+            success: function (data) {
+                if (data.Message == "OK") {
+                    MsgToast("Success!", "Invitation has been sent!", "success");
+                    $('#AddUserModal').modal('hide');  
+                }
+                else if (data.Message == "Already") {
+                    MsgToast("Warning!", "User already exist", "error");
+                   
+                }
+                else {
+                    MsgToast("Oops!", "An error occurred!", "error");
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+    });
+
+    ToggleDataList(false);
+    LoadData('', '');
+
+
+    var selectedProgram = '';
+    var selectedMnu = '';
+
+    var site;
+    function LoadData(IscreateUser, type) {
+        $('#tblBody').empty();
+
+        if (type == "") {
+            localStorage.removeItem("type");
+            $('#isActiveEmp option:contains("Class")').prop('selected', true);
+        }
+        else {
+            var type = localStorage.getItem("type");
+            if (type == "Y") {
+
+                $('#class option:contains("Y")').prop('selected', true);
+            }
+            if (type == "N") {
+
+                $('#class option:contains("N")').prop('selected', true);
+            }
+
+            if (typeof (type) === "-1") {
+
+                $('#isActiveEmp option:contains("Class")').prop('selected', true);
+            }
+        }
+
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/UserRoleX/GetList',
+            data: {
+                IscreateUser: IscreateUser,
+                type: type
+            },
+            datatype: JSON,
+            success: function (data) {
+                var columnDef = [
+                    {
+                        "data": "Edit", "title": "Edit", "className": "text-center", "className": "notexport", "width": "20px",
+                        render: function (data, type, row) {
+                            var url = '<a href="#" onclick="OpenView(\'\\\\UserRoleX\\\\Detail?ID=' + row["UserId"] + '&FirstName=' + row["FirstName"] + '&LastName=' + row["LastName"] + '&Password=' + row["Password"] + '\',\'rghtPanel\')">' + data + '<i class="fa fa-pencil-square" aria-hidden="true" style="font-size:20px"></i></a>';
+                            return url;
+                        },
+                    },
+                    {
+                        "data": "UserId", "title": "Id", "width": "30px", "visible": false
+                    },
+                    {
+                        "data": "FirstName", "title": "First Name", "width": "120px"
+                    },
+                    {
+                        "data": "LastName", "title": "Last Name", "width": "120px"
+                    },
+
+
+                    {
+                        "data": "EMAIL", "title": "Email"
+                    },
+                    {
+                        "data": "ACTIVE", "title": "Active", "width": "50px", "className": "text-center"
+                    },
+
+                    {
+                        "data": "ADMIN", "title": "Admin", "width": "50px", "className": "text-center"
+                    },
+
+
+
+                    {
+                        "data": "CreatedOn", "title": "Created On", "width": "140px", "className": "text-right"
+                    },
+                    {
+                        "data": "Password", "title": "Password", "width": "140px", "className": "text-left", "visible": false
+                    },
+                ]
+
+                ToggleDataList(true);
+                MakeDataGridForTraining('lstData', data.lstUser, 0, columnDef, 'buttons', true, true, false, false);
+                $('.dropdown-toggle').dropdown();
+                //  Loadddl();
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+    }
+    function MsgToast(msg, title, type) {
+
+        toastr.options = {
+            closeButton: true,
+            debug: false,
+            newestOnTop: false,
+            progressBar: true,
+            positionClass: 'toast-top-right',
+            preventDuplicates: true,
+            onclick: null
+        };
+
+
+
+        var $toast = toastr[type](title, msg); // Wire up an event handler to a button in the toast, if it exists
+        $toastlast = $toast;
+
+        if (typeof $toast === 'undefined') {
+            return;
+        }
+
+
+    }
+    $("#isActiveEmp").change(function () {
+        var type = $("#isActiveEmp").val();
+        localStorage.setItem("type", type);
+        LoadData('', localStorage.getItem("type"));
+    });
+    $('#btnCancel').click(function () {
+        $(Username).val('');
+        $(Password).val('');
+        $(FirstName).val('');
+        $(LastName).val('');
+        $(Email).val('');
+        $('#Msg').empty();
+    });
+
+    $('.btn-success').click(function () {
+        $('#user').modal('show');
+    });
+
+    $('.btn-success').click(function () {
+        $('#FirstName').focus();
+    });
+
+    function MakeDataGridForTraining(tableId, data, tableHeight, columns, buttonId, search, isScrollX, footerFunction, isFramed, detailed, reportTitleId, rowSelection, lstHeight) {
+        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+        var isFramed = isFramed === undefined || isFramed === false ? false : true;
+        var isDetailed = detailed === undefined ? false : true;
+        var reportTitle = '';
+
+        if (reportTitleId === undefined)
+            reportTitle = $('.box-title').text();
+        else
+            reportTitle = reportTitleId;
+
+        var gridHeight = 0;
+
+        isScrollX = isScrollX === undefined ? false : true;
+        if (search === undefined) { search = true; }
+
+        var gridButtonsClass = '';
+        var gridSearchBoxClass = '';
+        if (isDetailed === true) {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'bg-white';
+            gridButtonSize = 30;
+        }
+        else {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+            gridButtonSize = 30;
+        }
+
+        var boxtool;
+        if (search === true) {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search..">
+        </div>`;
+                $('#trHeadSearch').append(boxtool);
+            } else {
+                $('#' + buttonId).empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch${tableId}" type="text" placeholder="Search..">
+        </div>`;
+                $('#' + buttonId).append(boxtool);
+            }
+        }
+        else {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = '<input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+                $('#trHeadSearch').append(boxtool);
+            }
+            else {
+                $('#' + buttonId).empty();
+
+            }
+        }
+
+        var table = $('#' + tableId).DataTable({
+            order: [],
+            createdRow: rowSelection,
+            data: data,
+            columns: columns,
+            paging: true,
+            ordering: true,
+            searching: search,
+            deferRender: true,
+            destroy: true,
+            pagingType: 'full',
+            pageLength: 20,
+            scrollCollapse: false,
+            scrollX: isScrollX,
+            colReorder: true,
+            orderClasses: false,
+            deferRender: true,
+            select: true,
+            colResize: true,
+            //scrollY: gridHeight,
+
+            footerCallback: footerFunction,
+            language: {
+                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                oPaginate: {
+                    sNext: '<i class="fa fa-angle-right"></i>',
+                    sPrevious: '<i class="fa fa-angle-left"></i>',
+                    sFirst: '<i class="fa fa-angle-double-left"></i>',
+                    sLast: '<i class="fa fa-angle-double-right"></i>'
+                }
+            },
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5 dataTables_info' i><'col-sm-6 ms-3 dataTables_paginate' p>>",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Copy',
+                    title: reportTitle,
+                    filename: 'DataExport',
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)' // Excluding columns while exporting
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Export to excel',
+                    title: reportTitle,
+                    filename: 'DataExport', //Added By Tahir
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Print',
+                    title: '',
+                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                    filename: 'DataExport',
+                    exportOptions: {
+                        // columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                }
+            ],
+            select: true
+        });
+        table.buttons().container()
+            .appendTo('#buttons');
+
+        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+        table.button(0).nodes().addClass(gridButtonsClass);
+
+        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(1).nodes().addClass(gridButtonsClass);
+
+        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(2).nodes().addClass(gridButtonsClass);
+
+        var dsgndby = $('.modal-footer > #designedby ').html();
+
+        if (dsgndby === "") {
+            $('#designedBy').html($('.desgndBy').html());
+        }
+
+        var layoutHeader = $('nav').innerHeight();
+        var cardHeader = $('.box-header').innerHeight();
+        var tableHeader = $('.dataTables_scrollHead').innerHeight();
+        var tableFooter = 0;
+        var cardFooterH = 30;
+
+        if (isFooter === true)
+            tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+        var parentHeight = $('#' + lstHeight).innerHeight();
+        if (parentHeight == undefined)
+            parentHeight = window.innerHeight;
+        else
+            parentHeight = $('#' + lstHeight).innerHeight();
+
+        if (isFooter === true)
+            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+        var browserHeight = parentHeight;
+        if (tableHeight === 0) {
+            if (layoutHeader === undefined)
+                gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+            else
+                gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+        }
+        else { gridHeight = tableHeight; }
+
+        var topHeader = $('#topHeader').innerHeight();
+        if (topHeader > 0)
+            gridHeight = gridHeight - (topHeader + 1);
+
+        gridHeight = gridHeight - 6;
+
+        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+        table.columns.adjust().draw();
+
+        $('#txtFrameSearch' + tableId).on('keyup change', function () {
+            table.search(this.value).draw();
+        });
+        $('.dataTables_filter').hide();
+        table.columns.adjust().draw();
+
+
+        //return table;
+    }
+</script>

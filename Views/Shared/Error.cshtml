@@ -1,0 +1,224 @@
+﻿@{
+    ViewBag.Title = "Error";
+    Layout = cCommon.SwitchToDetailPage(Request.Url.PathAndQuery);
+}
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<style>
+    body {
+        background: linear-gradient(to top, white, #D6EFE8);
+        font-family: Arial, sans-serif;
+    }
+
+    .error-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        width: 400px;
+    }
+
+    .error-message {
+        font-size: 16px;
+        color: #6c757d;
+    }
+
+    /* Modal styling */
+
+    .modal-dialog {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 90vh;
+    }
+
+    .modal-content {
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .modal-header {
+        background-color: transparent;
+        color: #003B59;
+        border-bottom: none;
+    }
+
+        .modal-header h4 {
+            color: #dc3545;
+            font-size: 24px;
+            margin-bottom: 0;
+        }
+
+    .modal-body p {
+        font-size: 16px;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+        color: #333;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #495057;
+        margin-bottom: 15px;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        height: 80px;
+    }
+
+    .submit-button {
+        background: #003B59;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 4px;
+        transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+        .submit-button:hover {
+            background: transparent;
+            border: 1px solid #003B59;
+            color: #003B59;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+    .contact-info {
+        font-size: 14px;
+        color: #6c757d;
+        text-align: center;
+        margin-top: 10px;
+    }
+</style>
+
+<div style="padding-top: 1px; background-color: #D6EFE8">
+
+
+    <a href="https://collablly.com/" target="_blank">
+        <img src="/Content/Images/Collablly.gif" style="margin-left: 25px; margin-top: 10px; width: 15%;  margin-bottom: 3px;" />
+    </a>
+
+</div>
+
+<!-- Error Message and Link to Open Modal -->
+<div class="error-container">
+    <h2>We're Sorry!</h2>
+    <p class="error-message">
+       Please try refreshing the page.
+        If the issue persists,<br />
+        <a href="#" data-toggle="modal" data-target="#supportModal">click here to contact support</a>.
+    </p>
+</div>
+
+<!-- Modal Structure -->
+<div class="modal fade" id="supportModal" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="supportModalLabel">Support Request</h4>
+            </div>
+            <div class="modal-body">
+                <p>Please let us know by filling out the form below.</p>
+                <form action="/Error/SubmitErrorReport" method="post">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Your email address" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Describe what happened</label>
+                        <textarea id="message" name="message" placeholder="Describe the actions you took before the error" required></textarea>
+                    </div>
+                    <input type="hidden" id="RecipientEmail" name="RecipientEmail" value="support@collablly.com" />
+                    <button type="submit" class="submit-button">Submit</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="contact-info">
+                    Alternatively, contact support at <a href="mailto:support@collablly.com">support@collablly.com</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="wait" style="width:100%;height:100%;left:0px;top:0px; text-align:center; vertical-align:middle" class="modal">
+    <img src='~/Content/images/Loading.gif' width="100" height="100" style="text-align:center; vertical-align:middle; margin-top:400px;" />
+</div>
+<!-- jQuery and Bootstrap 3 JavaScript (ensure these are loaded) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="~/Scripts/Message.js"></script>
+
+<script>
+
+    $(document).ajaxStart(function () {
+        $('#wait').show();
+    }).ajaxStop(function () {
+        $('#wait').hide();
+    });
+    // Handle the form submission via AJAX to prevent page reload
+    $("form").submit(function (event) {
+        event.preventDefault();
+
+        $.ajax({
+            type: "POST",
+            url: "/Error/SubmitErrorReport",
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    // Close the modal
+                    $('#supportModal').modal('hide');
+                    MsgToast("Success!", "Your request has been logged.", "success");
+                  
+                } else {
+                    // Show an error message if submission failed
+                    MsgToast("Error!", response.message, "error");
+                   
+                }
+            },
+            error: function () {
+                MsgToast("Error!", "An unexpected error occurred.", "error"); 
+            }
+        });
+    });
+
+    function MsgToast(msg, title, type) {
+
+        toastr.options = {
+            closeButton: true,
+            debug: false,
+            newestOnTop: false,
+            progressBar: true,
+            positionClass: 'toast-top-right',
+            preventDuplicates: true,
+            onclick: null
+        };
+        var $toast = toastr[type](title, msg); // Wire up an event handler to a button in the toast, if it exists
+        $toastlast = $toast;
+
+        if (typeof $toast === 'undefined') {
+            return;
+        }
+    }
+    // Optional: Clear messages when reopening the modal
+    $('#supportModal').on('shown.bs.modal', function () {
+        $(".message-container").html('');
+    });
+</script>

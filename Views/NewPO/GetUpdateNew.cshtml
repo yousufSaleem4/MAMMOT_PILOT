@@ -1,0 +1,724 @@
+﻿@model PlusCP.Models.NewPO
+@{
+    ViewBag.Title = "Get New Update";
+    Layout = null;
+}
+<style>
+    .Message {
+        height: 200px;
+        width: 500px
+    }
+
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 1.5rem;
+        clear: both;
+        font-weight: 400;
+        color: #212529;
+        text-align: inherit;
+        white-space: nowrap;
+        background-color: transparent;
+        border: 0;
+        text-decoration: none;
+    }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background-color: #f8f9fa;
+        }
+    
+
+</style>
+<div id="parent" class="container-fluid">
+    <input id="rptCode" type="hidden" value="019" />
+    <input id="rptTitle" type="hidden" value="@ViewBag.ReportTitle" />
+    <div id="dataLists" class="box panel panel-default">
+        <div class="box-header with-border" style="background-color:whitesmoke; color:#14149F">
+
+            <h6 class="box-title"><strong>@ViewBag.ReportTitle  </strong><strong id="filterString"></strong></h6>
+            <div id="buttonParttran" class="box-tools pull-right">
+            </div>
+        </div>
+
+        <div class="box-body" id="lstP">
+            <table id="lstUpdate" class="table table-bordered table-striped text-sm table-hover" width="100%">
+                <thead class="sorted-asc">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                @*<tbody id="tblBody"></tbody>*@
+                <tfoot>
+                    <tr>
+                        @*<th>Total :</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>*@
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<div id="alertContainer"></div>
+<div id="ActionButton" style="display: flex;display:none;padding-left:35px; justify-content: space-between;">
+    <a href="#accept" id="acceptBtn">Accept</a>
+    <span>|</span>
+    <a href="#propose" id="proposeBtn">Propose</a>
+    <span>|</span>
+    <a href="#reject" id="rejectBtn">Reject</a>
+    <span>|</span>
+    <a href="#hold" id="holdBtn">Hold</a>
+</div>
+
+<!-- Modal -->
+<div id="ActionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <!-- Increased modal width -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" style="padding-left:4px; padding-top:2px" id="showTitle">Propose</h4>
+
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- Left side with green background color -->
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <!-- Green background -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>PO Num:</label>
+                                        @Html.EditorFor(model => model.PONo, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "PO No.", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Part No:</label>
+                                        @Html.EditorFor(model => model.PartNo, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Part No", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Supplier:</label>
+                                        @Html.EditorFor(model => model.Vendor, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Buyer Name", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <!-- Green background -->
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Qty:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Qty", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Qty", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @Html.EditorFor(model => model.ProposedQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Qty" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Price:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Price", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Price", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @Html.EditorFor(model => model.ProposedPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Price" } })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <br />
+                                        <label>Due Date:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Current:</label>
+                                        @Html.EditorFor(model => model.CurrentDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Current Due Date", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Last Committed:</label>
+                                        @Html.EditorFor(model => model.CommitDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Due Date", disabled = "disabled" } })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Buyer Proposed:</label>
+                                        @*@Html.EditorFor(model => model.ProposedDueDate, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Due Date" } })*@
+                                        @Html.TextBoxFor(model => model.ProposedDueDate, htmlAttributes: new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <label>Message</label>
+                            @Html.TextAreaFor(model => model.Message, new { style = "height: 20%; width: 100%;", htmlAttributes = new { placeholder = "Email Body", @class = "form-control input-lg" } })
+                            <label id="lblMsg1" style="color:green"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancel" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btnSend" type="button" class="btn btn-primary">Save</button>
+                <label id="VendorId" style="visibility:hidden" hidden></label>
+                <label id="VendorName" style="visibility:hidden" hidden></label>
+                <label id="BuyerId" style="visibility:hidden" hidden></label>
+                <label id="GUID" style="visibility:hidden" hidden></label>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Yes or NO -->
+
+<div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+            <div class="custom-modal-header bg-primary text-white">
+                <h5 class="custom-modal-title">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12" style="background-color:#F5F5F5">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label id="confirmationMessage"></label>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="yesButton" type="button" class="btn btn-secondary" data-dismiss="modal">Yes</button>
+                <button id="noButton" type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <label id="lblAction" style="visibility:hidden" hidden></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        //var _lstupdate = @Html.Raw(Json.Encode(Model.lstUpdate));
+        var _lstupdate = @Html.Raw(Model.serializer.Serialize(Model.lstUpdate));
+    ToggleDataList(false);
+    var columnDef = [
+        { "data": "GUID", "title": "GUID", "width": "100px", "visible": false },
+        {
+
+            "data": "Accept", "title": "Actions", "width": "50px", "visible": false,
+            render: function (data, type, row) {
+                return '<div class="dropdown">' +
+                    '<a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="ddlAction" style="font-size:12px" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                    'Choose an Action' +
+                    '</a>' +
+                    '<div class="dropdown-menu" aria-labelledby="ddlAction">' +
+                    '<a class="dropdown-item" href="#" onclick="handleActionAHR(\'' + row["GUID"] + '\', \'Accept\')">Accept</a>' +
+                    '<a class="dropdown-item" href="#" onclick="handleAction(\'' + row["PONo"] + '\', \'' + row["PartNo"] + '\', \'' + row["VendorName"] + '\', \'' + row["CurrentQty"] + '\', \'' + row["CurrentPrice"] + '\', \'' + row["CurrentDueDate"] + '\', \'' + row["CommitQty"] + '\', \'' + row["CommitPrice"] + '\', \'' + row["CommitDueDate"] + '\', \'' + row["GUID"] + '\', \'Propose\')">Propose</a>' +
+                    '<a class="dropdown-item" href="#" onclick="handleActionAHR(\'' + row["GUID"] + '\', \'Hold\')">Hold</a>' +
+                    '<a class="dropdown-item" href="#" onclick="handleActionAHR(\'' + row["GUID"] + '\', \'Reject\')">Reject</a>' +
+                    '</div>' +
+                    '</div>';
+            }
+
+        },
+
+        { "data": "PONo", "title": "PO Num", "width": "100px", "visible": false },
+        { "data": "PartNo", "title": "Part No.", "width": "40px", "visible": false },
+        { "data": "PartDesc", "title": "Line Desc.", "visible": false },
+        { "data": "VendorName", "title": "Supplier", "visible": false },
+        { "data": "CurrentQty", "title": "Current Qty", "width": "50px", "visible": false },
+        { "data": "CurrentPrice", "title": "Current Price", "width": "50px", "visible": false },
+        { "data": "CurrentDueDate", "title": "Current Due Date", "width": "90px", "className": "text-right", "visible": false },
+        { "data": "CommitQty", "title": "Qty", "width": "50px" },
+        { "data": "CommitPrice", "title": "Price", "width": "50px"},
+        { "data": "CommitDueDate", "title": "Due Date", "width": "90px", "className": "text-center" },
+        { "data": "CompletedBy", "title": "Compl. By", "width": "90px", "className": "text-center" },
+    ]
+
+
+    ToggleDataList(true);
+    //MakeDataGrid('lstUpdate', data.lstUpdate, 0, columnDef, true, true);
+    //MakeMeBabyGridIP('lstUpdate', _lstupdate, 0, columnDef, 'buttonParttran', false, $('#Parttran').text(), false, 'Parttrans');
+        MakeFrameGrid('lstUpdate', _lstupdate, 0, columnDef, 'buttonParttran', false, $('#Parttran').text(), false, false, $('#head_lstUnitLst').text(), false);
+        $('#ActionButton').show();
+
+    });
+
+    // Action Button accept Events
+    $('#acceptBtn').click(function () {
+        var action = "Accept";
+        $('#lblAction').val(action);
+        var confirmationMessage = "Are you sure you want to " + action + " this PO?";
+        $("#confirmationMessage").text(confirmationMessage);
+        // Show the modal popup
+      
+        $('#confirmationModal').modal('show');
+
+    });
+
+    $("#yesButton").click(function () {
+        // Perform action based on the button clicked
+        var action = $('#lblAction').val();
+
+        var table = $('#lstUpdate').DataTable();
+        // Get data of the first row
+        var rowData = table.row(0).data();
+        var GUID = rowData["GUID"]
+
+        handleactionahr(GUID, action);
+        
+    });
+    // Handle click event for the No button in the popup
+    $("#noButton").click(function () {
+        // Hide the popup
+        $('#confirmationModal').modal('hide');
+    });
+
+    // Action Button Reject Events
+    $('#rejectBtn').click(function () {
+        var action = "Reject";
+        $('#lblAction').val(action);
+        var confirmationMessage = "Are you sure you want to " + action + " this PO?";
+        $("#confirmationMessage").text(confirmationMessage);
+        // Show the modal popup
+
+        $('#confirmationModal').modal('show');
+    
+    });
+
+    // Action Button Reject Events
+    $('#holdBtn').click(function () {
+        var action = "Hold";
+        $('#lblAction').val(action);
+        var confirmationMessage = "Are you sure you want to " + action + " this PO?";
+        $("#confirmationMessage").text(confirmationMessage);
+        // Show the modal popup
+
+        $('#confirmationModal').modal('show');
+    });
+
+    // Action Button Propose Events
+    $('#proposeBtn').click(function () {
+        var table = $('#lstUpdate').DataTable();
+
+        // Get data of the first row
+        var rowData = table.row(0).data();
+        var GUID = rowData["GUID"];
+        var Action = "Propose";
+        var PONo = rowData["PONo"];
+        var Vendor = rowData["VendorName"];
+        var PartNo = rowData["PartNo"];
+        var CurrentQty = rowData["CurrentQty"];
+        var CommitQty = rowData["CommitQty"];
+
+        var CurrentPrice = rowData["CurrentPrice"];
+        var CommitPrice = rowData["CommitPrice"];
+        var CurrentDueDate = rowData["CurrentDueDate"];
+        var CommitDueDate = rowData["CommitDueDate"];
+
+        handleAction(PONo, PartNo,Vendor,CurrentQty,CurrentPrice,CurrentDueDate,CommitQty,CommitPrice,CommitDueDate,GUID,Action);
+
+
+    });
+
+    function handleactionahr(guid, action) {
+
+        $.ajax({
+
+            cache: false,
+            type: 'get',
+            url: '/NewPO/UpdateHasAction',
+            data: {
+                actionahr: action,
+                guid: guid,
+
+            },
+            success: function (data) {
+                if (data == 'Updated') {
+                    MsgToast("Success!", "Record has been updated!", "success");
+                }
+                else {
+                    MsgToast("Oops!", "An error occurred!", "error");
+                }
+            }
+
+        })
+    }
+
+    //// Click event handler for dropdown items
+    function handleAction(PONo, partNo, vendor, currentQty, currentPrice, currentDueDate, commitQty, commitPrice, commitDueDate, GUID, action) {
+
+        $('#PONo').val(PONo);
+        $('#Vendor').val(vendor);
+        $('#PartNo').val(partNo);
+
+        $('#CurrentQty').val(currentQty);
+        $('#CommitQty').val(commitQty);
+
+        $('#CurrentPrice').val(currentPrice);
+        $('#CommitPrice').val(commitPrice);
+
+        $('#CurrentDueDate').val(currentDueDate);
+        $('#CommitDueDate').val(commitDueDate);
+
+
+        $('#GUID').val(GUID);
+        $('#showTitle').empty();
+        $('#showTitle').append(action);
+        $('#ActionModal').modal('show');
+
+
+    }
+
+
+
+    dateTo();
+    //// Function to display alert message
+    function showAlert(message, type) {
+        var alertContainer = document.getElementById('alertContainer');
+        var alertHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">';
+        alertHTML += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
+        alertHTML += '<span aria-hidden="true">&times;</span></button>';
+        alertHTML += message + '</div>';
+        alertContainer.innerHTML = alertHTML;
+    }
+    $("#ProposedDueDate").mouseover(function () {
+        $(this).css('cursor', 'pointer');
+    });
+    $('#btnSend').click(function () {
+        $('#lblMsg1').empty();
+
+        var GUID = $('#GUID').val();
+        var Qty = $('#ProposedQty').val();
+        var Price = $('#ProposedPrice').val();
+        var DueDate = $('#ProposedDueDate').val();
+        var Message = $('#Message').val();
+        var PONo = $('#PONo').val();
+        var PartNo = $('#PartNo').val();
+
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/NewPO/ProposeUpdate',
+            data: {
+                GUID: GUID,
+                Qty: Qty,
+                Price: Price,
+                DueDate: DueDate,
+                Message: Message,
+                PONo: PONo,
+                PartNo: PartNo,
+            },
+            datatype: JSON,
+            success: function (data) {
+                if (data == "Updated") {    
+                    $('#ActionModal').modal('hide');
+                    MsgToast("Success!", "Email has been sent!", "success");
+                }
+                else {
+                    MsgToast("Oops!", "An error occurred!", "error");
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+
+    });
+    function dateTo() {
+        var date = new Date();
+        var newdate = new Date(date);
+        //For To Date
+        newdate.setDate(newdate.getDate());
+        var dd = ('0' + newdate.getDate()).slice(-2);
+        var mm = ('0' + (newdate.getMonth() + 1)).slice(-2);
+        var y = newdate.getFullYear();
+        var someFormattedDate = y + '.' + mm + '.' + dd;
+        document.getElementById('ProposedDueDate').value = someFormattedDate;
+    }
+
+    $("#ProposedDueDate").datepicker({
+        format: 'yyyy.mm.dd',
+        autoclose: true,
+        startDate: 'd',
+        endDate: null
+    });
+    function MakeDataGridForTraining(tableId, data, tableHeight, columns, buttonId, search, isScrollX, footerFunction, isFramed, detailed, reportTitleId, rowSelection, lstHeight) {
+        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+        var isFramed = isFramed === undefined || isFramed === false ? false : true;
+        var isDetailed = detailed === undefined ? false : true;
+        var reportTitle = '';
+
+        if (reportTitleId === undefined)
+            reportTitle = $('.box-title').text();
+        else
+            reportTitle = reportTitleId;
+
+        var gridHeight = 0;
+
+        isScrollX = isScrollX === undefined ? false : true;
+        if (search === undefined) { search = true; }
+
+        var gridButtonsClass = '';
+        var gridSearchBoxClass = '';
+        if (isDetailed === true) {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'bg-white';
+            gridButtonSize = 30;
+        }
+        else {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+            gridButtonSize = 30;
+        }
+
+        var boxtool;
+        if (search === true) {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search..">
+        </div>`;
+                $('#trHeadSearch').append(boxtool);
+            } else {
+                $('#' + buttonId).empty();
+                boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch${tableId}" type="text" placeholder="Search..">
+        </div>`;
+                $('#' + buttonId).append(boxtool);
+            }
+        }
+        else {
+            if (isFramed) {
+                $('#trHeadSearch').empty();
+                boxtool = '<input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+                $('#trHeadSearch').append(boxtool);
+            }
+            else {
+                $('#' + buttonId).empty();
+
+            }
+        }
+
+        var table = $('#' + tableId).DataTable({
+            order: [],
+            createdRow: rowSelection,
+            data: data,
+            columns: columns,
+            paging: true,
+            ordering: true,
+            searching: search,
+            deferRender: true,
+            destroy: true,
+            pagingType: 'full',
+            pageLength: 20,
+            scrollCollapse: false,
+            scrollX: isScrollX,
+            colReorder: true,
+            orderClasses: false,
+            deferRender: true,
+            select: true,
+            colResize: true,
+            //scrollY: gridHeight,
+
+            footerCallback: footerFunction,
+            language: {
+                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                oPaginate: {
+                    sNext: '<i class="fa fa-angle-right"></i>',
+                    sPrevious: '<i class="fa fa-angle-left"></i>',
+                    sFirst: '<i class="fa fa-angle-double-left"></i>',
+                    sLast: '<i class="fa fa-angle-double-right"></i>'
+                }
+            },
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5 dataTables_info' i><'col-sm-6 ms-3 dataTables_paginate' p>>",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Copy',
+                    title: reportTitle,
+                    filename: 'DataExport',
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)' // Excluding columns while exporting
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Export to excel',
+                    title: reportTitle,
+                    filename: 'DataExport', //Added By Tahir
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Print',
+                    title: '',
+                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                    filename: 'DataExport',
+                    exportOptions: {
+                        // columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                }
+            ],
+            select: true
+        });
+        table.buttons().container()
+            .appendTo('#buttons');
+
+        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+        table.button(0).nodes().addClass(gridButtonsClass);
+
+        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(1).nodes().addClass(gridButtonsClass);
+
+        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(2).nodes().addClass(gridButtonsClass);
+
+        var dsgndby = $('.modal-footer > #designedby ').html();
+
+        if (dsgndby === "") {
+            $('#designedBy').html($('.desgndBy').html());
+        }
+
+        var layoutHeader = $('nav').innerHeight();
+        var cardHeader = $('.box-header').innerHeight();
+        var tableHeader = $('.dataTables_scrollHead').innerHeight();
+        var tableFooter = 0;
+        var cardFooterH = 30;
+
+        if (isFooter === true)
+            tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+        var parentHeight = $('#' + lstHeight).innerHeight();
+        if (parentHeight == undefined)
+            parentHeight = window.innerHeight;
+        else
+            parentHeight = $('#' + lstHeight).innerHeight();
+
+        if (isFooter === true)
+            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+        var browserHeight = parentHeight;
+        if (tableHeight === 0) {
+            if (layoutHeader === undefined)
+                gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+            else
+                gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+        }
+        else { gridHeight = tableHeight; }
+
+        var topHeader = $('#topHeader').innerHeight();
+        if (topHeader > 0)
+            gridHeight = gridHeight - (topHeader + 1);
+
+        gridHeight = gridHeight - 6;
+
+        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+        table.columns.adjust().draw();
+
+        $('#txtFrameSearch' + tableId).on('keyup change', function () {
+            table.search(this.value).draw();
+        });
+        $('.dataTables_filter').hide();
+        table.columns.adjust().draw();
+
+
+        //return table;
+    }
+</script>
+
+

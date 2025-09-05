@@ -1,0 +1,504 @@
+﻿@model PlusCP.Models.POScheduler
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+
+}
+
+<style>
+    .dropdown-list {
+        width: 140px;
+    }
+
+    a {
+        cursor: pointer;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+    /* .margin {
+                        margin: 4px;
+                        padding-top: 5px;
+                        color: white;
+                    }*/
+
+    /* .dropdown {
+            background-color: #29373D;
+            color: white;
+        }*/
+    .btn-success {
+        width: 115px;
+        height: 25px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    #lbl {
+        font-family: 'Helvetica Neue', Helvetica;
+    }
+
+    .Msg {
+        color: red;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    [data-tip] {
+        position: relative;
+    }
+
+        [data-tip]:before {
+            content: '';
+            /* hides the tooltip when not hovered */
+            display: none;
+            content: '';
+            display: none;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #1a1a1a;
+            position: absolute;
+            top: 30px;
+            left: 35px;
+            z-index: 8;
+            font-size: 0;
+            line-height: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+            top: 30px;
+            left: 35px;
+            z-index: 8;
+            font-size: 0;
+            line-height: 0;
+            width: 0;
+            height: 0;
+        }
+
+        [data-tip]:after {
+            display: none;
+            content: attr(data-tip);
+            position: absolute;
+            top: 35px;
+            left: 0px;
+            padding: 0px 0px;
+            background-color: white;
+            color: black;
+            z-index: 9;
+            font-size: 10px;
+            height: 18px;
+            line-height: 18px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 1px;
+            border: 2px;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+
+        [data-tip]:hover:before,
+        [data-tip]:hover:after {
+            display: block;
+        }
+
+    .optionMsgGreen {
+        color: darkgreen !important;
+    }
+
+    .table.dataTable {
+        font-family: Roboto, sans-serif; /* Change to desired font family */
+        font-size: 12px; /* Change to desired font size */
+    }
+
+
+    /* Change odd row background color */
+    table.dataTable tbody tr:nth-child(odd) {
+        background-color: whitesmoke; /* Change to your desired color */
+    }
+
+    /* Change even row background color */
+    table.dataTable tbody tr:nth-child(even) {
+        background-color: #ffffff; /* Change to your desired color */
+    }
+
+
+    .pad {
+        padding-bottom: 15px;
+        padding: 2px;
+        padding-top: 10px;
+    }
+
+
+
+    .table-container {
+        height: 200px; /* Set the desired fixed height */
+        overflow-y: auto;
+    }
+
+    /*table > thead > tr > th {
+        background-color: gray !important;
+        color: white;
+    }*/
+
+    table.table thead th {
+        background-color: white !important; /* Change to your desired color */
+        color: lightslategray; /* Change to desired text color */
+        font-size: 13px;
+        font-family: Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+
+    table.table tbody td, lbl_ {
+        /*background-color: white !important; /* Change to your desired color */
+        font-size: 12px;
+        font-family: Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+
+    .lbl_ {
+        /*background-color: white !important; /* Change to your desired color */
+        font-family: Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+
+
+
+    /*th, td {
+        border: 1px solid black;
+        padding: 2px;
+        text-align: left;
+    }*/
+
+    /*tr:not(:last-child) {
+        border-bottom: 1px solid black; /* Add a border-bottom to all rows except the last one */
+    }
+
+    */
+
+    table th {
+        /*padding: 1rem 0.5rem !important;*/
+        border: 1px solid black;
+        border-bottom: 1px solid black;
+        /*padding: 8px;*/
+        text-align: left;
+    }
+
+    table td {
+        padding: 1rem 0.5rem !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        vertical-align: middle;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0 10px; /* Adjust the second value to increase/decrease the vertical gap */
+        width: 100%;
+    }
+
+        table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td {
+            border-bottom-width: 1px;
+        }
+
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2;
+    }
+</style>
+
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<link href="~/Content/css/message.css" rel="stylesheet" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+            <div id="dataList" class="box panel panel-default">
+                <div class="box-header with-border" style="background-color: #f8f9fc; color: #325FAB !important">
+                    <span class="fa fa-list fa-lg" style="color: #325FAB"></span>
+                    <h6 class="box-title"><strong>Schedulers</strong></h6>
+                    <div id="buttons" class="box-tools pull-right">
+
+                    </div>
+
+                </div>
+                <div class="box-body">
+                    <table id="lstData" class="table table-bordered table-striped text-sm table-hover" style="width:100%">
+                        <thead class="sorted-asc">
+                            <tr>
+                                <th class="notexport"></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                               
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4" id="rghtPanel">
+            <div class="row">
+                <div class="box-header with-border" style="margin-top: 1px; margin-left: 1px; background-color: #f8f9fc; color: #325FAB !important">
+                    <button type="button" class="btn btn-box-tool">
+                        <span class="fa fa-th-list fa-lg" style="color: #325FAB"></span>
+                    </button>
+                    <h6 class="box-title"><strong>PO Schedule<span><label id="lblUsrInfo" style="color:white;"></label></span> </strong>  </h6>
+                </div>
+                <div class="form-group" style="margin-top: 10px;">
+                    <label for="noOfDays">No of Days:</label>
+                    <input type="number" class="form-control" id="noOfDays" min="0" step="1" placeholder="Enter number of days" required>
+                </div>
+            </div>
+
+            <div class="row" style="">
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="form-group" style="">
+                        <label class="col-form-label">Menus:</label>
+                        <select id="MnuLst" multiple="multiple">
+                            @{
+                                if (Model != null)
+                                {
+                                    object parentMnu = null;
+                                    foreach (var item in Model.lstMnu)
+                                    {
+                                        object list = item[2];
+                                        if (!list.Equals(parentMnu))
+                                        {
+                                            <optgroup label="@item[2]"></optgroup>
+                                        }
+                                        <option value="@item[0]">@item[1]</option>
+                                        parentMnu = item[2];
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/Message.js"></script>
+<script>
+
+    LoadData();
+
+    function LoadData() {
+        $.ajax({
+
+            cache: false,
+            type: 'GET',
+            url: '/POScheduler/GetList',
+            data: { 
+            },
+            datatype: JSON,
+            success: function (data) {
+                var columnDef = [
+
+                    {
+                        "data": "Id", "title": "Id", "width": "30px", "visible": false
+                    },
+                    {
+                        "data": "PO", "title": "Purchase Order"
+                    },
+                    {
+                        "data": "NoOfDays", "title": "No. Of Days", "width": "100"
+                    },
+
+                    {
+                        "data": "CreatedBy", "title": "Created By", "width": "120"
+                    },
+                   
+                    {
+                        "data": "CreatedOn", "title": "Created On", "width": "100"
+                    },
+
+
+                ]
+
+                ToggleDataList(true);
+                MakeDataGrid('lstData', data.lstScheduler, 0, columnDef, true, false, false, false);
+                $('.dropdown-toggle').dropdown();
+                //  Loadddl();
+                if (data["ErrorMessage"] != null) {
+                    $('.dataTables_empty > p').text(data["ErrorMessage"]);
+                }
+            },
+            onerror: function (r) { r },
+            failure: function (r) { r }
+        });
+    }
+
+    function MakeDataGrid(tableId, data, tableHeight, columns, search, isScrollX, footerFunction, detailed, reportTitleId, rowSelection, lstHeight) {
+        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+        var isDetailed = detailed === undefined ? false : true;
+        var reportTitle = '';
+
+        if (reportTitleId === undefined)
+            reportTitle = $('.box-title').text();
+        else
+            reportTitle = reportTitleId;
+
+        var gridHeight = 0;
+
+        isScrollX = isScrollX === undefined ? false : true;
+        if (search === undefined) { search = true; }
+
+        var gridButtonsClass = '';
+        var gridSearchBoxClass = '';
+        if (isDetailed === true) {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'bg-white  txtSearch';
+            gridButtonSize = 20;
+        }
+        else {
+            gridButtonsClass = 'btn-header btn-box-tool';
+            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+            gridButtonSize = 20;
+        }
+ 
+
+        if (search === true) {
+            var boxtool = '<input class="' + gridSearchBoxClass + '" id="txtSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+            $('#buttons').empty();
+            $('#buttons').append(boxtool);
+        }
+
+        var table = $('#' + tableId).DataTable({
+            order: [],
+            createdRow: rowSelection,         // add Parameter for row selection in PO Detail // Added By Tahir
+            data: data,
+            columns: columns,
+            paging: true,
+            ordering: true,
+            searching: search,
+            select: {
+                style: 'single'
+            },
+            deferRender: true,
+            destroy: true,
+            pagingType: 'full',
+            pageLength: 100,
+            scrollCollapse: false,
+            scrollX: isScrollX,
+            //scrollY: gridHeight,
+
+            footerCallback: footerFunction,
+            language: {
+                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                oPaginate: {
+                    sNext: '<i class="fa fa-forward"></i>',
+                    sPrevious: '<i class="fa fa-backward"></i>',
+                    sFirst: '<i class="fa fa-step-backward"></i>',
+                    sLast: '<i class="fa fa-step-forward"></i>'
+                }
+            },
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-3'i><'#designedBy.col-sm-7'><'col-sm-2'p>>",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Copy',
+                    title: reportTitle,
+                    filename: 'DataExport',
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)' // Excluding columns while exporting
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Export to excel',
+                    title: reportTitle,
+                    filename: 'DataExport', //Added By Tahir
+                    exportOptions: {
+                        //columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                    titleAttr: 'Print',
+                    title: '',
+                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                    filename: 'DataExport',
+                    exportOptions: {
+                        // columns: ':visible'
+                        columns: 'th:not(.notexport)'
+                    }
+                }
+            ],
+            select: true
+        });
+        table.buttons().container()
+            .appendTo('#buttons');
+
+        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+        table.button(0).nodes().addClass(gridButtonsClass);
+
+        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(1).nodes().addClass(gridButtonsClass);
+
+        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+        table.button(2).nodes().addClass(gridButtonsClass);
+
+        var dsgndby = $('.modal-footer > #designedby ').html();
+
+        if (dsgndby === "") {
+            $('#designedBy').html($('.desgndBy').html());
+        }
+
+        var layoutHeader = $('nav').innerHeight();
+        var cardHeader = $('.box-header').innerHeight();
+        var tableHeader = $('.dataTables_scrollHead').innerHeight();
+        var tableFooter = 0;
+        var cardFooterH = 30;
+
+        if (isFooter === true)
+            tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+        var parentHeight = $('#' + lstHeight).innerHeight();
+        if (parentHeight == undefined)
+            parentHeight = window.innerHeight;
+        else
+            parentHeight = $('#' + lstHeight).innerHeight();
+
+        if (isFooter === true)
+            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+        var browserHeight = parentHeight;
+        if (tableHeight === 0) {
+            if (layoutHeader === undefined)
+                gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+            else
+                gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+        }
+        else { gridHeight = tableHeight; }
+
+        var topHeader = $('#topHeader').innerHeight();
+        if (topHeader > 0)
+            gridHeight = gridHeight - (topHeader + 1);
+
+        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+        table.columns.adjust().draw();
+
+        $('.dataTables_filter').hide();
+        $('#txtSearch').on('keyup change', function () {
+            table.search(this.value).draw();
+        });
+
+        return table;
+    }
+
+
+</script>

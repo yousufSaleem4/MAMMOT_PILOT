@@ -1,0 +1,312 @@
+﻿@model PlusCP.Models.LateChart
+    @{
+        ViewBag.Title = "Index";
+        Layout = null;
+
+    }
+
+
+    <style>
+        .card {
+            transition: box-shadow 0.3s; /* Add transition for smooth hover effect */
+        }
+
+            .card:hover {
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adjust shadow as needed */
+            }
+    </style>
+
+    <div style="background-color: whitesmoke">
+
+
+        <div class="container-fluid">
+            <div class="row" id="ADMIN">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <canvas style="background-color: white; margin-left:10px; margin-bottom:10px" id="bar-chart-hori" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <canvas style="background-color: white; margin-left:20px; margin-bottom:10px" id="pie-chart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <canvas style="background-color: white; margin-left:10px; margin-bottom:10px" id="bar-chart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <canvas style="background-color: white; margin-left:20px; margin-bottom:10px" id="line-chart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row bg-light" id="NOT_ADMIN"></div>
+        </div>
+    </div>
+    <script src="~/Scripts/Chart.js"></script>
+    <script src="~/Scripts/ChartJsLabeling.js"></script>
+    <script src="~/Scripts/chartCommon.js"></script>
+    <script src="~/Scripts/ChartBundle.js"></script>
+    <script>
+    //GetPartCount();
+    GetPartCountBarHori();
+    GetPartCountPie();
+    GetPartCountBar();
+    GetPartCountLine();
+
+    function GetPartCountBarHori() {
+        var _Key = [];
+        var _Value = [];
+        var _label = "PO On Time ";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: '/NewReport/GetOnTimeChart',
+            dataType: "json",
+            success: function (data) {
+                var jsonResult = JSON.parse(data);
+                $(jsonResult).each(function (index, item) {
+                    _Key.push(item.KEY);
+                    _Value.push(item.VALUE);
+                });
+
+                //now set values to chart
+                new Chart(document.getElementById("bar-chart-hori"), {
+                    type: 'horizontalBar', // Changed type to horizontalBar
+                    data: {
+                        labels: _Key,
+                        datasets: [
+                            {
+                                maxBarThickness: 1,
+                                label: _label,
+                                backgroundColor: ["#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff"],
+
+
+                                data: _Value
+                            }
+                        ]
+                    },
+                    options: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Purchase Order On Time',
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            xAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }],
+                            yAxes: [{
+                                barThickness: 10 // Adjust as needed
+                            }]
+                        }
+                    }
+                });
+            },
+            error: function (r) {
+                alert(r);
+            },
+            failed: function (f) {
+                alert(f);
+            }
+        });
+    }
+
+    function GetPartCountPie() {
+        var _Key = [];
+        var _Value = [];
+        var _label = "Total Late PO: ";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: '/NewReport/GetLateChart',
+            dataType: "json",
+            success: function (data) {
+                var jsonResult = JSON.parse(data);
+                $(jsonResult).each(function (index, item) {
+                    _Key.push(item.KEY);
+                    _Value.push(item.VALUE);
+                });
+
+                // Convert the doughnut chart to a pie chart
+                new Chart(document.getElementById("pie-chart"), {
+                    type: 'pie',
+                    data: {
+                        labels: _Key,
+                        datasets: [{
+                            label: _label,
+                            backgroundColor: ["#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff"],
+
+                            data: _Value
+                        }]
+                    },
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Purchase Order Late by Days'
+                        },
+                        maintainAspectRatio: false,
+                        responsive: true,
+                    }
+                });
+            },
+            error: function (r) {
+                alert(r);
+            },
+            failed: function (f) {
+                alert(f);
+            }
+        });
+    }
+
+    function GetPartCountBar() {
+        var _Key = []
+        var _Value = []
+        var _label = "Total Late PO: ";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: '/NewReport/GetOnTimeVendors',
+            dataType: "json",
+            success: function (data) {
+                var jsonResult = JSON.parse(data);
+                $(jsonResult).each(function (index, item) {
+                    _Key.push(item.KEY);
+                    _Value.push(item.VALUE);
+                });
+
+                //now set values to chart
+                new Chart(document.getElementById("bar-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: _Key,
+                        datasets: [
+
+                            {
+                                maxBarThickness: 1,
+                                label: _label,
+                                backgroundColor: ["#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff",
+                                    "#004c6d", "#005a84", "#00669b", "#0072b3", "#007fc9", "#0091e0", "#00a5f6", "#33b5ff", "#66c5ff"],
+
+                                data: _Value
+
+
+                            }
+                        ]
+                    },
+                    options: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Vendor On Time',
+
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            xAxes: [{
+                                barThickness: 50,  // number (pixels) or 'flex'
+                                maxBarThickness: 40 //
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    barThickness: 6,
+                                }
+                            }]
+                        },
+
+                    }
+                });
+            },
+            error: function (r) {
+                alert(r);
+            },
+            failed: function (f) {
+                alert(f);
+            }
+        });
+    }
+
+    function GetPartCountLine() {
+        var _Key = [];
+        var _Value = [];
+        var _label = "Total Late PO: ";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: '/NewReport/GetLateChart',
+            dataType: "json",
+            success: function (data) {
+                var jsonResult = JSON.parse(data);
+                $(jsonResult).each(function (index, item) {
+                    _Key.push(item.KEY);
+                    _Value.push(item.VALUE);
+                });
+
+                //now set values to chart
+                new Chart(document.getElementById("line-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: _Key,
+                        datasets: [{
+                            label: _label,
+                            borderColor: "#3e95cd",
+                            fill: false,
+                            data: _Value
+                        }]
+                    },
+                    options: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Purchase Order Late by Days'
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            },
+            error: function (r) {
+                alert(r);
+            },
+            failed: function (f) {
+                alert(f);
+            }
+        });
+    }
+
+
+
+    </script>

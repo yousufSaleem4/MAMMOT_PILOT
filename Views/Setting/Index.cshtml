@@ -1,0 +1,569 @@
+﻿@model PlusCP.Models.Home
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+
+}
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/css/message.css" rel="stylesheet" />
+</head>
+<body>
+    <style>
+        .Red {
+            color: red;
+        }
+
+        .box-body {
+            padding: 20px;
+        }
+
+        .ModalHeaderColor {
+            background-color: #D6EFE8;
+            color: #003B59
+        }
+
+        .ModalLabelColor {
+            color: #003B59;
+        }
+
+        .btn-hover-save {
+            background-color: #003B59; /* Default background color */
+            border-color: #003B59; /* Default border color */
+            color: #fff; /* Default text color */
+        }
+
+            .btn-hover-save:hover {
+                background-color: transparent; /* Make background transparent on hover */
+                border-color: #003B59; /* Dark border color on hover */
+                color: #003B59; /* Dark font color on hover */
+            }
+
+        .btnClose {
+            background-color: whitesmoke; /* Make background transparent on hover */
+            color: #003B59; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+        }
+
+            .btnClose:hover {
+                border: 1px solid #003B59; /* Thicker border with dark color on hover */
+                color: #003B59; /* Dark font color on hover */
+                transform: scale(1.05); /* Slightly scale up the card on hover */
+                -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            }
+    </style>
+
+    <div class="container" style="background-color: white; height: 100%;">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6" style="padding-top: 12px; padding-right: 12px;">
+                <!-- API Settings Card -->
+                <div class="box panel panel-default">
+                    <div class="box-header with-border" style=" background-color: whitesmoke;">
+                        <span class="fa fa-list fa-lg ModalLabelColor"></span>
+                        <h5 class="box-title ModalLabelColor"><strong>API Settings</strong></h5>
+                    </div>
+                    <div class="box-body">
+                        <div style="margin-bottom: 20px; display:none">
+                            <label class="ModalLabelColor">Connection Type : </label>
+                            @Html.DropDownList("Connections", null, new { id = "ddlConn", @name = "ddlConn", @class = "dropdown-list" })
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label class="ModalLabelColor">API URL : </label>
+                            <input type="hidden" id="ApiUrlValue" value="@ViewBag.URL" />
+                            @Html.EditorFor(model => model.ApiUrl, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter API URL" } })
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label class="ModalLabelColor">Username : </label>
+                            <input type="hidden" id="UsernameValue" value="@ViewBag.username" />
+                            @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter Username" } })
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label class="ModalLabelColor">Password : </label><br />
+                            <input type="hidden" id="passwordValue" value="@ViewBag.password" />
+                            @Html.PasswordFor(model => model.password, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter Password", id = "password", style = "width: 100% !important;" } })
+                            <input type="checkbox" id="showPasswordCheckbox"> Show Password
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label class="ModalLabelColor">Token : </label><br />
+                            <input type="hidden" id="tokenValue" value="@ViewBag.token" />
+                            @Html.PasswordFor(model => model.token, new { htmlAttributes = new { @class = "input-sm form-control full-width", placeholder = "Enter Token", id = "token", style = "width: 100% !important;" } })
+                            <input type="checkbox" id="showTokenCheckbox"> Show Token
+                        </div>
+                        <div style="margin-bottom: 20px; text-align:left">
+                            <button id="btnCheck" class="btn btn-hover-save" type="button" style="border-radius:3px; width:130px;height:30px; font-size:12px; font-weight:bold;">
+                                Test Connection
+                            </button>
+                        </div>
+                        @*<div style="margin-bottom: 20px; text-align:left">
+                                <button id="btnSync" onclick="LoadERPData()" class="btn btn-hover-save" type="button" style="border-radius:3px; width:130px;height:30px; font-size:12px; font-weight:bold;">
+                                    Sync PO Data
+                                </button>
+                            </div>*@
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6" style="padding-top: 12px; padding-right: 12px;">
+                <!-- Database Settings Card -->
+                <div class="box panel panel-default" style="display:none">
+                    <div class="box-header with-border" style=" background-color: whitesmoke;">
+                        <span class="fa fa-list fa-lg ModalLabelColor"></span>
+                        <h5 class="box-title ModalLabelColor"><strong>Database Settings</strong></h5>
+                    </div>
+                    <div class="box-body">
+                        <div style="margin-bottom: 20px">
+                            <label class="ModalLabelColor">Connection : </label>
+                            <input type="hidden" id="SQlConnval" value="@ViewBag.SQlConn" />
+                            @Html.EditorFor(model => model.SQlConn, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter API URL" } })
+                        </div>
+                        <div style="margin-bottom: 20px; display: none">
+                            <label class="ModalLabelColor">Username : </label>
+                            <input type="hidden" id="SQLUsernameval" value="@ViewBag.SQLUsername" />
+                            @Html.EditorFor(model => model.SQLUsername, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter Username" } })
+                        </div>
+                        <div style="margin-bottom: 20px; display:none">
+                            <label class="ModalLabelColor">Password : </label><br />
+                            <input type="hidden" id="SQLpasswordval" value="@ViewBag.SQLpassword" />
+                            @Html.PasswordFor(model => model.SQLpassword, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter Password", id = "password", style = "width: 100% !important;" } })
+                            <input type="checkbox" id="showSQLPasswordCheckbox"> Show Password
+                        </div>
+
+                        <div style="margin-bottom: 20px; text-align:left">
+                            <button id="btnSQLCheck" class="btn btn-hover-save" type="button" style="border-radius:3px; width:130px;height:30px; font-size:12px; font-weight:bold;">
+                                Test Connection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Other Settings Card -->
+                <div class="box panel panel-default" style="padding-top:4px">
+                    <div class="box-header with-border" style=" background-color: whitesmoke;">
+                        <span class="fa fa-list fa-lg ModalLabelColor"></span>
+                        <h5 class="box-title ModalLabelColor"><strong>Other Settings</strong></h5>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-right:4px">
+                                <label class="ModalLabelColor">Set Hours :</label>
+                                <input type="hidden" id="hoursValue" value="@ViewBag.HoursValue" />
+                                @Html.EditorFor(model => model.Hours, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Hours" } })
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-9">
+                                <label class="ModalLabelColor">Set CC Email to all PO Email:</label>
+                                <input type="hidden" id="ccEmail" value="@ViewBag.CCEmailAddress" />
+                                @Html.EditorFor(model => model.CCEmail, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter CC Email" } })
+                            </div>
+                        </div>
+                        <div style="padding-top: 20px">
+                            <label class="ModalLabelColor">City (Time Zone) : </label>
+                            <input type="hidden" id="TimeZone" value="@ViewBag.TimeZone" />
+                            @Html.DropDownList("ddlTimeZone", null, new { id = "ddlTimeZone", @name = "ddlTimeZone", @class = "form-control", @onkeydown = "GoOnEnter()" })
+                        </div>
+                        <div style="padding-top: 20px">
+                            <label class="ModalLabelColor">Terms and Conditions :</label>
+                            <!-- Make sure that @ViewBag.TermsCondition is HTML-encoded properly -->
+                            <textarea class="form-control" id="TermsCondition" rows="5">@Html.Raw(ViewBag.TermsCondition)</textarea>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="padding-top:20px;text-align:center;">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="form-group">
+
+                    <button id="btnCancel" class="btn btnClose" type="button" style="border-radius:3px; width:70px;height:30px; font-size:12px; font-weight:bold;">
+                        Cancel
+                    </button>
+
+                    <button id="btnUser" class="btn btn-hover-save" type="button" style="border-radius:3px; width:70px;height:30px; font-size:12px; font-weight:bold;">
+                        Save
+                    </button>
+
+                    <div id="lblMsg" class="optionMsg"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="~/Scripts/Message.js"></script>
+    <!-- TinyMCE library -->
+    <script src="~/Scripts/TextFormatter.js"></script>
+
+    <!-- Initialize TinyMCE AFTER library load -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            tinymce.init({
+                selector: '#TermsCondition',  // Target the textarea with the ID
+                menubar: false,  // Disable the menu bar
+                plugins: 'lists link image code',  // Enable the required plugins
+                toolbar: 'undo redo | bold italic underline | bullist numlist | link image | code',  // Configure the toolbar
+                branding: false,  // Disable the TinyMCE branding
+                height: 300,  // Set the height of the editor
+                readonly: false,  // Ensure the editor is not read-only
+            });
+        });
+    </script>
+
+
+    <script>
+        // Initialize TinyMCE after the page is fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            tinymce.init({
+                selector: '#TermsCondition',  // Initialize TinyMCE on this textarea
+                menubar: false,  // Disable menubar if not needed
+                plugins: 'lists link image', // Add additional plugins as needed
+                toolbar: 'undo redo | bold italic | bullist numlist | link image', // Toolbar configuration
+            });
+        });
+        function LoadERPData() {
+            $.ajax({
+                cache: false,
+                type: 'POST',
+                url: '/Setting/LoadERPData',
+                data:
+                {
+                },
+
+                datatype: JSON,
+                success: function (data) {
+
+
+                    $('#ddlConn').blur();
+                    $('#IPMnu').empty();
+                    LoadMenus();
+                    OpenPage('\\Dashboard\\Index');
+                    location.reload(true);
+
+
+                },
+                onerror: function (r) { r },
+                failure: function (r) { r }
+
+            });
+        }
+
+
+        var passwordInput = document.getElementById('password');
+        var showPasswordCheckbox = document.getElementById('showPasswordCheckbox');
+
+        showPasswordCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                passwordInput.type = 'text';
+            } else {
+                passwordInput.type = 'password';
+            }
+        });
+        var TokenInput = document.getElementById('token');
+        var showTokenCheckbox = document.getElementById('showTokenCheckbox');
+
+        showTokenCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                TokenInput.type = 'text';
+            } else {
+                TokenInput.type = 'password';
+            }
+        });
+
+        var SQLPasswordInput = document.getElementById('SQLpassword');
+        var showPasswordCheckbox = document.getElementById('showSQLPasswordCheckbox');
+
+        showPasswordCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                SQLPasswordInput.type = 'text';
+            } else {
+                SQLPasswordInput.type = 'password';
+            }
+        });
+
+        loadData();
+        function loadData() {
+
+            var conType = $("#ddlConn :selected").text();
+
+            var CCEmail = $("#ccEmail").val();
+            var hoursValue = $("#hoursValue").val();
+            var ApiUrlValue = $("#ApiUrlValue").val();
+            var UsernameValue = $("#UsernameValue").val();
+            var passwordValue = $("#passwordValue").val();
+            var tokenValue = $("#tokenValue").val();
+
+            var SQlConn = $("#SQlConnval").val();
+            var SQLUsername = $("#SQLUsernameval").val();
+            var SQLpassword = $("#SQLpasswordval").val();
+            var TermsCondition = $("#TermsCondition").val();
+
+            // Set the value to the input field
+            $("#CCEmail").val(CCEmail);
+            $("#Hours").val(hoursValue);
+            $("#ApiUrl").val(ApiUrlValue);
+            $("#Username").val(UsernameValue);
+            $("#password").val(passwordValue);
+            $("#token").val(tokenValue);
+
+            $("#SQlConn").val(SQlConn);
+            $("#SQLUsername").val(SQLUsername);
+            $("#SQLpassword").val(SQLpassword);
+            $("#TermsCondition").val(TermsCondition);
+
+
+            if (conType.toUpperCase() == 'TEST') {
+
+                $("#ApiUrl").val('');
+                $("#Username").val('');
+                $("#password").val('');
+                $("#token").val('');
+
+                $('#ApiUrl').prop('disabled', true);
+                $('#Username').prop('disabled', true);
+                $('#password').prop('disabled', true);
+                $('#token').prop('disabled', true);
+                $('#btnCheck').prop('disabled', true);
+            }
+            else {
+                $('#ApiUrl').prop('disabled', false);
+                $('#Username').prop('disabled', false);
+                $('#password').prop('disabled', false);
+                $('#token').prop('disabled', false);
+                $('#btnCheck').prop('disabled', false);
+            }
+
+        }
+
+        $("#btnUser").click(function () {
+            debugger
+            $('#lblMsg').empty();
+
+            var conType = $("#ddlConn :selected").text();
+            var Hours = $('#Hours').val();
+            var ApiUrl = $("#ApiUrl").val();
+            var Username = $("#Username").val();
+            var password = $("#password").val();
+            var token = $("#token").val();
+            var SQlConn = $("#SQlConn").val();
+            var SQLUsername = $("#SQLUsername").val();
+            var SQLpassword = $("#SQLpassword").val();
+            var TimeZone = $("#ddlTimeZone :selected").val();
+            var CCEmail = $("#CCEmail").val();
+            var TermsCondition = $("#TermsCondition").val();
+
+
+
+            $.ajax({
+                cache: false,
+                type: 'POST',
+                url: '/Setting/UpdateSetting',
+                data:
+                {
+                    conType: conType,
+                    Hours: Hours,
+                    ApiUrl: ApiUrl,
+                    Username: Username,
+                    password: password,
+                    token: token,
+                    SQlConn: SQlConn,
+                    SQLUsername: SQLUsername,
+                    SQLpassword: SQLpassword,
+                    TimeZone: TimeZone,
+                    CCEmail: CCEmail,
+                    TermsCondition: TermsCondition
+                },
+
+                datatype: JSON,
+                success: function (data) {
+
+
+                    $('#ddlConn').blur();
+                    $('#IPMnu').empty();
+                    LoadMenus();
+                    OpenPage('\\Dashboard\\Index');
+                    location.reload(true);
+
+
+                },
+                onerror: function (r) { r },
+                failure: function (r) { r }
+
+            });
+            //loadUserData(_userId);
+
+        });
+
+        $("#btnCancel").click(function () {
+            $('#ddlConn').blur();
+            $('#IPMnu').empty();
+            LoadMenus();
+            //OpenPage('\\Dashboard\\Index');
+        });
+        function changeColor(id, newColor) {
+            $("#" + id).css("color", newColor);
+        }
+
+        $("#btnCheck").click(function () {
+            $('#lblMsg').empty();
+            var conType = $("#ddlConn :selected").text();
+            var ApiUrl = $("#ApiUrl").val();
+            var Username = $("#Username").val();
+            var password = $("#password").val();
+            var token = $("#token").val();
+
+            $.ajax({
+                cache: false,
+                type: 'GET',
+                url: '/Setting/CheckAPI',
+                data:
+                {
+                    conType: conType,
+                    ApiUrl: ApiUrl,
+                    Username: Username,
+                    password: password,
+                    token: token
+                },
+
+                datatype: JSON,
+                success: function (data) {
+                    debugger
+                    if (data === 'OK') {
+                        MsgToast("Success!", "Test connection succeeded !", "success");
+                    }
+                    else {
+                        MsgToast("Oops!", "An error occurred!", "error");
+
+                    }
+
+                },
+                onerror: function (r) { r },
+                failure: function (r) { r }
+
+            });
+            //loadUserData(_userId);
+
+        });
+
+
+        $("#btnSQLCheck").click(function () {
+            $('#lblMsg').empty();
+            var conType = $("#ddlConn :selected").text();
+            var SQlConn = $("#SQlConn").val();
+            var SQLUsername = $("#SQLUsername").val();
+            var SQLpassword = $("#SQLpassword").val();
+
+
+            $.ajax({
+                cache: false,
+                type: 'GET',
+                url: '/Setting/CheckSQLConnction',
+                data:
+                {
+                    conType: conType,
+                    SQlConn: SQlConn,
+                    SQLUsername: SQLUsername,
+                    SQLpassword: SQLpassword
+
+                },
+
+                datatype: JSON,
+                success: function (data) {
+                    debugger
+                    if (data === 'OK') {
+                        MsgToast("Success!", "Test connection succeeded !", "success");
+                    }
+                    else {
+                        MsgToast("Oops!", "An error occurred!", "error");
+
+                    }
+
+                },
+                onerror: function (r) { r },
+                failure: function (r) { r }
+
+            });
+            //loadUserData(_userId);
+
+        });
+
+
+        $("#ddlConn").change(function () {
+            var conType = $("#ddlConn :selected").text();
+            $.ajax({
+                cache: false,
+                type: 'GET',
+                url: '/Setting/GetConnectionData',
+                data:
+                {
+                    conType: conType
+                },
+
+                datatype: JSON,
+                success: function (data) {
+                    debugger
+                    if (conType.toUpperCase() != 'TEST') {
+                        $("#ApiUrl").val(data.lstConnectionData[1]["URL"]);
+                        $("#Username").val(data.lstConnectionData[1]["UserName"]);
+                        $("#password").val(data.lstConnectionData[1]["Password"]);
+                        $("#token").val(data.lstConnectionData[1]["Token"]);
+
+                        $('#ApiUrl').prop('disabled', false);
+                        $('#Username').prop('disabled', false);
+                        $('#password').prop('disabled', false);
+                        $('#token').prop('disabled', false);
+                        $('#btnCheck').prop('disabled', false);
+                    }
+
+                    else {
+                        $("#ApiUrl").val('');
+                        $("#Username").val('');
+                        $("#password").val('');
+                        $("#token").val('');
+
+                        $('#ApiUrl').prop('disabled', true);
+                        $('#Username').prop('disabled', true);
+                        $('#password').prop('disabled', true);
+                        $('#token').prop('disabled', true);
+                        $('#btnCheck').prop('disabled', true);
+
+                    }
+                    $("#SQlConn").val(data.lstConnectionData[0]["ConValue"]);
+                    $("#SQLUsername").val(data.lstConnectionData[0]["UserName"]);
+                    $("#SQLpassword").val(data.lstConnectionData[0]["Password"]);
+
+                },
+                onerror: function (r) { r },
+                failure: function (r) { r }
+
+            });
+
+        });
+
+        function MsgToast(msg, title, type) {
+
+            toastr.options = {
+                closeButton: true,
+                debug: false,
+                newestOnTop: false,
+                progressBar: true,
+                positionClass: 'toast-top-right',
+                preventDuplicates: true,
+                onclick: null
+            };
+
+
+
+            var $toast = toastr[type](title, msg); // Wire up an event handler to a button in the toast, if it exists
+            $toastlast = $toast;
+
+            if (typeof $toast === 'undefined') {
+                return;
+            }
+
+
+        }
+    </script>
+</body>
+</html>
