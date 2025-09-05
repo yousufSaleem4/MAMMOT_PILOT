@@ -2294,7 +2294,17 @@ ORDER BY CreatedOn DESC
 
             return result;
         }
+        public string GetGUID(string PO)
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string result = "";
+            string query = @"SELECT GUID FROM [BuyerPOHeader] WHERE PONumber = '" + PO + "' ";
+            DataTable dt = oDAL.GetData(query);
+            if (dt.Rows.Count > 0)
+                result = dt.Rows[0]["GUID"].ToString();
 
+            return result;
+        }
         public string AddPOHeaderData(string PO, string VendorId, string Vendor, string VendorEmail, string POStatus, string newGuid)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
@@ -2317,7 +2327,7 @@ ORDER BY CreatedOn DESC
                    [IsEmailSent] = '<IsEmailSent>',
                    [Buyer]       = '<Buyer>',
                    [UpdatedBy]  = '<InsertedBy>',
-                   [UpdatedOn]  = '<InsertedOn>'
+                   [UpdatedOn]  = '<InsertedOn>',
                    [IsAnswerd]  = '<IsAnswerd>'
 
              WHERE PONumber = '<PONumber>' AND GUID = '<GUID>'

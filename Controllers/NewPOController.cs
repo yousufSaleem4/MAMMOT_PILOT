@@ -1271,10 +1271,18 @@ where POHeader_PONum = '<PONum>' and PODetail_POLine = '<POLine>' and PORel_PORe
                         string VendorEmailAddress = row["Vendor_EMailAddress"];
                         string Status = row["POStatus"];
                         string POApprove = row["POHeader_Approve"];
+                        Guid newGuid;
                         if (POApprove == "true" || POApprove == "True")
                         {
-                            Guid newGuid;
-                            newGuid = Guid.NewGuid();
+                            string GUID = oPO.GetGUID(PO);
+                            if (GUID == "")
+                            {
+                                newGuid = Guid.NewGuid();
+                            }
+                            else
+                            {
+                                newGuid = new Guid(GUID);
+                            }
                             string result = oPO.AddPOHeaderData(PO, VendorId, VendorName, VendorEmailAddress, Status, newGuid.ToString());
                             oPO.AddPOHeaderTransaction(PO, VendorName, VendorEmailAddress, newGuid.ToString());
                             approvedPOs.Add(PO);
