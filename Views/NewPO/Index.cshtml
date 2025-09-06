@@ -458,9 +458,9 @@
     <div class="col-lg-12 col-md-12 col-sm-12">
         <div id="dataList" class="box panel panel-default">
             <div class="box-header with-border">
-                <button type="button" class="btn btn-box-tool" title="Option Page" id="btnOptionFilter">
+                @*<button type="button" class="btn btn-box-tool" title="Option Page" id="btnOptionFilter">
                     <span class="fa fa-filter fa-lg blue"></span>
-                </button>
+                </button>*@
 
 
                 <h5 class="box-title"><strong style="font-size:14px !important;">@ViewBag.ReportTitle  </strong><strong id="filterString"></strong></h5>
@@ -1480,7 +1480,7 @@
 
 // END CC Email
 
-   
+
     function validateFileSize(input) {
         var file = input.files[0];
         var maxSize = 1 * 1024 * 1024; // 1MB in bytes
@@ -1570,11 +1570,11 @@
         }
         OpenPage(pageUrl); // Call the function to open the page with the specified URL
     }
-    // Get all the buttons with the class 'btn-badges' and attach a click event listener to each of them
-    document.querySelectorAll('.btn-badges').forEach(button => {
+   document.querySelectorAll('.btn-badges').forEach(button => {
         button.addEventListener('click', function () {
             var selectedStatus = '@Request.QueryString["POStatus"]';
             var PO = '@Session["PO"]';
+             var WidgetId = '@Session["WidgetId"]';debugger
             var pageUrl;
             // Determine the page URL based on the button clicked
             switch (this.id) {
@@ -1597,12 +1597,12 @@
                     pageUrl = '\\NewPO\\SupplierUpdate?POStatus=Update';
                     break;
                 case 'CardRefresh':
-                    pageUrl = '\\NewPO\\Index?PO=' + PO + '&POStatus=' + selectedStatus + '';
+                    pageUrl = '\\NewPO\\Index?PO=' + PO + '&POStatus=' + selectedStatus + '&WidgetId=' + WidgetId +'';
                     saveRefreshTime(); // Save the refresh time before loading the page
                     break;
                 default:
                     // Default case
-                    pageUrl = '\\NewPO\\Index?PO=' + PO+'';  // Set a default page URL if necessary
+                    pageUrl = '\\NewPO\\Index?PO=' + PO +' ';  // Set a default page URL if necessary
             }
             toggleSelectionAndOpenPage(this, pageUrl); // Toggle the selection and open the page
             // Store the selected button's ID in local storage
@@ -1706,7 +1706,7 @@ You already selected <span style="font-weight:bold; color:#006400">${selectedVen
 
     ToggleDataList(false);
     function LoadData() {
-        
+
 
         $('#option').modal('hide');
         var isSingleRow = false;
@@ -2165,7 +2165,7 @@ You already selected <span style="font-weight:bold; color:#006400">${selectedVen
     }
 
     function ResendEmail() {
-        
+
         var PONo = $('#_PONumber').text();
         var Line = $('#_POLine').text();
         var Rel = $('#_PORel').text();
@@ -2402,7 +2402,7 @@ You already selected <span style="font-weight:bold; color:#006400">${selectedVen
     function handleactionahr(guid, action, PONum, PartNo, DueDate, Qty, Price, ArrivedQty) {
         var selectedStatus = '@Request.QueryString["POStatus"]';
         var PurchaseOrder = PONum.split('-')[0]; // Extract value before first '-'
-       
+
         $.ajax({
 
             cache: false,
@@ -2420,7 +2420,7 @@ You already selected <span style="font-weight:bold; color:#006400">${selectedVen
 
             },
             success: function (data) {
-                
+
                 if (data.Status == 'Updated') {
                     MsgToast("Success!", "Record has been updated!", "success");
                     OpenPage('\\NewPO\\Index?PO=' + PurchaseOrder + '&POStatus=' + selectedStatus + '');
