@@ -435,26 +435,26 @@
 
 
     /* Toastr Info Custom Background */
-    #toast-container > .toast-info {
-        background-color: #d6efeb !important; /* light teal background */
-        color: #003b59 !important; /* dark blue text */
-    }
+    /*#toast-container > .toast-info {
+        background-color: #d6efeb !important;*/ /* light teal background */
+        /*color: #003b59 !important;*/ /* dark blue text */
+    /*}*/
 
         /* Title styling */
-        #toast-container > .toast-info .toast-title {
+        /*#toast-container > .toast-info .toast-title {
             font-weight: bold !important;
             color: #003b59 !important;
-        }
+        }*/
 
         /* Message styling */
-        #toast-container > .toast-info .toast-message {
+        /*#toast-container > .toast-info .toast-message {
             color: #003b59 !important;
-        }
+        }*/
 
         /* ✅ Toastr info ka default icon dark blue karna */
-        #toast-container > .toast-info::before {
-            color: #003b59 !important; /* Dark blue icon */
-        }
+        /*#toast-container > .toast-info::before {
+            color: #003b59 !important;*/ /* Dark blue icon */
+        /*}*/
 
 
 </style>
@@ -1682,8 +1682,8 @@
                 // Toastr info with styled message
                 toastr.info(
                     `</br>
-You already selected <span style="font-weight:bold; color:#006400">${selectedVendorName}</span>.<br>
-                 Please uncheck it before selecting <span style="font-weight:bold; color:#8B0000">${currentVendor}</span>.`,
+You already selected <span style="font-weight:bold;">${selectedVendorName}</span>.<br>
+                 Please uncheck it before selecting <span style="font-weight:bold;">${currentVendor}</span>.`,
                     "ℹ️ Vendor Selection Info",
                     {
                         closeButton: true,
