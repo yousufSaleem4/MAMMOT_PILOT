@@ -1672,7 +1672,7 @@
     var selectedVendorName = null;
 
     $(document).on("change", ".suppliers-checkbox", function () {
-        var currentVendor = $(this).closest("tr").find("td:eq(6)").text().trim();
+        var currentVendor = $(this).closest("tr").find("td:eq(2)").text().trim();
         // ⚠️ apne table ke hisaab se Vendor_Name column ka index adjust karo
 
         if (this.checked) {
@@ -1699,7 +1699,7 @@ You already selected <span style="font-weight:bold; color:#006400">${selectedVen
             var anyChecked = $(".suppliers-checkbox:checked").length > 0;
 
             if (anyChecked) {
-                var stillSelectedVendor = $(".suppliers-checkbox:checked").first().closest("tr").find("td:eq(6)").text().trim();
+                var stillSelectedVendor = $(".suppliers-checkbox:checked").first().closest("tr").find("td:eq(2)").text().trim();
                 selectedVendorName = stillSelectedVendor;
             } else {
                 selectedVendorName = null;
@@ -1715,7 +1715,7 @@ You already selected <span style="font-weight:bold; color:#006400">${selectedVen
             var mismatch = false;
 
             $(".suppliers-checkbox").each(function () {
-                var currentVendor = $(this).closest("tr").find("td:eq(6)").text().trim(); // apne table ke hisaab se index adjust karo
+                var currentVendor = $(this).closest("tr").find("td:eq(2)").text().trim(); // apne table ke hisaab se index adjust karo
 
                 if (firstVendor === null) {
                     firstVendor = currentVendor;
