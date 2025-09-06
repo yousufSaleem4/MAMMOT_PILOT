@@ -700,27 +700,28 @@
             <div class="row">
                 @foreach (System.Data.DataRow row in Model.dtWidgetPO.Rows)
                 {
-                    // Extract title, count, and id from the row
                     var title = row["WidgetTitle"].ToString();
                     var desc = row["WidgetDesc"].ToString();
                     var count = row["Count"].ToString();
                     var id = row["Id"].ToString();
                     var token = row["Token"].ToString();
 
-                    // Generate card HTML with data-id attribute for delete button
                     <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-3 CardPad">
-                        <div class="card order-card clickable-card" id="WidgetCard" data-id="@id" data-title="@title"  style="position: relative; border-top: 4px solid #003B59;">
+                        <div class="card order-card clickable-card WidgetCard"
+                             data-id="@id" data-title="@title"
+                             style="position: relative; border-top: 4px solid #003B59;">
                             <div class="card-block" style="padding: 10px;">
-                                <!-- Button container to handle settings and delete buttons -->
+                                <!-- Buttons (settings + delete) -->
                                 <div style="position: absolute; top: 5px; right: 10px; display: flex; gap: 2px;">
                                     <!-- Settings button -->
-                                    <a class="btn btn-light Edit-btn" id="WidgetEdit" data-id="@id" style="padding: 2px 5px; font-size: 5px;">
-            <i class="fa fa-edit" style="color: #003B59"></i>
-        </a>
-                                    <!-- Delete button -->
-                                   
+                                    <a class="btn btn-light WidgetEdit" data-id="@id"
+                                       style="padding: 2px 5px; font-size: 5px;">
+                                        <i class="fa fa-edit" style="color: #003B59"></i>
+                                    </a>
 
-                                    <a class="btn btn-light delete-btn" id="WidgetDelete" data-id="@id" style="padding: 2px 5px; font-size: 5px;">
+                                    <!-- Delete button -->
+                                    <a class="btn btn-light WidgetDelete" data-id="@id"
+                                       style="padding: 2px 5px; font-size: 5px;">
                                         <i class="fa fa-trash" style="color: #003B59"></i>
                                     </a>
                                 </div>
@@ -1315,14 +1316,17 @@
 
 
 
-    // Event delegation for dynamically added elements
-    $(document).on('click', '#WidgetCard', function (e) {
-        e.preventDefault();
-        var WidgetId = $(this).data('id');
-        var title = $(this).data('title');
-        var encodedTitle = encodeURIComponent(title);
-        OpenPage('\\NewPO\\Index?POStatus=Widget&PO=&WidgetId=' + WidgetId + '&WidgetTitle=' + encodedTitle);
-    });
+    // Unbind old events first to prevent multiple calls
+    $(document).off('click', '.WidgetCard')
+        .on('click', '.WidgetCard', function (e) {
+            e.preventDefault();
+
+            var WidgetId = $(this).data('id');
+            var title = $(this).data('title');
+            var encodedTitle = encodeURIComponent(title);
+
+            OpenPage('\\NewPO\\Index?POStatus=Widget&PO=&WidgetId=' + WidgetId + '&WidgetTitle=' + encodedTitle);
+        });
 
     $(document).on('click', '#WidgetEdit', function (e) {
         e.preventDefault();
