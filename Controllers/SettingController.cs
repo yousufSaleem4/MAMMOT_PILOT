@@ -99,7 +99,8 @@ namespace PlusCP.Controllers
                 bool isUpdateSetting = updateHours(Hours);
                 bool isUpdateAPISetting = updateAPISetting(conType, ApiUrl, Username, password, token, SQlConn, SQLUsername, SQLpassword);
                 updateDefaultDB(conType);
-                updatetermCondition(TermsCondition);
+                string decodedTerms = HttpUtility.UrlDecode(TermsCondition);
+                updatetermCondition(decodedTerms);
                 Session["CONN_ACTIVE"] = BasicEncrypt.Instance.Encrypt(oHome.GetConnectionString(conType));
                 //  Session["CONN_TYPE"] = conType;
                 bool isUpdated = oAuth.UpdateDfltCon(conType);
@@ -124,21 +125,25 @@ namespace PlusCP.Controllers
         public bool updatetermCondition(string TermsCondition)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
-           
 
-            string sql = "";
+            // single quotes escape karna zaroori hai
+            TermsCondition = TermsCondition.Replace("'", "''");
 
-            sql = @"UPDATE [dbo].[zSysIni] 
-           SET   SysValue = '<TermsCondition>' 
-        WHERE SysCode = '12647' AND SysDesc  = 'Terms and Condition' "; 
+            string sql = $@"
+        UPDATE [dbo].[zSysIni] 
+        SET SysValue = '{TermsCondition}' 
+        WHERE SysCode = '12647' 
+          AND SysDesc = 'Terms and Condition'";
 
+            oDAL.Execute(sql);
 
-            sql = sql.Replace("<TermsCondition>", TermsCondition);
-                oDAL.Execute(sql);
-                if (oDAL.HasErrors)
-                    return false;
+            if (oDAL.HasErrors)
+                return false;
+
             return true;
         }
+
+
 
         public bool updateDefaultDB(string conType)
         {

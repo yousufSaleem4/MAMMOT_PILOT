@@ -136,7 +136,8 @@ SELECT DISTINCT
 FROM [dbo].[PODetail] PD
 LEFT JOIN [SRM].[BuyerPO] BH
     ON PD.POHeader_PONum = BH.PONum
-WHERE DATEDIFF(DAY, GETDATE(), PD.Calculated_DueDate) =  '<noOfDays>'
+WHERE DATEDIFF(DAY, GETDATE(), PD.Calculated_DueDate) BETWEEN 0 AND <noOfDays>
+
 ";
 
             sql = sql.Replace("<noOfDays>", noOfDays);

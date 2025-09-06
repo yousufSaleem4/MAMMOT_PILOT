@@ -11,6 +11,17 @@
     <meta charset="UTF-8">
     <title>@ViewBag.Title</title>
     <link href="~/Content/css/message.css" rel="stylesheet" />
+  
+    <!-- jQuery (required for Summernote) -->
+    <!-- jQuery pehle -->
+    @*<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>*@
+
+    <!-- Bootstrap (agar use kar rahe ho) -->
+   
+
+    <!-- Summernote -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
 </head>
 <body>
     <style>
@@ -165,9 +176,9 @@
                         </div>
                         <div style="padding-top: 20px">
                             <label class="ModalLabelColor">Terms and Conditions :</label>
-                            <!-- Make sure that @ViewBag.TermsCondition is HTML-encoded properly -->
-                            <textarea class="form-control" id="TermsCondition" rows="5">@Html.Raw(ViewBag.TermsCondition)</textarea>
+                            <textarea class="form-control" id="TermsCondition" rows="10">@ViewBag.TermsCondition</textarea>
                         </div>
+
 
                     </div>
                 </div>
@@ -193,35 +204,39 @@
 
 
     <script src="~/Scripts/Message.js"></script>
-    <!-- TinyMCE library -->
+
     <script src="~/Scripts/TextFormatter.js"></script>
 
-    <!-- Initialize TinyMCE AFTER library load -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            tinymce.init({
-                selector: '#TermsCondition',  // Target the textarea with the ID
-                menubar: false,  // Disable the menu bar
-                plugins: 'lists link image code',  // Enable the required plugins
-                toolbar: 'undo redo | bold italic underline | bullist numlist | link image | code',  // Configure the toolbar
-                branding: false,  // Disable the TinyMCE branding
-                height: 300,  // Set the height of the editor
-                readonly: false,  // Ensure the editor is not read-only
-            });
-        });
-    </script>
+
+
+
+
+
+
 
 
     <script>
-        // Initialize TinyMCE after the page is fully loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            tinymce.init({
-                selector: '#TermsCondition',  // Initialize TinyMCE on this textarea
-                menubar: false,  // Disable menubar if not needed
-                plugins: 'lists link image', // Add additional plugins as needed
-                toolbar: 'undo redo | bold italic | bullist numlist | link image', // Toolbar configuration
+
+
+
+        // set existing DB value
+        $(function () {
+            console.log("jQuery loaded:", $.fn.jquery);
+            console.log("Summernote loaded:", typeof $.fn.summernote);
+
+            $('#TermsCondition').summernote({
+                placeholder: 'Write terms and conditions here...',
+                height: 350,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['insert', ['link']],
+                    ['view', ['undo', 'redo']]
+                ]
             });
         });
+
         function LoadERPData() {
             $.ajax({
                 cache: false,
@@ -297,7 +312,7 @@
             var SQlConn = $("#SQlConnval").val();
             var SQLUsername = $("#SQLUsernameval").val();
             var SQLpassword = $("#SQLpasswordval").val();
-            var TermsCondition = $("#TermsCondition").val();
+            //var TermsCondition = $('#TermsCondition').summernote('code');
 
             // Set the value to the input field
             $("#CCEmail").val(CCEmail);
@@ -310,7 +325,7 @@
             $("#SQlConn").val(SQlConn);
             $("#SQLUsername").val(SQLUsername);
             $("#SQLpassword").val(SQLpassword);
-            $("#TermsCondition").val(TermsCondition);
+          /*  $("#TermsCondition").val(TermsCondition);*/
 
 
             if (conType.toUpperCase() == 'TEST') {
@@ -351,7 +366,7 @@
             var SQLpassword = $("#SQLpassword").val();
             var TimeZone = $("#ddlTimeZone :selected").val();
             var CCEmail = $("#CCEmail").val();
-            var TermsCondition = $("#TermsCondition").val();
+            var TermsCondition = encodeURIComponent($('#TermsCondition').summernote('code'));
 
 
 
@@ -428,7 +443,7 @@
 
                 datatype: JSON,
                 success: function (data) {
-                    debugger
+
                     if (data === 'OK') {
                         MsgToast("Success!", "Test connection succeeded !", "success");
                     }
@@ -470,7 +485,7 @@
 
                 datatype: JSON,
                 success: function (data) {
-                    debugger
+
                     if (data === 'OK') {
                         MsgToast("Success!", "Test connection succeeded !", "success");
                     }
@@ -502,7 +517,7 @@
 
                 datatype: JSON,
                 success: function (data) {
-                    debugger
+                    //string decodedTerms = HttpUtility.UrlDecode(TermsCondition);
                     if (conType.toUpperCase() != 'TEST') {
                         $("#ApiUrl").val(data.lstConnectionData[1]["URL"]);
                         $("#Username").val(data.lstConnectionData[1]["UserName"]);
