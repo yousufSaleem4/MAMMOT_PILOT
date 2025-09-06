@@ -436,20 +436,26 @@
 
     /* Toastr Info Custom Background */
     #toast-container > .toast-info {
-        background-color: #d6efeb !important; /* Bootstrap info blue */
-        color: #003b59 !important;
+        background-color: #d6efeb !important; /* light teal background */
+        color: #003b59 !important; /* dark blue text */
     }
 
+        /* Title styling */
         #toast-container > .toast-info .toast-title {
             font-weight: bold !important;
             color: #003b59 !important;
         }
 
+        /* Message styling */
         #toast-container > .toast-info .toast-message {
             color: #003b59 !important;
         }
-    /* Info toast ka icon dark blue karna */
-    /* Toastr info ka icon dark blue me */
+
+        /* ✅ Toastr info ka default icon dark blue karna */
+        #toast-container > .toast-info::before {
+            color: #003b59 !important; /* Dark blue icon */
+        }
+
 
 </style>
 <div id="parentDiv" class="container-fluid">
@@ -1698,6 +1704,39 @@ You already selected <span style="font-weight:bold; color:#006400">${selectedVen
             } else {
                 selectedVendorName = null;
             }
+        }
+    });
+
+
+    // ✅ Select All logic
+    $(document).on("change", "#selectAll", function () {
+        if (this.checked) {
+            var firstVendor = null;
+            var mismatch = false;
+
+            $(".suppliers-checkbox").each(function () {
+                var currentVendor = $(this).closest("tr").find("td:eq(6)").text().trim(); // apne table ke hisaab se index adjust karo
+
+                if (firstVendor === null) {
+                    firstVendor = currentVendor;
+                } else if (firstVendor !== currentVendor) {
+                    mismatch = true;
+                    return false; // loop break
+                }
+            });
+
+            if (mismatch) {
+                toastr.info("Multiple suppliers found. You can only select one supplier at a time.");
+                $(this).prop("checked", false); // select-all uncheck
+                $(".suppliers-checkbox").prop("checked", false); // sab checkboxes bhi uncheck
+                selectedVendorName = null;
+            } else {
+                selectedVendorName = firstVendor;
+                $(".suppliers-checkbox").prop("checked", true); // ✅ sirf ek supplier group hai tohi check karega
+            }
+        } else {
+            $(".suppliers-checkbox").prop("checked", false);
+            selectedVendorName = null;
         }
     });
 
