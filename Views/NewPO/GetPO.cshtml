@@ -640,22 +640,7 @@
         color: green;
     }
 
-    /* Toastr Info Custom Background */
-    #toast-container > .toast-info {
-        background-color: #d6efeb !important; /* Bootstrap info blue */
-        color: #003b59 !important;
-    }
-
-        #toast-container > .toast-info .toast-title {
-            font-weight: bold !important;
-            color: #003b59 !important;
-        }
-
-        #toast-container > .toast-info .toast-message {
-            color: #003b59 !important;
-        }
-    /* Info toast ka icon dark blue karna */
-    /* Toastr info ka icon dark blue me */
+  
    
 
 
@@ -977,7 +962,8 @@
 
 <script>
 
-       $(document).ready(function() {
+    $(document).ready(function () {
+            var selectedVendorName = null;
        //var urlParams = new URLSearchParams(window.location.search);
        var selectedStatus = '@Request.QueryString["POStatus"]';
 
@@ -1162,56 +1148,20 @@ function loadDropdowns() {
         }
     });
 }
+   
+
+
+   
 
 
 
     var selectedVendorName = null;
 
-    $(document).on("change", ".supplier-checkbox", function () {
-        var currentVendor = $(this).closest("tr").find("td:eq(6)").text().trim();
-        // ⚠️ apne table ke hisaab se Vendor_Name column ka index adjust karo
-
-        if (this.checked) {
-            if (selectedVendorName === null) {
-                selectedVendorName = currentVendor;
-            } else if (selectedVendorName !== currentVendor) {
-                // Toastr info with styled message
-                toastr.info(
-                    `</br>
-You already selected <span style="font-weight:bold; color:#006400">${selectedVendorName}</span>.<br>
-                 Please uncheck it before selecting <span style="font-weight:bold; color:#8B0000">${currentVendor}</span>.`,
-                    "ℹ️ Vendor Selection Info",
-                    {
-                        closeButton: true,
-                        progressBar: true,
-                        timeOut: 6000,
-                        escapeHtml: false, // HTML allow karne ke liye
-                    }
-                );
-
-                $(this).prop("checked", false);
-            }
-        } else {
-            var anyChecked = $(".supplier-checkbox:checked").length > 0;
-
-            if (anyChecked) {
-                var stillSelectedVendor = $(".supplier-checkbox:checked").first().closest("tr").find("td:eq(6)").text().trim();
-                selectedVendorName = stillSelectedVendor;
-            } else {
-                selectedVendorName = null;
-            }
-        }
-    });
-
-
-
-
-
 
 
 
     $('#btnOptionFilterSend').click(function () {
-        debugger
+        var selectedVendorName = null;
         $('#OptionFilter').modal('hide');
         localStorage.setItem('filter_buyer', $('#ddlBuyer').val());
         localStorage.setItem('filter_supplier', $('#ddlSupplier').val());
