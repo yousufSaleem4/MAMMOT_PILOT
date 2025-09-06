@@ -1328,8 +1328,8 @@
             OpenPage('\\NewPO\\Index?POStatus=Widget&PO=&WidgetId=' + WidgetId + '&WidgetTitle=' + encodedTitle);
         });
 
-    $(document).on('click', '#WidgetEdit', function (e) {
-        e.preventDefault();
+    $(document).off('click', '.WidgetEdit')
+        .on('click', '.WidgetEdit', function (e) {
         e.stopPropagation(); // Prevent event from bubbling up to #WidgetCard
          WidgetEditId = $(this).data('id');
         $('#widgetModal').modal('show');
@@ -1391,8 +1391,9 @@
         });
     });
 
-    $(document).on('click', '#WidgetDelete', function (e) {
-        e.preventDefault();
+    $(document).off('click', '.WidgetDelete')
+        .on('click', '.WidgetDelete', function (e) {
+            e.preventDefault();
         e.stopPropagation(); // Prevent event from bubbling up to #WidgetCard
         WidgetDeleteId = $(this).data('id');
         $('#confirmationModal').modal('show');
