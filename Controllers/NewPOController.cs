@@ -624,6 +624,8 @@ namespace PlusCP.Controllers
                     }
 
                     string TrackingNo = GetTrackingNumber(GUID, PONum);
+
+
                     string jsonstringPODTL = MakeJsonBody(PO, Line, Rel, finalQty.ToString(), formattedDate, Price, "GETPODTL", TrackingNo);
                     string apiUrlPODTL = dtURLDtl.Rows[0]["PageURL"].ToString()
                                             .Replace("<company>", "159599")
@@ -668,7 +670,7 @@ namespace PlusCP.Controllers
                         if (postPORELResponse.StatusCode == System.Net.HttpStatusCode.Created || postPORELResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
                         {
                             // **If POREL API is successful, then update data in database**
-                            UpdatePORelQty(PO, Line, Rel, finalQty.ToString(), DueDate, Price);
+                            UpdatePORelQty(PO, Line, Rel, finalQty.ToString(), DueDate, Price, TrackingNo);
                             NewPO oPO = new NewPO();
                             Result = UpdateStatusPO("POAPPROVED", PO);
 
@@ -711,30 +713,45 @@ namespace PlusCP.Controllers
             }
         }
 
-        public void UpdatePORelQty(string PONo, string POLine, string PoRel, string RelQty, string DueDate, string Price)
+        public void UpdatePORelQty(string PONo, string POLine, string PoRel, string RelQty, string DueDate, string Price, string TrackingNo)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
-            string sql = @"Update [dbo].[PODetail] SET PORel_RelQty = <RelQty>, Calculated_DueDate = '<DueDate>' , Calculated_UnitCost = '<Price>', 
-                            PODetail_UnitCost = '<Price>'  
-                           WHERE POHeader_PONum = <PONum> AND PODetail_POLine = <Line> AND PORel_PORelNum = <Rel> ";
 
+            // Initial SQL query without the TrackingNo update
+            string sql = @"Update [dbo].[PODetail] SET 
+                        PORel_RelQty = <RelQty>, 
+                        Calculated_DueDate = '<DueDate>', 
+                        Calculated_UnitCost = '<Price>', 
+                        PODetail_UnitCost = '<Price>'  
+                    WHERE POHeader_PONum = <PONum> 
+                        AND PODetail_POLine = <Line> 
+                        AND PORel_PORelNum = <Rel>";
+
+            // Convert DueDate if it's not empty or null
             DateTime ConvertedNewDueDate = new DateTime();
             if (!string.IsNullOrEmpty(DueDate))
             {
                 ConvertedNewDueDate = DateTime.Parse(DueDate);
             }
 
+            // Replace the placeholders with actual values
             sql = sql.Replace("<RelQty>", RelQty);
-            sql = sql.Replace("<DueDate>", ConvertedNewDueDate.ToString());
+            sql = sql.Replace("<DueDate>", ConvertedNewDueDate.ToString("yyyy-MM-dd")); // Use appropriate format for SQL
             sql = sql.Replace("<Price>", Price);
-            sql = sql.Replace("<RelQty>", RelQty);
             sql = sql.Replace("<PONum>", PONo);
             sql = sql.Replace("<Line>", POLine);
             sql = sql.Replace("<Rel>", PoRel);
 
-            oDAL.Execute(sql);
+            // If TrackingNo is not null or empty, include it in the update query
+            if (!string.IsNullOrEmpty(TrackingNo))
+            {
+                sql += ", PODetail_OrigComment = '" + TrackingNo + "'";  // Append TrackingNo update
+            }
 
+            // Execute the final SQL
+            oDAL.Execute(sql);
         }
+
         public string UpdateStatusPO(string Status, string PO)
         {
             cLog oLog;
@@ -864,8 +881,10 @@ namespace PlusCP.Controllers
             {
                 cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
                 string Result = "";
-                string query = @"SELECT TOP 1 TrackingNo FROM [SRM].[VendorCommunication]
-                                    WHERE GUID = '<GUID>' AND PONo = '<PO>' ORDER BY Id desc";
+                string query = @"SELECT TOP 1 CONCAT(serviceType, ':',  TrackingNo) AS TrackingNo    FROM [SRM].[VendorCommunication]
+WHERE GUID = '<GUID>' AND PONo = '<PO>'  
+ORDER BY Id DESC";
+                
                 query = query.Replace("<GUID>", GUID);
                 query = query.Replace("<PO>", PO);
                 DataTable dt = oDAL.GetData(query);

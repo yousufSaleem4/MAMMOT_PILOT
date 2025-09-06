@@ -390,7 +390,7 @@ HAVING COUNT(DISTINCT CASE WHEN POP.CommunicationStatus = 'Completed' THEN POP.[
        LEFT JOIN (
     SELECT * FROM [dbo].[BuyerPOHeader] WHERE IsActive = 1
 ) BPH ON PO.POHeader_PONum = BPH.PONumber
-        WHERE PO.rn = 1 ORDER BY BPH.UpdatedOn DESC, BPH.InsertedOn DESC;";
+        WHERE PO.rn = 1 ORDER BY BPH.UpdatedOn DESC, BPH.InsertedOn DESC; ";
 
             dt = oDAL.GetData(query);
 
@@ -516,7 +516,40 @@ HAVING COUNT(DISTINCT CASE WHEN POP.CommunicationStatus = 'Completed' THEN POP.[
         {
             string fileName = ConfigurationManager.AppSettings["Key"];
             string setupConnection = BasicEncrypt.Instance.Decrypt(System.IO.File.ReadAllLines(fileName)[0].ToString());
+            // ✅ List of all datetime columns from your staging table
+            string[] dateColumns = new string[]
+            {
+            "Calculated_OrderDate",
+            "Calculated_DueDate",
+            "Calculated_ArrivedDate",
+            "POHeader_ChangeDate",
+            "CreatedAt"
+            };
 
+            // ✅ Clean up each datetime column
+            foreach (string colName in dateColumns)
+            {
+                if (dt.Columns.Contains(colName))
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        var value = row[colName]?.ToString()?.Trim();
+
+                        if (string.IsNullOrEmpty(value) || value.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                        {
+                            row[colName] = DBNull.Value;
+                        }
+                        else if (DateTime.TryParse(value, out DateTime parsedDate))
+                        {
+                            row[colName] = parsedDate;
+                        }
+                        else
+                        {
+                            row[colName] = DBNull.Value; // fallback for invalid formats
+                        }
+                    }
+                }
+            }
             using (SqlConnection con = new SqlConnection(setupConnection))
             {
                 con.Open();
@@ -533,7 +566,7 @@ HAVING COUNT(DISTINCT CASE WHEN POP.CommunicationStatus = 'Completed' THEN POP.[
                     bulkCopy.WriteToServer(dt);
                 }
             }
-        }      
+        }
         public DataTable GETALLPOREFRESH()
         {
             cLog oLog;
