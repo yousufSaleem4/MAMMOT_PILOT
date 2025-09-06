@@ -430,6 +430,27 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
             background-color: #d44646;
         }
+
+
+
+
+    /* Toastr Info Custom Background */
+    #toast-container > .toast-info {
+        background-color: #d6efeb !important; /* Bootstrap info blue */
+        color: #003b59 !important;
+    }
+
+        #toast-container > .toast-info .toast-title {
+            font-weight: bold !important;
+            color: #003b59 !important;
+        }
+
+        #toast-container > .toast-info .toast-message {
+            color: #003b59 !important;
+        }
+    /* Info toast ka icon dark blue karna */
+    /* Toastr info ka icon dark blue me */
+
 </style>
 <div id="parentDiv" class="container-fluid">
     <input id="rptCode" type="hidden" value="019" />
@@ -1640,6 +1661,49 @@
         LoadData();
     }
 
+
+
+    var selectedVendorName = null;
+
+    $(document).on("change", ".suppliers-checkbox", function () {
+        var currentVendor = $(this).closest("tr").find("td:eq(6)").text().trim();
+        // ⚠️ apne table ke hisaab se Vendor_Name column ka index adjust karo
+
+        if (this.checked) {
+            if (selectedVendorName === null) {
+                selectedVendorName = currentVendor;
+            } else if (selectedVendorName !== currentVendor) {
+                // Toastr info with styled message
+                toastr.info(
+                    `</br>
+You already selected <span style="font-weight:bold; color:#006400">${selectedVendorName}</span>.<br>
+                 Please uncheck it before selecting <span style="font-weight:bold; color:#8B0000">${currentVendor}</span>.`,
+                    "ℹ️ Vendor Selection Info",
+                    {
+                        closeButton: true,
+                        progressBar: true,
+                        timeOut: 6000,
+                        escapeHtml: false, // HTML allow karne ke liye
+                    }
+                );
+
+                $(this).prop("checked", false);
+            }
+        } else {
+            var anyChecked = $(".suppliers-checkbox:checked").length > 0;
+
+            if (anyChecked) {
+                var stillSelectedVendor = $(".suppliers-checkbox:checked").first().closest("tr").find("td:eq(6)").text().trim();
+                selectedVendorName = stillSelectedVendor;
+            } else {
+                selectedVendorName = null;
+            }
+        }
+    });
+
+
+
+
     ToggleDataList(false);
     function LoadData() {
         
@@ -1687,7 +1751,7 @@
                                 selectedVendorName = row["Vendor_Name"];
                                 if (row["PODetail_OrderQty"] != row["Calculated_ReceivedQty"] && row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
                                     if (row["CommunicationStatus"] == "New" && row["GUID"] == "") {
-                                        return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
+                                        return '<input type="checkbox" class="suppliers-checkbox" value="' + $('<div/>').text(data).html() + '">';
 
                                     }
                                     else {
@@ -1842,8 +1906,8 @@
                         document.getElementById("RefreshTime").innerText = "Last Refreshed: " + lastRefresh;
                     }
                     // Event handler for checkbox change
-                    $('#lstData tbody').off('change', 'input[type="checkbox"].supplier-checkbox');
-                    $('#lstData tbody').on('change', 'input[type="checkbox"].supplier-checkbox', function () {
+                    $('#lstData tbody').off('change', 'input[type="checkbox"].suppliers-checkbox');
+                    $('#lstData tbody').on('change', 'input[type="checkbox"].suppliers-checkbox', function () {
                         toggleActionButtonVisibility();
                         var checkbox = $(this);
                         var vendorName = checkbox.closest('tr').find('td:eq(1)').text(); // Assuming the vendor name is in the second column (index 1)
@@ -1851,7 +1915,7 @@
                         if (checkbox.is(':checked')) {
                             return;
                             //// Uncheck all other checkboxes for different vendors
-                            //$('input[type="checkbox"].supplier-checkbox').not(checkbox).prop('checked', false);
+                            //$('input[type="checkbox"].suppliers-checkbox').not(checkbox).prop('checked', false);
                             //// Update the selected vendor name
                             //selectedVendorName = vendorName;
                         } else {
@@ -1873,7 +1937,7 @@
 
     }
     function toggleActionButtonVisibility() {
-        var anyCheckboxChecked = $('input[type="checkbox"].supplier-checkbox:checked').length > 0;
+        var anyCheckboxChecked = $('input[type="checkbox"].suppliers-checkbox:checked').length > 0;
         $('#actionButton').toggle(anyCheckboxChecked);
     }
     function showModalForZPL(head, str) {
@@ -1884,14 +1948,14 @@
 
     $(document).on('click', '#selectAll', function () {
         var isChecked = $(this).prop('checked');
-        $('.supplier-checkbox').prop('checked', isChecked);
+        $('.suppliers-checkbox').prop('checked', isChecked);
 
         // Call function to toggle action button visibility
         toggleActionButtonVisibility();
     });
 
     // Ensure individual checkboxes also trigger the function
-    $(document).on('click', '.supplier-checkbox', function () {
+    $(document).on('click', '.suppliers-checkbox', function () {
         toggleActionButtonVisibility();
     });
 
@@ -2732,12 +2796,12 @@
         var selectedRows = [];
 
         // Unbind any previously bound event handler to prevent multiple executions
-        $('#lstData').off('change', '.supplier-checkbox').on('change', '.supplier-checkbox', function () {
+        $('#lstData').off('change', '.suppliers-checkbox').on('change', '.suppliers-checkbox', function () {
             // Clear selected rows array
             selectedRows = [];
 
             // Iterate over checked checkboxes
-            $('#lstData .supplier-checkbox:checked').each(function () {
+            $('#lstData .suppliers-checkbox:checked').each(function () {
                 var rowData = table.row($(this).closest('tr')).data();
                 selectedRows.push(rowData);
             });
@@ -2746,7 +2810,7 @@
         });
 
         // Initially check for checked checkboxes
-        $('#lstData .supplier-checkbox:checked').trigger('change');
+        $('#lstData .suppliers-checkbox:checked').trigger('change');
     });
     function passRowsToTable(selectedRows) {
         // Clear previous rows from the table
@@ -3072,7 +3136,7 @@
                                 selectedVendorName = row["Vendor_Name"];
                                 if (row["PODetail_OrderQty"] != row["Calculated_ReceivedQty"] && row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
                                     if (row["CommunicationStatus"] == "New" && row["GUID"] == "") {
-                                        return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
+                                        return '<input type="checkbox" class="suppliers-checkbox" value="' + $('<div/>').text(data).html() + '">';
 
                                     }
                                     else {
@@ -3224,8 +3288,8 @@
                    // MakeDataGrid('lstData', data.lstPO, 0, columnDef, true, false, false, false);
                     MakeDataGridForTraining('lstData', data.lstPO, 0, columnDef, 'buttons', true, true, false, false);
                     // Event handler for checkbox change
-                    $('#lstData tbody').off('change', 'input[type="checkbox"].supplier-checkbox');
-                    $('#lstData tbody').on('change', 'input[type="checkbox"].supplier-checkbox', function () {
+                    $('#lstData tbody').off('change', 'input[type="checkbox"].suppliers-checkbox');
+                    $('#lstData tbody').on('change', 'input[type="checkbox"].suppliers-checkbox', function () {
                         toggleActionButtonVisibility();
                         var checkbox = $(this);
                         var vendorName = checkbox.closest('tr').find('td:eq(1)').text(); // Assuming the vendor name is in the second column (index 1)
@@ -3233,7 +3297,7 @@
                         if (checkbox.is(':checked')) {
                             return;
                             //// Uncheck all other checkboxes for different vendors
-                            //$('input[type="checkbox"].supplier-checkbox').not(checkbox).prop('checked', false);
+                            //$('input[type="checkbox"].suppliers-checkbox').not(checkbox).prop('checked', false);
                             //// Update the selected vendor name
                             //selectedVendorName = vendorName;
                         } else {
