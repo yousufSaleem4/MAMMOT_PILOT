@@ -11,12 +11,7 @@
     <meta charset="UTF-8">
     <title>@ViewBag.Title</title>
     <link href="~/Content/css/message.css" rel="stylesheet" />
-  
-    <!-- jQuery (required for Summernote) -->
-    <!-- jQuery pehle -->
-    @*<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>*@
-
-    <!-- Bootstrap (agar use kar rahe ho) -->
+ 
    
 
     <!-- Summernote -->
@@ -219,22 +214,28 @@
 
 
 
-        // set existing DB value
-        $(function () {
-            console.log("jQuery loaded:", $.fn.jquery);
-            console.log("Summernote loaded:", typeof $.fn.summernote);
+        function initTermsEditor() {
+            var $el = $('#TermsCondition');
+            if ($el.length) {
+                // Agar pehle se init hua ho to reset kar do
+                if ($el.next('.note-editor').length) {
+                    $el.summernote('destroy');
+                }
 
-            $('#TermsCondition').summernote({
-                placeholder: 'Write terms and conditions here...',
-                height: 350,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['font', ['strikethrough', 'superscript', 'subscript']],
-                    ['insert', ['link']],
-                    ['view', ['undo', 'redo']]
-                ]
-            });
+                $el.summernote({
+                    placeholder: 'Write terms and conditions here...',
+                    height: 350,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['para', ['ul', 'ol', 'paragraph']]
+                    ]
+                });
+            }
+        }
+
+        // jab page first time load ho
+        $(document).ready(function () {
+            initTermsEditor();
         });
 
         function LoadERPData() {
@@ -299,7 +300,10 @@
 
         loadData();
         function loadData() {
-
+            $.get('/Setting/UpdateSetting', function (html) {
+                $("#divTerms").html(html);
+                initTermsEditor(); // <- ab yahan dobara init hoga
+            });
             var conType = $("#ddlConn :selected").text();
 
             var CCEmail = $("#ccEmail").val();
