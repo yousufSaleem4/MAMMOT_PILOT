@@ -30,6 +30,8 @@ namespace PlusCP.Externals
                 DateTime DueDate = new DateTime();
                 string Qty = "";
                 string Price = "";
+                string TrackingNo = "";
+                string ServiceType = "";
                 GUID = Request.QueryString["GUID"].ToString();
                 Action = Request.QueryString["Action"].ToString();
                 PO = Request.QueryString["PO"].ToString();
@@ -37,13 +39,15 @@ namespace PlusCP.Externals
                 PO = Uri.UnescapeDataString(PO.Replace(" ", "+"));
                 PO = BasicEncrypt.Instance.Decrypt(PO);
 
-
+                DataTable dtTracking = new DataTable();
                 DataTable dt = new DataTable();
                 if (!AlreadyAsnwer(GUID, PO))
                 {
                     dt = GetData(GUID, PO);
                     dgvVendor.DataSource = dt;
                     dgvVendor.DataBind();
+
+                    dtTracking = GetVendorTrackingDtls(GUID, PO);
 
                     if (dt.Rows.Count > 0)
                     {
@@ -87,6 +91,23 @@ namespace PlusCP.Externals
                         txtQty.Value = Qty;
                         txtPrice.Value = Price;
                     }
+               
+                    if(dtTracking.Rows.Count > 0)
+                    {
+                        TrackingNo = dtTracking.Rows[0]["TrackingNo"].ToString();
+                        ServiceType = dtTracking.Rows[0]["serviceType"].ToString();
+
+                        if (!string.IsNullOrEmpty(TrackingNo))
+                        {
+                            txtTrackingNo.Value = TrackingNo;
+                        }
+
+                        if (!string.IsNullOrEmpty(ServiceType))
+                        {
+                            ddlType.Value = ServiceType;
+                        }
+                    }
+                
                 }
                 else
                 {
@@ -622,6 +643,24 @@ namespace PlusCP.Externals
                             from[SRM].[BuyerPO] WHERE GUID = '<GUID>' 
                             AND CONCAT(PONum,'-',[LineNo],'-',RelNo) = '<PO>' ";
             }
+            sql = sql.Replace("<GUID>", GUID);
+            sql = sql.Replace("<PO>", PO);
+            DataTable dt = new DataTable();
+            dt = oDAL.GetData(sql, DBConnectionString);
+
+            return dt;
+        }
+
+        public DataTable GetVendorTrackingDtls(string GUID, string PO)
+        {
+            ExternalDAL oDAL = new ExternalDAL();
+            string ConnectionType = Request.QueryString["Connection"].ToString();
+            DBConnectionString = GetConnectionString(ConnectionType);
+            string sql = "";
+
+                sql = @" SELECT TOP 1 serviceType, TrackingNo  FROM [SRM].[VendorCommunication]
+                             WHERE GUID = '<GUID>' AND  PONo = '<PO>' ORDER BY ID DESC ";
+                    
             sql = sql.Replace("<GUID>", GUID);
             sql = sql.Replace("<PO>", PO);
             DataTable dt = new DataTable();

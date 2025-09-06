@@ -1844,56 +1844,22 @@
                     // Event handler for checkbox change
                     $('#lstData tbody').off('change', 'input[type="checkbox"].supplier-checkbox');
                     $('#lstData tbody').on('change', 'input[type="checkbox"].supplier-checkbox', function () {
+                        toggleActionButtonVisibility();
                         var checkbox = $(this);
-                        var vendorName = checkbox.closest('tr').find('td:eq(1)').text(); // Get the vendor name from the row
+                        var vendorName = checkbox.closest('tr').find('td:eq(1)').text(); // Assuming the vendor name is in the second column (index 1)
 
                         if (checkbox.is(':checked')) {
-                            // If this is a new vendor selection, show an alert if a different vendor is already selected
-                            if (selectedVendors.length > 0 && selectedVendors[0] !== vendorName) {
-                                alert("Vendor has changed! You can uncheck the previous vendor to select a different vendor.");
-                                checkbox.prop('checked', false); // Uncheck the current checkbox
-                            } else {
-                                // Allow selecting the same vendor and add to selected vendors
-                                selectedVendors.push(vendorName);
-                            }
+                            return;
+                            //// Uncheck all other checkboxes for different vendors
+                            //$('input[type="checkbox"].supplier-checkbox').not(checkbox).prop('checked', false);
+                            //// Update the selected vendor name
+                            //selectedVendorName = vendorName;
                         } else {
-                            // If the checkbox is unchecked, remove the vendor from selected vendors
-                            selectedVendors = selectedVendors.filter(function (item) {
-                                return item !== vendorName;
-                            });
+                            // If the checkbox is unchecked, update the selected vendor name to empty
+                            selectedVendorName = "";
                         }
                     });
-
-                    // Select All checkbox handler
-                    $('#selectAll').off('change').on('change', function () {
-                        var isChecked = $(this).is(':checked');
-
-                        // If Select All is checked, select checkboxes only for the currently selected vendor
-                        if (isChecked) {
-                            if (selectedVendors.length === 0) {
-                                // If no vendor is selected yet, select checkboxes for the vendor in the first row
-                                selectedVendorName = $('#lstData tbody tr:first').find('td:eq(1)').text();
-                                selectedVendors.push(selectedVendorName);
-                            }
-                            $('#lstData tbody input[type="checkbox"].supplier-checkbox')
-                                .each(function () {
-                                    var vendorName = $(this).closest('tr').find('td:eq(1)').text();
-                                    if (vendorName === selectedVendorName) {
-                                        $(this).prop('checked', true);
-                                    }
-                                });
-                        } else {
-                            // Uncheck all checkboxes
-                            $('#lstData tbody input[type="checkbox"].supplier-checkbox').prop('checked', false);
-                            selectedVendors = []; // Clear the selected vendors list
-                        }
-                        toggleActionButtonVisibility();
-                    });
-
-                    // Toggle action button visibility based on selection
                     toggleActionButtonVisibility();
-
-                    // Initialize dropdowns
                     $('.dropdown-toggle').dropdown();
                 }
                 if (data["ErrorMessage"] != null) {

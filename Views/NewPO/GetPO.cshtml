@@ -1351,27 +1351,34 @@ function loadDropdowns() {
                     var columnDef = [
                         {
                             data: "Checkbox",
-                            title: '<input type="checkbox" id="selectAll" class="select-all-checkbox" />',
+                            title: '',
                             width: "20px",
                             className: "notexport text-center",
                             render: function (data, type, row) {
                                 selectedVendor = row["Vendor_VendorID"];
-                                // Only show checkbox if PO is approved AND status is New
-                                if (row["POHeader_Approve"] === true && row["POStatus"] == "New" || row["POStatus"] == "Reject") {
+                                // Only show checkbox if POHeader_Approve is true AND POStatus is "New" or "Reject"
+                                if (row["POHeader_Approve"] === true && (row["POStatus"] === "New" || row["POStatus"] === "Reject")) {
                                     return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
                                 }
-                                return ''; // Return empty string if conditions not met
+                                return ''; // Return empty string if conditions are not met (no checkbox)
                             }
                         },
                         { "data": "POHeader_OrderDate", "title": "Order Date", "width": "190px", "className": "text-center" },
                         {
-                            "data": "POHeader_PONum", "title": "PO. No", "width": "190px", "className": "text-center",
+                            "data": "POHeader_PONum",
+                            "title": "PO. No",
+                            "width": "190px",
+                            "className": "text-center",
                             "render": function (data, type, row) {
-                                return '<a href="#" class="po-hover" onclick="OpenPOForm(\'' + row["POHeader_PONum"] + '\')"' +
-                                    ' data-po-number="' + row["POHeader_PONum"] + '" data-supplier="' + row["Vendor_Name"] + '"' +
-                                    ' data-date="' + row["POHeader_OrderDate"] + '">' +
-                                    '<i class="fas fa-file-invoice po-icon"></i> ' + data +
-                                    '</a>';
+                                // Only show the hyperlink if POHeader_Approve is true
+                                if (row["POHeader_Approve"] === true) {
+                                    return '<a href="#" class="po-hover" onclick="OpenPOForm(\'' + row["POHeader_PONum"] + '\')"' +
+                                        ' data-po-number="' + row["POHeader_PONum"] + '" data-supplier="' + row["Vendor_Name"] + '"' +
+                                        ' data-date="' + row["POHeader_OrderDate"] + '">' +
+                                        '<i class="fas fa-file-invoice po-icon"></i> ' + data +
+                                        '</a>';
+                                }
+                                return data; // Return empty string if POHeader_Approve is false (hide the hyperlink)
                             }
                         },
                         {
@@ -1432,6 +1439,10 @@ function loadDropdowns() {
                     if (lastRefresh) {
                         document.getElementById("RefreshTime").innerText = "Last Refreshed: " + lastRefresh;
                     }
+
+
+
+
                     // Event handler for checkbox change
                     $('#lstData tbody').off('change', 'input[type="checkbox"].supplier-checkbox');
                     $('#lstData tbody').on('change', 'input[type="checkbox"].supplier-checkbox', function () {
@@ -1463,6 +1474,9 @@ function loadDropdowns() {
 
 
     }
+
+    
+
 
     function TransactionDtl(PoNo) {
         $('#TransactionModal').modal('show');
