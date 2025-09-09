@@ -61,17 +61,21 @@ namespace PlusCP.Externals
                 string status = Convert.ToString(r["Status"]);
                 if (status == "Sent")
                 {
-                    txtStatus.Text = "Sent";
+                    txtStatus.Text = "Pending";
                     txtStatus.CssClass = "form-control status-readonly status-sent";
+                    //txtStatus.Attributes["style"] = "background:red; border-color:red; color:#C2410C; font-weight:700;";
+
                 }
                 else if (status == "Received")
                 {
-                    txtStatus.Text = "Received";
+                    txtStatus.Text = "Acknowledged";
                     txtStatus.CssClass = "form-control status-readonly status-received";
+                    //txtStatus.Attributes["style"] = "background:#FFF7ED; border-color:#FED7AA; color:#C2410C; font-weight:700;";
+
                 }
                 else if (status == "Reject")
                 {
-                    txtStatus.Text = "Reject";
+                    txtStatus.Text = "Rejected";
                     txtStatus.CssClass = "form-control status-readonly status-reject";
                 }
                 else

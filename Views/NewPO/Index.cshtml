@@ -15,7 +15,7 @@
     .table.dataTable {
         font-family: "Segoe UI", "Roboto";
         clear: both;
-       /* border-collapse: separate;*/
+        /* border-collapse: separate;*/
         border-spacing: 0;
         font-size: 16px;
         margin-top: 1px;
@@ -145,7 +145,7 @@
     }
 
     table {
-       /* border-collapse: separate;*/
+        /* border-collapse: separate;*/
         border-spacing: 0 10px; /* Adjust the second value to increase/decrease the vertical gap */
         width: 100%;
     }
@@ -159,6 +159,7 @@
         font-size: 19px;
         color: #003B59 !important;
     }
+
     #SecondemailInputContainer {
         border: 1px solid #ccc;
         background-color: #fff;
@@ -297,7 +298,7 @@
         color: #023160;
     }
 
-   
+
 
     .box-header {
         background-color: #f8f9fc !important;
@@ -306,7 +307,7 @@
         box-shadow: 0px 5px #ededed;
     }
 
-   
+
 
     .btn-box-tool {
         color: #003B59 !important;
@@ -360,6 +361,7 @@
             color: #003B59 !important;
             border: 2px solid #003B59 !important;
         }
+
     .selected {
         background-color: deepskyblue;
         color: black;
@@ -437,24 +439,24 @@
     /* Toastr Info Custom Background */
     /*#toast-container > .toast-info {
         background-color: #d6efeb !important;*/ /* light teal background */
-        /*color: #003b59 !important;*/ /* dark blue text */
+    /*color: #003b59 !important;*/ /* dark blue text */
     /*}*/
 
-        /* Title styling */
-        /*#toast-container > .toast-info .toast-title {
+    /* Title styling */
+    /*#toast-container > .toast-info .toast-title {
             font-weight: bold !important;
             color: #003b59 !important;
         }*/
 
-        /* Message styling */
-        /*#toast-container > .toast-info .toast-message {
+    /* Message styling */
+    /*#toast-container > .toast-info .toast-message {
             color: #003b59 !important;
         }*/
 
-        /* ✅ Toastr info ka default icon dark blue karna */
-        /*#toast-container > .toast-info::before {
+    /* ✅ Toastr info ka default icon dark blue karna */
+    /*#toast-container > .toast-info::before {
             color: #003b59 !important;*/ /* Dark blue icon */
-        /*}*/
+    /*}*/
 
 
 </style>
@@ -465,8 +467,8 @@
         <div id="dataList" class="box panel panel-default">
             <div class="box-header with-border">
                 @*<button type="button" class="btn btn-box-tool" title="Option Page" id="btnOptionFilter">
-                    <span class="fa fa-filter fa-lg blue"></span>
-                </button>*@
+                        <span class="fa fa-filter fa-lg blue"></span>
+                    </button>*@
 
 
                 <h5 class="box-title"><strong style="font-size:14px !important;">@ViewBag.ReportTitle  </strong><strong id="filterString"></strong></h5>
@@ -479,7 +481,8 @@
                     All @*<span id="AllCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAll"></span></span>*@
                 </button>
                 <!--<button id="AllOpenCard" class="btn btn-badges">
-                    Idle--> @*<span id="AllOpenCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAllOpen"></span></span>*@
+                    Idle-->
+                @*<span id="AllOpenCard" onclick="toggleSelection(this)" class="badge badge_light"><span id="lblAllOpen"></span></span>*@
                 <!--</button>-->
                 <button id="CardPending" class="btn btn-badges">
                     In Process @*<span id="badgeCount" class="badge badge_light"><span id="lblPending"></span></span>*@
@@ -570,7 +573,7 @@
 </div>
 
 <!-- Modal Email Entry -->
-<div id="EmailEntry" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+<div id="EmailEntry" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header ModalHeaderColor" style="height: 35px;">
@@ -799,7 +802,7 @@
                             </div>
                         </div>
                     </div>
-                   
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -1785,7 +1788,7 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
                 if (!isSingleRow) {
                     var columnDef = [
                         {
-                            data: "Checkbox", title: '<input type="checkbox" id="selectAll" class="select-all-checkbox" />', width: "20px", "className": "notexport", "className": "text-center",
+                            data: "Checkbox", orderable: false, title: '<input type="checkbox" id="selectAll" class="select-all-checkbox" />', width: "20px", "className": "notexport", "className": "text-center",
                             render: function (data, type, row) {
                                 selectedVendorName = row["Vendor_Name"];
                                 if (row["PODetail_OrderQty"] != row["Calculated_ReceivedQty"] && row["PODetail_OrderQty"] != row["Calculated_ArrivedQty"]) {
@@ -2439,8 +2442,9 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
     });
 
     function handleactionahr(guid, action, PONum, PartNo, DueDate, Qty, Price, ArrivedQty) {
-        var selectedStatus = '@Request.QueryString["POStatus"]';
+        var selectedStatus = '@Request.QueryString["POStatus"]'; debugger
         var PurchaseOrder = PONum.split('-')[0]; // Extract value before first '-'
+        var WidgetId = '@Session["WidgetId"]';
 
         $.ajax({
 
@@ -2462,7 +2466,10 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
 
                 if (data.Status == 'Updated') {
                     MsgToast("Success!", "Record has been updated!", "success");
-                    OpenPage('\\NewPO\\Index?PO=' + PurchaseOrder + '&POStatus=' + selectedStatus + '');
+                  //  OpenPage('\\NewPO\\Index?PO=' + PurchaseOrder + '&POStatus=' + selectedStatus + '');
+                    var pageUrl = '\\NewPO\\Index?PO= ' + PurchaseOrder + '&WidgetId=' + WidgetId + '';
+
+                    OpenPage(pageUrl);
                 }
                 else {
                     MsgToast("Oops!", data.Message, "error");
@@ -3437,7 +3444,7 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
             deferRender: true,
             destroy: true,
             pagingType: 'full',
-            pageLength: 20,
+            pageLength: 50,
             scrollCollapse: false,
             scrollX: isScrollX,
             colReorder: true,

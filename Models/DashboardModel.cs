@@ -25,6 +25,7 @@ namespace PlusCP.Models
 
         public string WidgetId { get; set; }
         public string WidgetTitle { get; set; }
+        public string vendorId { get; set; }
         public string WidgetDesc { get; set; }
         public string WidgetPO { get; set; }
         public string Count { get; set; }
@@ -95,7 +96,9 @@ namespace PlusCP.Models
     SELECT 
         Token,  
         Id, 
-        WidgetTitle, 
+        WidgetTitle,
+        VendorName,
+        ExpireOn,
         WidgetDesc, 
         Count,
         ROW_NUMBER() OVER (PARTITION BY Token ORDER BY Id) AS RowNum
@@ -108,7 +111,9 @@ namespace PlusCP.Models
 SELECT 
     Token, 
     Id, 
-    WidgetTitle, 
+    WidgetTitle,
+    VendorName,
+    ExpireOn,
     WidgetDesc, 
     Count
 FROM 
@@ -122,7 +127,7 @@ FROM
 
         }
 
-        public void GetPOList(string noOfDays)
+        public void GetPOList(string supplierId, string noOfDays)
         {
             
             string sql = @"
@@ -135,11 +140,12 @@ SELECT DISTINCT
     END AS IsExist
 FROM [dbo].[PODetail] PD
 LEFT JOIN [SRM].[BuyerPO] BH
-    ON PD.POHeader_PONum = BH.PONum
-WHERE DATEDIFF(DAY, GETDATE(), PD.Calculated_DueDate) BETWEEN 0 AND <noOfDays>
+    ON PD.POHeader_PONum = BH.PONum AND PD.PODetail_POLine = BH.[LineNo] AND PD.PORel_PORelNum = BH.RelNo
+WHERE Vendor_VendorID = '<supplierId>' AND  DATEDIFF(DAY, GETDATE(), PD.Calculated_DueDate) BETWEEN 0 AND <noOfDays>
 
 ";
 
+            sql = sql.Replace("<supplierId>", supplierId);
             sql = sql.Replace("<noOfDays>", noOfDays);
 
             cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
@@ -261,6 +267,7 @@ WHERE DATEDIFF(DAY, GETDATE(), PD.Calculated_DueDate) BETWEEN 0 AND <noOfDays>
             string sql = @"SELECT 
     Id,
     WidgetTitle,
+    vendorId,
     WidgetDesc,
     Days,
     (SELECT STUFF(
@@ -278,6 +285,7 @@ where Id = <WidgetId> AND IsActive = 1 ";
             {
                 WidgetId = dt.Rows[0]["Id"].ToString();
                 WidgetTitle = dt.Rows[0]["WidgetTitle"].ToString();
+                vendorId = dt.Rows[0]["vendorId"].ToString();
                 WidgetDesc = dt.Rows[0]["WidgetDesc"].ToString();
                 WidgetPO = dt.Rows[0]["PO"].ToString();
                 Days = dt.Rows[0]["Days"].ToString();
@@ -1604,7 +1612,7 @@ WHERE W.WidgetStatus = 1 AND E.EmpId = @EMP_ID
                 return false;
         }
 
-        public string SavePOWidgets(string WidgetTitle, string WidgetDesc, string NoOfDays, string[] POListId, List<Dictionary<string, object>> poItems)
+        public string SavePOWidgets(string WidgetTitle, string SupplierId, string SupplierName, string WidgetDesc, string NoOfDays, string[] POListId, List<Dictionary<string, object>> poItems)
         {
             string sql = "";
             oDAL = new cDAL(cDAL.ConnectionType.INIT);
@@ -1614,36 +1622,46 @@ WHERE W.WidgetStatus = 1 AND E.EmpId = @EMP_ID
 
             string commaSeparatedPO = string.Join(",", POListId);
             int count = POListId.Length;
+            DateTime expiryDate = DateTime.Now.AddDays(Convert.ToInt32(NoOfDays));
 
             sql = @"
 INSERT INTO [dbo].[Widgets]
    ([WidgetTitle]
+   ,[VendorId]
+   ,[VendorName]
    ,[WidgetDesc]
    ,[PO] 
    ,[Days]
    ,[Count]
    ,[Email]
    ,[IsActive]
+   ,[ExpireOn]
    ,[CreatedBy]
    ,[CreatedOn])
 VALUES
    ('<WidgetTitle>'
+    ,'<VendorId>'
+   ,'<VendorName>'
    ,'<WidgetDesc>'
    ,'<PO>'
    ,'<Days>'    
    ,'<Count>'
    ,'<Email>'
    ,'<IsActive>'
+   ,'<ExpireOn>'
    ,'<CreatedBy>'
    ,'<CreatedOn>')";
 
             sql = sql.Replace("<WidgetTitle>", WidgetTitle);
+            sql = sql.Replace("<VendorId>", SupplierId);
+            sql = sql.Replace("<VendorName>", SupplierName);
             sql = sql.Replace("<WidgetDesc>", WidgetDesc);
             sql = sql.Replace("<PO>", commaSeparatedPO);
             sql = sql.Replace("<Days>", NoOfDays);
             sql = sql.Replace("<Count>", count.ToString());
             sql = sql.Replace("<Email>", Email);
             sql = sql.Replace("<IsActive>", "1");
+            sql = sql.Replace("<ExpireOn>", expiryDate.ToString("yyyy-MM-dd"));
             sql = sql.Replace("<CreatedBy>", Email);
             sql = sql.Replace("<CreatedOn>", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
@@ -1663,7 +1681,7 @@ VALUES
         }
 
 
-        public string EditPOWidgets(string Id, string WIdgetTitle, string WidgetDesc, string NoOfDays, string[] POListId)
+        public string EditPOWidgets(string Id, string WIdgetTitle, string SupplierId, string SupplierName, string WidgetDesc, string NoOfDays, string[] POListId)
         {
             string query = string.Empty;
             oDAL = new cDAL(cDAL.ConnectionType.INIT);
@@ -1676,27 +1694,33 @@ VALUES
 
             string commaSeparatedPO = string.Join(",", POListId);
             int count = POListId.Length;
-
+            DateTime expiryDate = DateTime.Now.AddDays(Convert.ToInt32(NoOfDays));
 
             sql = @"UPDATE [dbo].[Widgets]
    SET [WidgetTitle] = '<WidgetTitle>'
+      ,[VendorId] = '<SupplierId>'
+      ,[VendorName] = '<SupplierName>'
       ,[WidgetDesc] = '<WidgetDesc>'
       ,[PO] = '<PO>'
       ,[Days] = '<Days>'
       ,[Count] = '<Count>'
       ,[UserId] = '<UserId>'
       ,[Email] = '<Email>'
+      ,[ExpireOn] = '<ExpireOn>'
       ,[CreatedBy] = '<CreatedBy>'
       ,[CreatedOn] = '<CreatedOn>'
  WHERE Id = '<Id>' ";
 
             sql = sql.Replace("<WidgetTitle>", WIdgetTitle);
+            sql = sql.Replace("<SupplierId>", SupplierId);
+            sql = sql.Replace("<SupplierName>", SupplierName);
             sql = sql.Replace("<WidgetDesc>", WidgetDesc);
             sql = sql.Replace("<PO>", commaSeparatedPO);
             sql = sql.Replace("<Days>", NoOfDays);
             sql = sql.Replace("<Count>", count.ToString());
             sql = sql.Replace("<UserId>", SigninId);
             sql = sql.Replace("<Email>", Email);
+            sql = sql.Replace("<ExpireOn>", expiryDate.ToString("yyyy-MM-dd"));
             sql = sql.Replace("<CreatedBy>", Email);
             sql = sql.Replace("<CreatedOn>", DateTime.Now.ToString());
             sql = sql.Replace("<Id>", Id);

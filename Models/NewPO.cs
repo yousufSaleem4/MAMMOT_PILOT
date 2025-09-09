@@ -2237,63 +2237,7 @@ ORDER BY CreatedOn DESC
             oDAL.Execute(query);
         }
 
-        public string sendMultiPOHeadEmail(string PO, string VendorId, string Vendor, string VendorEmail, string POStatus, byte[] PdfBytes, string GUID)
-        {
-            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
-            DataTable dt = new DataTable();
-            PDFReport oPDF = new PDFReport();
-            string ConnctionType = HttpContext.Current.Session["DefaultDB"].ToString();
-            string result = "";
-            var subject = "PO Confirmation Document";
-            // Recipient's email address
-            string recipientEmail = VendorEmail;
-            DataTable dtSender = new DataTable();
-            dtSender = cCommon.GetEmailSMTPSetup();
-            // Sender's email address and password
-            string senderEmail = dtSender.Rows[0]["SenderEmail"].ToString();
 
-
-            //URL
-            string URL = "";
-            DataTable dtURL = new DataTable();
-            dtURL = cCommon.GetEmailURL(DeployMode, "POHEADPDF");
-
-            if (DeployMode == "PROD")
-            {
-                URL = dtURL.Rows[0]["URL"].ToString() + dtURL.Rows[0]["PageURL"].ToString();
-
-            }
-            else
-            {
-                URL = dtURL.Rows[0]["URL"].ToString() + dtURL.Rows[0]["PageURL"].ToString();
-
-            }
-            URL = URL.Replace("<PO>", PO);
-            URL = URL.Replace("<Connection>", ConnctionType);
-            URL = URL.Replace("<GUID>", GUID);
-            //URL = URL + PONo + "&Connection=" + ConnctionType;
-
-            string htmlBody = "";
-            htmlBody = oPDF.MakeEmailBody(PO, Vendor, URL);
-
-            try
-            {
-                HttpPostedFileBase attachment = null;
-
-                if (PdfBytes != null && PdfBytes.Length > 0)
-                {
-                    attachment = new ByteArrayPostedFileBase(PdfBytes, $"PO_{PO}.pdf", "application/pdf");
-                }
-
-                result = cCommon.SendEmail("Yousufdev4@gmail.com", subject, htmlBody, "", attachment);
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-            return result;
-        }
         public string GetGUID(string PO)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);

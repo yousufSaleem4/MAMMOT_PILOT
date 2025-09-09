@@ -639,7 +639,8 @@ HAVING COUNT(DISTINCT CASE WHEN POP.CommunicationStatus = 'Completed' THEN POP.[
                     dt = GetAllPODtl(PO);
                 else if (POStatus.ToUpper() == "WIDGET" )
                     dt = GetWidgetData(widgetId);
-
+                else
+                    dt = GetWidgetData(widgetId);
 
                 return dt;
             }

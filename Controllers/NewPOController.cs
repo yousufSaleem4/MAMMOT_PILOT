@@ -1167,9 +1167,6 @@ where POHeader_PONum = '<PONum>' and PODetail_POLine = '<POLine>' and PORel_PORe
                         userName = Session["UserName"].ToString();
                         vendorEmail = row["SupplierEmail"];
                         CCvendorEmail = row["CCemails"];
-
-
-                        //vendorEmail = "yousufdev4@gmail.com";
                         ContactReason = row["Reason"];
                         BuyerEmail = row["PurAgent_EMailAddress"];
                         SupplierCompany = row["POHeader_Company"];

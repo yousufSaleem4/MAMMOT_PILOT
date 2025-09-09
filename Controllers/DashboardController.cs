@@ -26,93 +26,34 @@ namespace PlusCP.Controllers
         {
             if (cCommon.IsSessionExpired())
             {
-
                 return RedirectToAction("Logout", "Home");
             }
 
             DashboardModel oDB = new DashboardModel();
             oDB.GetCardWidgets();
-          
+            var dtSuppliers = GetSuppliers();
+            ViewBag.ddlSupplier = cCommon.ToDropDownList(dtSuppliers, "ID", "NAME", Session["DefaultProgram"].ToString(), "ID");
             return View(oDB);
         }
 
-
-        public void LoadBuyerInfo()
+        public DataTable GetSuppliers()
         {
-            cLog oLog;
-            try
+            DataTable dt = new DataTable();
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
+            string sql = "SELECT DISTINCT(vendor_vendorID) AS ID, vendor_name AS [NAME] FROM [dbo].[PODetail] WHERE Vendor_Name IS NOT NULL ORDER BY Vendor_Name";
+            dt = oDAL.GetData(sql);
+
+            // Add "Select from List" row at the top
+            if (dt != null && dt.Rows.Count > 0)
             {
-                DataTable dt = new DataTable();
-                string menuTitle = string.Empty;
-                DataTable dtURL = new DataTable();
-                string ConnectionType = Session["DefaultDB"].ToString();
-                dtURL = cCommon.GetEmailURL(ConnectionType.ToUpper(), "BuyerInfo");
-                string URL = dtURL.Rows[0]["URL"].ToString();
-                var client = new RestClient(URL);
-                var request = new RestRequest(dtURL.Rows[0]["PageURL"].ToString(), Method.Get);
-                string userName = dtURL.Rows[0]["UserName"].ToString();
-                string password = dtURL.Rows[0]["Password"].ToString();
-                password = BasicEncrypt.Instance.Decrypt(password.Trim());
-
-                // Add basic authentication header
-                request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(userName + ":" + password)));
-
-                var response = client.Execute(request);
-
-                if (response.IsSuccessStatusCode == true)
-                {
-
-                    string jsonstring = response.Content;
-                    dt = cCommon.Tabulate(jsonstring);
-                    string query = "Truncate Table BuyerInfo";
-                    cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
-                    if (dt.Rows.Count > 0)
-                    {
-                        oDAL.AddQuery(query);
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            string BuyerId = row["BuyerID"].ToString();
-                            string EmailAddress = row["EMailAddress"].ToString();
-                            string POLimit = row["POLimit"].ToString();
-                            query = "INSERT INTO BuyerInfo (BuyerId, EMailAddress, POLimit) VALUES ('" + BuyerId + "','" + EmailAddress + "', '" + POLimit + "') ";
-                            oDAL.AddQuery(query);
-                        }
-
-                        oDAL.Execute(query);
-                        oDAL.Commit();
-
-                        // Load Buyer Info in session
-                        query = "SELECT * FROM BuyerInfo";
-                        DataTable dtBuyerInfo = new DataTable();
-                        dtBuyerInfo = oDAL.GetData(query);
-                        Session["dtBuyerInfo"] = dtBuyerInfo;
-                    }
-                    else
-                    {
-                        oLog = new cLog();
-                        JObject json = JObject.Parse(response.Content);
-                        string errorMessage = json["ErrorMessage"]?.ToString();
-                        oLog.RecordError(errorMessage, response.Content.ToString(), "Buyer Info API");
-                    }
-
-                }
-                else
-                {
-                    oLog = new cLog();
-                    JObject json = JObject.Parse(response.Content);
-                    string errorMessage = json["ErrorMessage"]?.ToString();
-                    oLog.RecordError(errorMessage, response.Content.ToString(), "Buyer Info API");
-                }
+                DataRow newRow = dt.NewRow();
+                newRow["ID"] = "";
+                newRow["NAME"] = "Select from List";
+                dt.Rows.InsertAt(newRow, 0);
             }
-            catch (Exception ex)
-            {
 
-                oLog = new cLog();
-                oLog.RecordError(ex.Message, ex.StackTrace, "Buyer Info API");
-
-            }
+            return dt;
         }
-
         [HttpGet]
         public JsonResult GetWidgetList()
         {
@@ -125,14 +66,14 @@ namespace PlusCP.Controllers
         }
 
         [HttpGet]
-        public  JsonResult GetWidgetData() // Widgets Count 
+        public JsonResult GetWidgetData() // Widgets Count 
         {
             string ConnctionType = Session["DefaultDB"].ToString();
             string Email = Session["Email"].ToString();
             string userType = Session["UserType"].ToString();
             NewPOCommon oPOCommon = new NewPOCommon();
             DataTable dt = new DataTable();
-            dt =  oPOCommon.GetCounts();
+            dt = oPOCommon.GetCounts();
             DashboardModel oModel = new DashboardModel();
 
             if (ConnctionType.ToUpper() == "PROD" || ConnctionType.ToUpper() == "PILOT")
@@ -153,23 +94,23 @@ namespace PlusCP.Controllers
 
 
         [HttpPost]
-        public JsonResult SavePOWidgets(string WIdgetTitle, string WidgetDesc, string NoOfDays, string[] POListId, string items)
+        public JsonResult SavePOWidgets(string WIdgetTitle, string SupplierId, string SupplierName, string WidgetDesc, string NoOfDays, string[] POListId, string items)
         {
             // Deserialize JSON into a Dictionary with object values
             var dataList = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(items);
 
             DashboardModel oModel = new DashboardModel();
-            oModel.SavePOWidgets(WIdgetTitle, WidgetDesc, NoOfDays, POListId, dataList); // yahan dataList bhejna hai
+            oModel.SavePOWidgets(WIdgetTitle, SupplierId, SupplierName, WidgetDesc, NoOfDays, POListId, dataList); // yahan dataList bhejna hai
             return Json(oModel, JsonRequestBehavior.AllowGet);
         }
 
 
         [HttpPost]
-        public JsonResult EditPOWidgets(string WidgetEditId, string WIdgetTitle, string WidgetDesc, string NoOfDays, string[] POListId)
+        public JsonResult EditPOWidgets(string WidgetEditId, string WIdgetTitle, string SupplierId, string SupplierName, string WidgetDesc, string NoOfDays, string[] POListId)
         {
 
             DashboardModel oModel = new DashboardModel();
-            oModel.EditPOWidgets(WidgetEditId, WIdgetTitle, WidgetDesc, NoOfDays, POListId);
+            oModel.EditPOWidgets(WidgetEditId, WIdgetTitle, SupplierId, SupplierName, WidgetDesc, NoOfDays, POListId);
             return Json(oModel, JsonRequestBehavior.AllowGet);
         }
 
@@ -190,10 +131,10 @@ namespace PlusCP.Controllers
         //}
 
         [HttpGet]
-        public JsonResult GetPOList(string noOfDays)
+        public JsonResult GetPOList(string supplierId, string noOfDays)
         {
             DashboardModel oDB = new DashboardModel();
-            oDB.GetPOList(noOfDays);
+            oDB.GetPOList(supplierId, noOfDays);
             return Json(oDB, JsonRequestBehavior.AllowGet);
         }
 

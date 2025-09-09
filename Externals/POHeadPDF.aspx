@@ -7,34 +7,28 @@
 
 
     <style>
-
-        /* Status color map */
-        .status-new { /* New = Blue */
-            background: #EFF6FF; /* light blue */
-            border-color: #BFDBFE;
-            color: #1D4ED8; /* blue text */
-            font-weight: 700;
+        input.status-new[readonly] {
+            background: #EFF6FF !important;
+            border-color: #BFDBFE !important;
+            color: #1D4ED8 !important;
         }
 
-        .status-sent { /* Sent = Orange */
-            background: #FFF7ED; /* light orange */
-            border-color: #FED7AA;
-            color: #C2410C; /* orange text */
-            font-weight: 700;
+        input.status-sent[readonly] {
+            background: #FFF7ED !important;
+            border-color: #FED7AA !important;
+            color: #C2410C !important;
         }
 
-        .status-received { /* Received = Green */
-            background: #ECFDF5; /* light green */
-            border-color: #A7F3D0;
-            color: #065F46; /* green text */
-            font-weight: 700;
+        input.status-received[readonly] {
+            background: #ECFDF5 !important;
+            border-color: #A7F3D0 !important;
+            color: #065F46 !important;
         }
 
-        .status-reject { /* Reject = Crimson */
-            background: #FEF2F4; /* light crimson tint */
-            border-color: #F8C8D1;
-            color: #DC143C; /* crimson text */
-            font-weight: 700;
+        input.status-reject[readonly] {
+            background: #FEF2F4 !important;
+            border-color: #F8C8D1 !important;
+            color: #8f0308 !important;
         }
 
         .btn-hover-save {
@@ -334,10 +328,10 @@
             }
         /* Read-only inputs */
         input[readonly] {
-            background: #f5f7fa !important;
-            color: #334155 !important;
-            cursor: default !important;
-            box-shadow: none !important;
+            background: #f5f7fa;
+            color: #334155;
+            cursor: default;
+            box-shadow: none;
         }
 
         .body-no-scroll {
@@ -388,7 +382,7 @@
                                     <div class="form-group">
                                         <div class="row row-tight">
                                             <!-- PO Number -->
-                                            <div class="col-xs-12 col-sm-8">
+                                            <div class="col-xs-12 col-sm-7">
                                                 <label for="txtPoNumber">PO Number</label>
                                                 <div class="input-group">
                                                     <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
@@ -397,7 +391,7 @@
                                             </div>
 
                                             <!-- Status -->
-                                            <div class="col-xs-12 col-sm-4">
+                                            <div class="col-xs-12 col-sm-5">
                                                 <label for="txtStatus">Status</label>
                                                 <div class="input-group">
                                                     <span class="input-group-addon"><i class="glyphicon glyphicon-ok-circle"></i></span>
