@@ -12,6 +12,17 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
 
 <style type="text/css">
+    .card-separator {
+        margin: 6px 0;
+        border: 0;
+        border-top: 1px solid #d9e2ec; /* light subtle line */
+        opacity: 0.8;
+    }
+    .multiselect-container li.disabled a {
+        color: #aaa !important; /* gray text */
+        pointer-events: none; /* make sure it’s not clickable */
+        background: #f8f9fa !important; /* light background (optional) */
+    }
     .desc-text {
         font-size: 14px;
         color: #003B59;
@@ -729,40 +740,47 @@
                              data-id="@id" data-title="@title"
                              style="position: relative; border-top: 4px solid #003B59;">
                             <div class="card-block" style="padding: 10px;">
-                                <!-- Buttons (settings + delete) -->
+                                <!-- Buttons -->
                                 <div style="position: absolute; top: 5px; right: 10px; display: flex; gap: 2px;">
-                                    <!-- Settings button -->
                                     <a class="btn btn-light WidgetEdit" data-id="@id"
                                        style="padding: 2px 5px; font-size: 5px;">
                                         <i class="fa fa-edit" style="color: #003B59"></i>
                                     </a>
-
-                                    <!-- Delete button -->
                                     <a class="btn btn-light WidgetDelete" data-id="@id"
                                        style="padding: 2px 5px; font-size: 5px;">
                                         <i class="fa fa-trash" style="color: #003B59"></i>
                                     </a>
                                 </div>
 
-                                <h6 class="m-b-10 text-bold" style="font-size: 14px; color: #003B59 ">@title</h6>
-                                <h4 class="text-right" style="font-size: 24px; color: #003B59 ">
+                                <h6 class="m-b-10 text-bold" style="font-size: 14px; color: #003B59">@title</h6>
+                                <h4 class="text-right" style="font-size: 24px; color: #003B59">
                                     <i class="fa fa-file-alt f-left"></i><span>@count</span>
                                 </h4>
+                                <hr class="card-separator" />
+                                <!-- Description -->
                                 @if (!string.IsNullOrWhiteSpace(desc))
                                 {
-                                    <p class="m-b-0 desc-text" style="font-size: 14px; color: #003B59 "><strong>Description:</strong> @desc</p>
+                                    <p class="m-b-0 desc-text" style="font-size: 14px; color: #003B59">
+                                        <strong>Description:</strong> @desc
+                                    </p>
                                 }
                                 else
                                 {
-                                    <p class="m-b-0" style="font-size: 14px; color: #003B59; min-height:18px;"><strong>Description:</strong> &nbsp;</p>
+                                    <p class="m-b-0" style="font-size: 14px; color: #003B59; min-height:18px;">
+                                        <strong>Description:</strong> &nbsp;
+                                    </p>
                                 }
-                                <!-- ✅ Vendor before expire date -->
-                                <p class="m-b-0 vendor-text" title="@vendorName">
+                                <hr class="card-separator" />
+
+                                <!-- Supplier -->
+                                <p class="m-b-0 vendor-text" title="@vendorName" style="font-size: 14px; color: #003B59">
                                     <strong>Supplier:</strong> @vendorName
                                 </p>
+                                <hr class="card-separator" />
 
-                                <p class="m-b-0" style="font-size: 14px; color: #003B59 ">
-                                    <strong>Date Due By:</strong>@Convert.ToDateTime(expireOn).ToString("MM/dd/yyyy")
+                                <!-- Due Date -->
+                                <p class="m-b-0" style="font-size: 14px; color: #003B59">
+                                    <strong>Date Due By:</strong> @Convert.ToDateTime(expireOn).ToString("MM/dd/yyyy")
                                 </p>
                             </div>
                         </div>
