@@ -1,0 +1,129 @@
+﻿@model PlusCP.Models.POMonitoringDashbord
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">📊 Supplier Performance & PO Monitoring Dashboard</h2>
+
+    <!-- Cards -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm rounded-lg border-0 p-4 bg-info text-white h-100">
+                <i class="fas fa-link fa-2x mb-2"></i>
+                <h6>Buyer PO Linked</h6>
+                <h3 id="BuyerCommCount">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm rounded-lg border-0 p-4 bg-secondary text-white h-100">
+                <i class="fas fa-list-alt fa-2x mb-2"></i>
+                <h6>Total Epicor PO Lines</h6>
+                <h3 id="TotalEpicorPOLine">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm rounded-lg border-0 p-4 bg-success text-white h-100">
+                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                <h6>Completed by SRM</h6>
+                <h3 id="CompletedBySRM">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm rounded-lg border-0 p-4 bg-warning text-dark h-100">
+                <i class="fas fa-clipboard-check fa-2x mb-2"></i>
+                <h6>Completed by Epicor</h6>
+                <h3 id="CompletedByEpicor">0</h3>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Remaining Summary -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">Remaining Qty & Cost by Supplier</div>
+        <div class="card-body">
+            <canvas id="remainingChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- On-Time Summary -->
+    <div class="card mb-4 shadow-sm rounded-lg center-block">
+        <div class="card-header bg-success text-white fw-bold">On-Time Delivery Performance</div>
+        <div class="card-body d-flex justify-content-center">
+            <div style="width: 400px; height: 400px;">
+                <canvas id="onTimeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+$(document).ready(function() {
+    // 🟢 Query 2: Buyer & Epicor Line Counts
+    $.get('@Url.Action("GetBuyerEpicorSummary", "POMonitoringDashbord")', function(data) {
+        if (data.length > 0) {
+            $("#BuyerCommCount").text(data[0].BuyerCommCount);
+            $("#TotalEpicorPOLine").text(data[0].TotalEpicorPOLine);
+        }
+    });
+
+    // 🟢 Query 3: Completion Summary
+    $.get('@Url.Action("GetCompletionSummary", "POMonitoringDashbord")', function(data) {
+        if (data.length > 0) {
+            $("#CompletedBySRM").text(data[0].CompletedBySRM);
+            $("#CompletedByEpicor").text(data[0].CompletedByEpicor);
+        }
+    });
+
+    // 🟢 Query 1: Remaining Summary (Bar Chart)
+    $.get('@Url.Action("GetRemainingSummary", "POMonitoringDashbord")', function(data) {
+        const labels = data.map(x => x.Vendor_Name);
+        const qty = data.map(x => x.TotalRemainingQty);
+        const cost = data.map(x => x.TotalCostRemaining);
+
+        new Chart(document.getElementById('remainingChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Remaining Qty', data: qty, backgroundColor: '#17a2b8' },
+                    { label: 'Remaining Cost', data: cost, backgroundColor: '#ffc107' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            }
+
+        });
+    });
+
+    // 🟢 Query 4: On-Time Performance (Pie Chart)
+    $.get('@Url.Action("GetOnTimeSummary", "POMonitoringDashbord")', function(data) {
+        let totalOnTime = 0, totalDue = 0;
+        data.forEach(x => {
+            totalOnTime += parseInt(x.OnTimePOs || 0);
+            totalDue += parseInt(x.DuePOs || 0);
+        });
+
+
+        new Chart(document.getElementById('onTimeChart'), {
+            type: 'pie',
+            data: {
+                labels: ['On Time', 'Due / Late'],
+                datasets: [{
+                    data: [totalOnTime, totalDue],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+    });
+});
+</script>

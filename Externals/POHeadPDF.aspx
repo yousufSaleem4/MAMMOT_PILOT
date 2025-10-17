@@ -351,7 +351,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
     <link href="../Content/css/AlertMessage.css" rel="stylesheet" />
 </head>
-<body>
+<body style="background: linear-gradient(to Bottom, white, #D6EFE8);">
 
     <form id="form2" runat="server">
         <div style="padding-top: 1px; background-color: #D6EFE8">

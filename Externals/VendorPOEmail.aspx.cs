@@ -41,6 +41,7 @@ namespace PlusCP.Externals
 
                 DataTable dtTracking = new DataTable();
                 DataTable dt = new DataTable();
+                DataTable dtSysValues = new DataTable();
                 if (!AlreadyAsnwer(GUID, PO))
                 {
                     dt = GetData(GUID, PO);
@@ -90,9 +91,36 @@ namespace PlusCP.Externals
                         txtDueDate.Value = DueDate.ToString("yyyy-MM-dd");
                         txtQty.Value = Qty;
                         txtPrice.Value = Price;
+
+                        // Start Qty and Price Enable / Disable
+                        dtSysValues = GetSysValues();
+                        bool IsQtyUpdate = false;
+                        bool IsPriceUpdate = false;
+                        if (dtSysValues.Rows.Count > 0) // Check is Qty and Price update Allow
+                        {
+                            // Get value for SysDesc = 'IsQtyUpdate'
+                            IsQtyUpdate = dtSysValues.AsEnumerable()
+                              .Where(r => r.Field<string>("SysDesc") == "IsQtyUpdate")
+                              .Select(r => Convert.ToBoolean(r["SysValue"]))
+                              .FirstOrDefault();
+
+                            // Get value for SysDesc = 'IsPriceUpdate'
+                            IsPriceUpdate = dtSysValues.AsEnumerable()
+                              .Where(r => r.Field<string>("SysDesc") == "IsPriceUpdate")
+                              .Select(r => Convert.ToBoolean(r["SysValue"]))
+                              .FirstOrDefault();
+                        }
+
+                        lblQty.Visible = IsQtyUpdate;
+                        lblNewPrice.Visible = IsPriceUpdate;
+                        txtQty.Visible = IsQtyUpdate;      // true → disabled, false → enabled
+                        txtPrice.Visible = IsPriceUpdate;
+
+                        // End Qty and Price Enable / Disable
+
                     }
-               
-                    if(dtTracking.Rows.Count > 0)
+
+                    if (dtTracking.Rows.Count > 0)
                     {
                         TrackingNo = dtTracking.Rows[0]["TrackingNo"].ToString();
                         ServiceType = dtTracking.Rows[0]["serviceType"].ToString();
@@ -107,7 +135,9 @@ namespace PlusCP.Externals
                             ddlType.Value = ServiceType;
                         }
                     }
-                
+
+                   
+
                 }
                 else
                 {
@@ -126,6 +156,22 @@ namespace PlusCP.Externals
                 }
             }
         }
+
+
+        public DataTable GetSysValues()
+        {
+            ExternalDAL oDAL = new ExternalDAL();
+            string ConnectionType = Request.QueryString["Connection"].ToString();
+            DBConnectionString = GetConnectionString(ConnectionType);
+            string sql = "";
+            sql = @"select * from [dbo].[zSysIni] Where  SysDesc = 'IsPriceUpdate' OR SysDesc = 'IsQtyUpdate'
+                    ORDER BY SysCode DESC ";
+
+            DataTable dt = new DataTable();
+            dt = oDAL.GetData(sql, DBConnectionString);
+            return dt;
+        }
+
         public string GetConnectionString(string ConType)
         {
             // SQL query to get the connection value from the database
@@ -227,6 +273,8 @@ namespace PlusCP.Externals
 
 
 
+          
+
 
 
             string script = "";
@@ -264,6 +312,35 @@ namespace PlusCP.Externals
                     Page.ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script);
                     return;
                 }
+
+                // Start Qty and Price Enable / Disable
+                DataTable dtSysValues = new DataTable();
+                dtSysValues = GetSysValues();
+                bool IsQtyUpdate = false;
+                bool IsPriceUpdate = false;
+                if (dtSysValues.Rows.Count > 0) // Check is Qty and Price update Allow
+                {
+                    // Get value for SysDesc = 'IsQtyUpdate'
+                    IsQtyUpdate = dtSysValues.AsEnumerable()
+                      .Where(r => r.Field<string>("SysDesc") == "IsQtyUpdate")
+                      .Select(r => Convert.ToBoolean(r["SysValue"]))
+                      .FirstOrDefault();
+
+                    // Get value for SysDesc = 'IsPriceUpdate'
+                    IsPriceUpdate = dtSysValues.AsEnumerable()
+                      .Where(r => r.Field<string>("SysDesc") == "IsPriceUpdate")
+                      .Select(r => Convert.ToBoolean(r["SysValue"]))
+                      .FirstOrDefault();
+                }
+
+                lblQty.Visible = IsQtyUpdate;
+                lblNewPrice.Visible = IsPriceUpdate;
+                txtQty.Visible = IsQtyUpdate;      // true → disabled, false → enabled
+                txtPrice.Visible = IsPriceUpdate;
+
+                // End Qty and Price Enable / Disable
+
+
             }
 
 

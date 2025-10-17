@@ -816,9 +816,9 @@ ORDER BY
             if(dt.Rows.Count > 0)
             {
                 Arrived = dt.Rows[0]["EarlyCount"].ToString();
-                Pending = dt.Rows[0]["InProcessCount"].ToString();
-                Update = dt.Rows[0]["CompletedCount"].ToString();
-                Late = dt.Rows[0]["LatePOCount"].ToString();
+                Pending = dt.Rows[0]["PendingCount"].ToString();
+                Update = dt.Rows[0]["UpdatedCount"].ToString();
+                Late = dt.Rows[0]["LateCount"].ToString();
             }
             else
             {

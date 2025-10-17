@@ -1220,7 +1220,7 @@ function loadDropdowns() {
                             render: function (data, type, row) {
                                 selectedVendor = row["Vendor_VendorID"];
                                 // Only show checkbox if PO is approved AND status is New
-                                if (row["POHeader_Approve"] === true && row["POStatus"] == "New") {
+                                if (row["POHeader_Approve"] === true && row["POStatus"] === "New" || row["POStatus"] === "Sent") {
                                     return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
                                 }
                                 return ''; // Return empty string if conditions not met
@@ -1374,7 +1374,7 @@ function loadDropdowns() {
                             render: function (data, type, row) {
                                 selectedVendor = row["Vendor_VendorID"];
                                 // Only show checkbox if POHeader_Approve is true AND POStatus is "New" or "Reject"
-                                if (row["POHeader_Approve"] === true && (row["POStatus"] === "New" || row["POStatus"] === "Reject")) {
+                                if (row["POHeader_Approve"] === true && (row["POStatus"] === "New" || row["POStatus"] === "Reject" || row["POStatus"] === "Sent")) {
                                     return '<input type="checkbox" class="supplier-checkbox" value="' + $('<div/>').text(data).html() + '">';
                                 }
                                 return ''; // Return empty string if conditions are not met (no checkbox)

@@ -21,6 +21,11 @@ namespace PlusCP.Models
 
         public string Customer { get; set; }
         public string Hours { get; set; }
+        public bool IsQtyUpdate { get; set; }
+        public bool IsPriceUpdate { get; set; }
+
+
+
 
         public string ApiUrl { get; set; }
         public string Username { get; set; }
@@ -50,8 +55,8 @@ namespace PlusCP.Models
 
 
                 string WInITTeam = "Yousuf";
-              
-                    sql = @"
+
+                sql = @"
                                 WITH TMP AS
                                 (
                                 SELECT M.MnuId, RptCode, MnuType, MnuIcon, MnuTitle, MnuTitleShort, rptDesc, MnuDesc, MnuHyperlink, MnuTarget, MnuRights, MnuActive, MnuIsReady, MnuParent, AuthUser, AuthSite, DesignedBy
@@ -78,10 +83,10 @@ namespace PlusCP.Models
 
 
                      ";
-                    sql = sql.Replace("<programName>", programName);
-                
+                sql = sql.Replace("<programName>", programName);
 
-           
+
+
 
                 if (!WInITTeam.Contains(firstName))
                     sql = sql.Replace("<MENUISREADY>", "AND M.MnuIsReady = 1 ");
@@ -151,16 +156,28 @@ namespace PlusCP.Models
             }
         }
 
-        public void GetHours()
+        public void GetSysSettings()
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
             object result = null;
-            string sql = "select SysValue from [dbo].[zSysIni] Where SysDesc = 'Hours' ";
-            result = oDAL.GetObject(sql);
-            if (result != null)
-                Hours = result.ToString();
+            DataTable dt = new DataTable();
+            string sql = "select SysValue from [dbo].[zSysIni] Where SysDesc = 'Hours' OR SysDesc = 'IsQtyUpdate' OR SysDesc = 'IsPriceUpdate' ORDER BY SysCode DESC  ";
+            dt = oDAL.GetData(sql);
+            if (dt.Rows.Count > 0)
+            {
+                IsPriceUpdate = Convert.ToBoolean(dt.Rows[0]["SysValue"]);
+                IsQtyUpdate = Convert.ToBoolean(dt.Rows[1]["SysValue"]);
+                Hours = dt.Rows[2]["SysValue"].ToString();
+                
+                
+            }
             else
+            {
                 Hours = "0";
+                IsQtyUpdate = false;
+                IsPriceUpdate = false;
+            }
+
 
         }
 
@@ -176,6 +193,8 @@ namespace PlusCP.Models
                 CCEmail = "";
 
         }
+
+
 
         public void GetAPISettings()
         {
@@ -208,12 +227,12 @@ namespace PlusCP.Models
             }
 
 
-            sql = "select SysValue from [dbo].[zSysIni] where [SysCode] = '12647' AND [SysDesc] = 'Terms and Condition' ";
+            sql = "select SysValue from [dbo].[zSysIni] where  [SysDesc] = 'TermsandCondition' ";
             dt = oDAL.GetData(sql);
             if (dt.Rows.Count > 0)
             {
                 TermsCondition = dt.Rows[0]["SysValue"].ToString();
-               
+
             }
         }
 

@@ -583,9 +583,46 @@ from[SRM].[BuyerPO] WHERE GUID = '<GUID>' AND VendorName Like '%<Vendor>%' ";
                     }
                     ddlServiceType.SelectedValue = serviceType;
                 }
+
+                if (e.Row.RowType == DataControlRowType.DataRow)
+                {
+                    // Fetch sys values only once per row
+                    DataTable dtSysValues = GetSysValues();
+                    bool IsQtyUpdate = dtSysValues.AsEnumerable()
+                        .Where(r => r.Field<string>("SysDesc") == "IsQtyUpdate")
+                        .Select(r => Convert.ToBoolean(r["SysValue"]))
+                        .FirstOrDefault();
+                    bool IsPriceUpdate = dtSysValues.AsEnumerable()
+                        .Where(r => r.Field<string>("SysDesc") == "IsPriceUpdate")
+                        .Select(r => Convert.ToBoolean(r["SysValue"]))
+                        .FirstOrDefault();
+
+                    if ((e.Row.RowState & DataControlRowState.Edit) > 0)
+                    {
+                        // In Edit mode, find textboxes only
+                        TextBox txtQty = (TextBox)e.Row.FindControl("txtQty");
+                        TextBox txtPrice = (TextBox)e.Row.FindControl("txtPrice");
+
+                        if (txtQty != null) txtQty.Enabled = IsQtyUpdate;
+                        if (txtPrice != null) txtPrice.Enabled = IsPriceUpdate;
+                    }
+                }
             }
         }
 
+        public DataTable GetSysValues()
+        {
+            ExternalDAL oDAL = new ExternalDAL();
+            string ConnectionType = Request.QueryString["Connection"].ToString();
+            DBConnectionString = GetConnectionString(ConnectionType);
+            string sql = "";
+            sql = @"select * from [dbo].[zSysIni] Where  SysDesc = 'IsPriceUpdate' OR SysDesc = 'IsQtyUpdate'
+                    ORDER BY SysCode DESC ";
+
+            DataTable dt = new DataTable();
+            dt = oDAL.GetData(sql, DBConnectionString);
+            return dt;
+        }
 
         public void AddInTransaction(string tPO, string tpartNo, string tGUID, string tHasAction, string tQty, string tprice, string tDueDate, string tcreatedBy)
         {

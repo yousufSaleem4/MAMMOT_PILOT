@@ -11,15 +11,220 @@
     <meta charset="UTF-8">
     <title>@ViewBag.Title</title>
     <link href="~/Content/css/message.css" rel="stylesheet" />
- 
-   
+
+
 
     <!-- Summernote -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
 </head>
 <body>
     <style>
+
+       
+
+        /* Toggle Switch Style */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: 0.3s;
+                border-radius: 50%;
+            }
+
+        input:checked + .slider {
+            background-color: #003B59; /* Your theme color */
+        }
+
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+
+
+
+        .card {
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease-in-out;
+        }
+
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.08);
+            }
+
+        .card-header {
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            background-color: #f9f9f9;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+        }
+
+            .toggle-password:hover {
+                color: #333;
+            }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+        }
+
+            .toggle-password:hover {
+                color: #333;
+            }
+
+        .mb-3 {
+            margin-bottom: 15px; /* Adjust as needed */
+        }
+
+        .position-relative {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+            .toggle-password i {
+                font-size: 16px;
+            }
+
+        /* Card Styling */
+        .api-settings-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
+            max-width: 100%;
+        }
+
+            .api-settings-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.1);
+            }
+
+        .api-settings-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+
+            .api-settings-card .box-header {
+                display: flex;
+                align-items: center;
+                background: #f8f9fa;
+                border-bottom: 1px solid #e1e1e1;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                margin: -20px -20px 15px -20px;
+                padding: 12px 20px;
+            }
+
+            .api-settings-card label {
+                font-weight: 600;
+                margin-bottom: 5px;
+            }
+
+            /* Make all inputs consistent height */
+            .api-settings-card .form-control,
+            .api-settings-card .input-group .form-control {
+                height: 36px;
+                font-size: 14px;
+                border-radius: 6px;
+            }
+
+        /* Input group consistency */
+        .input-group-addon {
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+            border-left: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+            /* Checkbox alignment fix */
+            .input-group-addon input[type="checkbox"] {
+                margin: 0;
+                transform: scale(1.2);
+                cursor: pointer;
+            }
+
+        /* Button styling */
+        #btnCheck {
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 20px;
+            box-shadow: 0px 3px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease-in-out;
+        }
+
+            #btnCheck:hover {
+                transform: translateY(-2px);
+                box-shadow: 0px 5px 10px rgba(0,0,0,0.15);
+            }
+
         .Red {
             color: red;
         }
@@ -62,138 +267,206 @@
                 -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
                 box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
             }
+        .btn-hover-save, .btnClose {
+            transition: all 0.2s ease-in-out;
+        }
+
+            .btn-hover-save:hover, .btnClose:hover {
+                transform: scale(1.05);
+            }
+
     </style>
 
-    <div class="container" style="background-color: white; height: 100%;">
-        <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6" style="padding-top: 12px; padding-right: 12px;">
-                <!-- API Settings Card -->
-                <div class="box panel panel-default">
-                    <div class="box-header with-border" style=" background-color: whitesmoke;">
-                        <span class="fa fa-list fa-lg ModalLabelColor"></span>
-                        <h5 class="box-title ModalLabelColor"><strong>API Settings</strong></h5>
-                    </div>
-                    <div class="box-body">
-                        <div style="margin-bottom: 20px; display:none">
-                            <label class="ModalLabelColor">Connection Type : </label>
-                            @Html.DropDownList("Connections", null, new { id = "ddlConn", @name = "ddlConn", @class = "dropdown-list" })
+    <div class="container-fluid" style="background-color: white; min-height: 100vh; background: linear-gradient(to Bottom, white, #D6EFE8);">
+        <div class="d-flex flex-column align-items-center justify-content-start" style="padding: 40px 5%;">
+
+            <!-- API Settings Card -->
+            <div class="row justify-content-center mb-4 w-100">
+                <div class="col-xl-12 col-lg-12 col-md-11 col-sm-12">
+                    <div class="api-settings-card shadow-lg p-4 rounded w-100" style="max-width: 900px; margin:auto;">
+                        <div class="box-header d-flex align-items-center mb-3">
+                            <span class="fa fa-cogs fa-lg ModalLabelColor"></span>
+                            <h4 class="box-title ModalLabelColor ml-2 mb-0"><strong>API Settings</strong></h4>
                         </div>
-                        <div style="margin-bottom: 20px;">
-                            <label class="ModalLabelColor">API URL : </label>
-                            <input type="hidden" id="ApiUrlValue" value="@ViewBag.URL" />
-                            @Html.EditorFor(model => model.ApiUrl, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter API URL" } })
+
+                        <!-- API URL -->
+                        <div class="form-group">
+                            <label>API URL:</label>
+                            <input type="hidden" id="ApiUrlValue" value="@ViewBag.ApiUrl" />
+                            @Html.EditorFor(model => model.ApiUrl, new { htmlAttributes = new { @class = "form-control", placeholder = "Enter API URL" } })
                         </div>
-                        <div style="margin-bottom: 20px;">
-                            <label class="ModalLabelColor">Username : </label>
-                            <input type="hidden" id="UsernameValue" value="@ViewBag.username" />
-                            @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter Username" } })
+
+                        <!-- Username + Password -->
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label>Username:</label>
+                                    <input type="hidden" id="UsernameValue" value="@ViewBag.username" />
+                                    @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control", placeholder = "Enter Username" } })
+                                </div>
+                                <div class="col-sm-1"></div>
+                                <div class="col-sm-7">
+                                    <label>Password:</label>
+                                    <div class="position-relative">
+                                        <input type="hidden" id="ApiPasswordValue" value="@ViewBag.ApiPassword" />
+                                        @Html.PasswordFor(model => model.password, new { @class = "form-control pr-5", placeholder = "Enter Password", id = "password" })
+                                        <span class="toggle-password" onclick="togglePassword('password', this)">
+                                            <i class="glyphicon glyphicon-eye-open"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div style="margin-bottom: 20px;">
-                            <label class="ModalLabelColor">Password : </label><br />
-                            <input type="hidden" id="passwordValue" value="@ViewBag.password" />
-                            @Html.PasswordFor(model => model.password, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter Password", id = "password", style = "width: 100% !important;" } })
-                            <input type="checkbox" id="showPasswordCheckbox"> Show Password
+
+                        <!-- Token -->
+                        <div class="form-group">
+                            <label>Token:</label>
+                            <div class="position-relative">
+                                <input type="hidden" id="ApiTokenValue" value="@ViewBag.ApiToken" />
+                                @Html.PasswordFor(model => model.token, new { @class = "form-control pr-5", placeholder = "Enter Token", id = "token" })
+                                <span class="toggle-password" onclick="togglePassword('token', this)">
+                                    <i class="glyphicon glyphicon-eye-open"></i>
+                                </span>
+                            </div>
                         </div>
-                        <div style="margin-bottom: 20px;">
-                            <label class="ModalLabelColor">Token : </label><br />
-                            <input type="hidden" id="tokenValue" value="@ViewBag.token" />
-                            @Html.PasswordFor(model => model.token, new { htmlAttributes = new { @class = "input-sm form-control full-width", placeholder = "Enter Token", id = "token", style = "width: 100% !important;" } })
-                            <input type="checkbox" id="showTokenCheckbox"> Show Token
-                        </div>
-                        <div style="margin-bottom: 20px; text-align:left">
-                            <button id="btnCheck" class="btn btn-hover-save" type="button" style="border-radius:3px; width:130px;height:30px; font-size:12px; font-weight:bold;">
-                                Test Connection
+
+                        <!-- Button -->
+                        <div class="text-center mt-3">
+                            <button id="btnCheck"
+                                    class="btn btn-hover-save shadow-sm d-inline-flex align-items-center justify-content-center"
+                                    type="button"
+                                    style="border-radius:8px; height:40px; font-size:14px; font-weight:bold; padding:0 18px;">
+                                <i class="fa fa-plug mr-2"></i> Test Connection
                             </button>
                         </div>
-                        @*<div style="margin-bottom: 20px; text-align:left">
-                                <button id="btnSync" onclick="LoadERPData()" class="btn btn-hover-save" type="button" style="border-radius:3px; width:130px;height:30px; font-size:12px; font-weight:bold;">
-                                    Sync PO Data
-                                </button>
-                            </div>*@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-6" style="padding-top: 12px; padding-right: 12px;">
-                <!-- Database Settings Card -->
-                <div class="box panel panel-default" style="display:none">
-                    <div class="box-header with-border" style=" background-color: whitesmoke;">
-                        <span class="fa fa-list fa-lg ModalLabelColor"></span>
-                        <h5 class="box-title ModalLabelColor"><strong>Database Settings</strong></h5>
-                    </div>
-                    <div class="box-body">
-                        <div style="margin-bottom: 20px">
-                            <label class="ModalLabelColor">Connection : </label>
-                            <input type="hidden" id="SQlConnval" value="@ViewBag.SQlConn" />
-                            @Html.EditorFor(model => model.SQlConn, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter API URL" } })
-                        </div>
-                        <div style="margin-bottom: 20px; display: none">
-                            <label class="ModalLabelColor">Username : </label>
-                            <input type="hidden" id="SQLUsernameval" value="@ViewBag.SQLUsername" />
-                            @Html.EditorFor(model => model.SQLUsername, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter Username" } })
-                        </div>
-                        <div style="margin-bottom: 20px; display:none">
-                            <label class="ModalLabelColor">Password : </label><br />
-                            <input type="hidden" id="SQLpasswordval" value="@ViewBag.SQLpassword" />
-                            @Html.PasswordFor(model => model.SQLpassword, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter Password", id = "password", style = "width: 100% !important;" } })
-                            <input type="checkbox" id="showSQLPasswordCheckbox"> Show Password
+
+            <br />
+
+            <!-- Other Settings Card -->
+            <div class="row justify-content-center mb-4 w-100">
+                <div class="col-xl-12 col-lg-12 col-md-11 col-sm-12">
+                    <div class="api-settings-card shadow-lg p-4 rounded w-100" style="max-width: 900px; margin:auto;">
+                        <div class="box-header d-flex align-items-center mb-3">
+                            <span class="fa fa-sliders fa-lg ModalLabelColor"></span>
+                            <h4 class="box-title ModalLabelColor ml-2 mb-0"><strong>Other Settings</strong></h4>
                         </div>
 
-                        <div style="margin-bottom: 20px; text-align:left">
-                            <button id="btnSQLCheck" class="btn btn-hover-save" type="button" style="border-radius:3px; width:130px;height:30px; font-size:12px; font-weight:bold;">
-                                Test Connection
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Other Settings Card -->
-                <div class="box panel panel-default" style="padding-top:4px">
-                    <div class="box-header with-border" style=" background-color: whitesmoke;">
-                        <span class="fa fa-list fa-lg ModalLabelColor"></span>
-                        <h5 class="box-title ModalLabelColor"><strong>Other Settings</strong></h5>
-                    </div>
-                    <div class="box-body">
-                        <div class="row">
-                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-right:4px">
-                                <label class="ModalLabelColor">Set Hours :</label>
-                                <input type="hidden" id="hoursValue" value="@ViewBag.HoursValue" />
-                                @Html.EditorFor(model => model.Hours, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Hours" } })
-                            </div>
-                            <div class="col-lg-9 col-md-9 col-sm-9">
-                                <label class="ModalLabelColor">Set CC Email to all PO Email:</label>
-                                <input type="hidden" id="ccEmail" value="@ViewBag.CCEmailAddress" />
-                                @Html.EditorFor(model => model.CCEmail, new { htmlAttributes = new { @class = "input-sm form-control", placeholder = "Enter CC Email" } })
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label>Set Hours:</label>
+                                    <input type="hidden" id="hoursValue" value="@ViewBag.HoursValue" />
+                                    @Html.EditorFor(model => model.Hours, new { htmlAttributes = new { @class = "form-control", placeholder = "Hours" } })
+                                </div>
+                                <div class="col-sm-1"></div>
+                                <div class="col-sm-7">
+                                    <label>Set CC Email:</label>
+                                    <input type="hidden" id="ccEmail" value="@ViewBag.CCEmailAddress" />
+                                    @Html.EditorFor(model => model.CCEmail, new { htmlAttributes = new { @class = "form-control", placeholder = "Enter CC Email" } })
+                                </div>
                             </div>
                         </div>
-                        <div style="padding-top: 20px">
-                            <label class="ModalLabelColor">City (Time Zone) : </label>
+
+                        <div class="form-group mt-3">
+                            <label>City (Time Zone):</label>
                             <input type="hidden" id="TimeZone" value="@ViewBag.TimeZone" />
                             @Html.DropDownList("ddlTimeZone", null, new { id = "ddlTimeZone", @name = "ddlTimeZone", @class = "form-control", @onkeydown = "GoOnEnter()" })
                         </div>
-                        <div style="padding-top: 20px">
-                            <label class="ModalLabelColor">Terms and Conditions :</label>
-                            <textarea class="form-control" id="TermsCondition" rows="10">@ViewBag.TermsCondition</textarea>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h6 class="box-title ModalLabelColor ml-2 mb-0" style="margin-left:8px;">Line Communication Permissions</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="row align-items-center">
+                                        <!-- Update Qty Toggle -->
+                                        <div class="col-sm-6 d-flex align-items-center mb-2">
+                                            <label class="mb-0 mr-2"><strong>Allow Quantity Edits</strong></label>
+                                            <i class="bi bi-info-circle text-primary ms-1"
+                                               tabindex="0"
+                                               role="button"
+                                               data-bs-toggle="popover"
+                                               data-bs-trigger="focus"
+                                               title="Enable this option if users should be able to edit quantities."
+                                               data-bs-content="">
+                                            </i>
+                                            <label class="switch mb-0 ms-auto">
+                                                <input type="checkbox" id="UpdateQtyToggle" @(ViewBag.IsQtyUpdate == true ? "checked" : "") />
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Update Price Toggle -->
+                                        <div class="col-sm-6 d-flex align-items-center mb-2">
+                                            <label class="mb-0 mr-2"><strong>Allow Price Edits</strong></label>
+                                            <i class="bi bi-info-circle text-primary ms-1"
+                                               tabindex="0"
+                                               role="button"
+                                               data-bs-toggle="popover"
+                                               data-bs-trigger="focus"
+                                               title="Enable this option if users should be able to edit prices."
+                                               data-bs-content="">
+                                            </i>
+                                            <label class="switch mb-0 ms-auto">
+                                                <input type="checkbox" id="UpdatePriceToggle" @(ViewBag.IsPriceUpdate == true ? "checked" : "") />
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
 
 
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row" style="padding-top:20px;text-align:center;">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="form-group">
 
-                    <button id="btnCancel" class="btn btnClose" type="button" style="border-radius:3px; width:70px;height:30px; font-size:12px; font-weight:bold;">
-                        Cancel
-                    </button>
+            <br />
 
-                    <button id="btnUser" class="btn btn-hover-save" type="button" style="border-radius:3px; width:70px;height:30px; font-size:12px; font-weight:bold;">
-                        Save
-                    </button>
-
-                    <div id="lblMsg" class="optionMsg"></div>
+            <!-- Terms and Conditions Card -->
+            <div class="row justify-content-center mb-4 w-100">
+                <div class="col-xl-12 col-lg-12 col-md-11 col-sm-12">
+                    <div class="api-settings-card shadow-lg p-4 rounded w-100" style="max-width: 900px; margin:auto;">
+                        <div class="box-header d-flex align-items-center mb-3">
+                            <span class="fa fa-file-text fa-lg ModalLabelColor"></span>
+                            <h4 class="box-title ModalLabelColor ml-2 mb-0"><strong>Terms & Conditions</strong></h4>
+                        </div>
+                        <textarea class="form-control" id="TermsCondition" rows="8">@ViewBag.TermsCondition</textarea>
+                    </div>
                 </div>
             </div>
+
+            <br />
+          
+            <!-- Buttons Row -->
+            <div class="row justify-content-center mb-4 mt-3">
+                <div class="col-xl-12 col-lg-12 col-md-11 col-sm-12 text-center">
+                    <button id="btnCancel" class="btn btnClose mx-2 d-inline-flex align-items-center justify-content-center"
+                            type="button"
+                            style="border-radius:8px; width:100px; height:40px; font-size:14px; font-weight:bold; margin-right:6px">
+                        <i class="fa fa-times-circle mr-2"></i> Cancel
+                    </button>
+                    <button id="btnUser" class="btn btn-hover-save mx-2 d-inline-flex align-items-center justify-content-center"
+                            type="button"
+                            style="border-radius:8px; width:100px; height:40px; font-size:14px; font-weight:bold;">
+                        <i class="fa fa-save mr-2"></i> Save
+                    </button>
+                </div>
+            </div>
+
+            <!-- Message -->
+            @*<div class="row justify-content-center">
+            <div class="col-auto">
+                <div id="lblMsg" class="optionMsg mt-2 text-center"></div>
+            </div>
+        </div>*@
+
         </div>
     </div>
 
@@ -211,8 +484,27 @@
 
 
     <script>
+        function togglePassword(fieldId, el) {
+            var field = document.getElementById(fieldId);
+            var icon = el.querySelector('i');
 
+            if (field.type === "password") {
+                field.type = "text";
+                icon.classList.remove("glyphicon-eye-open");
+                icon.classList.add("glyphicon-eye-close");
+            } else {
+                field.type = "password";
+                icon.classList.remove("glyphicon-eye-close");
+                icon.classList.add("glyphicon-eye-open");
+            }
+        }
 
+        document.addEventListener("DOMContentLoaded", function () {
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl)
+            })
+        });
 
         function initTermsEditor() {
             var $el = $('#TermsCondition');
@@ -241,65 +533,40 @@
             initTermsEditor();
         });
 
-        function LoadERPData() {
-            $.ajax({
-                cache: false,
-                type: 'POST',
-                url: '/Setting/LoadERPData',
-                data:
-                {
-                },
-
-                datatype: JSON,
-                success: function (data) {
 
 
-                    $('#ddlConn').blur();
-                    $('#IPMnu').empty();
-                    LoadMenus();
-                    OpenPage('\\Dashboard\\Index');
-                    location.reload(true);
 
+        //var passwordInput = document.getElementById('password');
+        //var showPasswordCheckbox = document.getElementById('showPasswordCheckbox');
 
-                },
-                onerror: function (r) { r },
-                failure: function (r) { r }
+        //showPasswordCheckbox.addEventListener('change', function () {
+        //    if (this.checked) {
+        //        passwordInput.type = 'text';
+        //    } else {
+        //        passwordInput.type = 'password';
+        //    }
+        //});
+        //var TokenInput = document.getElementById('token');
+        //var showTokenCheckbox = document.getElementById('showTokenCheckbox');
 
-            });
-        }
+        //showTokenCheckbox.addEventListener('change', function () {
+        //    if (this.checked) {
+        //        TokenInput.type = 'text';
+        //    } else {
+        //        TokenInput.type = 'password';
+        //    }
+        //});
 
+        //var SQLPasswordInput = document.getElementById('SQLpassword');
+        //var showPasswordCheckbox = document.getElementById('showSQLPasswordCheckbox');
 
-        var passwordInput = document.getElementById('password');
-        var showPasswordCheckbox = document.getElementById('showPasswordCheckbox');
-
-        showPasswordCheckbox.addEventListener('change', function () {
-            if (this.checked) {
-                passwordInput.type = 'text';
-            } else {
-                passwordInput.type = 'password';
-            }
-        });
-        var TokenInput = document.getElementById('token');
-        var showTokenCheckbox = document.getElementById('showTokenCheckbox');
-
-        showTokenCheckbox.addEventListener('change', function () {
-            if (this.checked) {
-                TokenInput.type = 'text';
-            } else {
-                TokenInput.type = 'password';
-            }
-        });
-
-        var SQLPasswordInput = document.getElementById('SQLpassword');
-        var showPasswordCheckbox = document.getElementById('showSQLPasswordCheckbox');
-
-        showPasswordCheckbox.addEventListener('change', function () {
-            if (this.checked) {
-                SQLPasswordInput.type = 'text';
-            } else {
-                SQLPasswordInput.type = 'password';
-            }
-        });
+        //showPasswordCheckbox.addEventListener('change', function () {
+        //    if (this.checked) {
+        //        SQLPasswordInput.type = 'text';
+        //    } else {
+        //        SQLPasswordInput.type = 'password';
+        //    }
+        //});
 
         loadData();
         function loadData() {
@@ -309,12 +576,12 @@
             });
             var conType = $("#ddlConn :selected").text();
 
-            var CCEmail = $("#ccEmail").val();
+            var CCEmail = $("#ccEmail").val(); debugger
             var hoursValue = $("#hoursValue").val();
             var ApiUrlValue = $("#ApiUrlValue").val();
             var UsernameValue = $("#UsernameValue").val();
-            var passwordValue = $("#passwordValue").val();
-            var tokenValue = $("#tokenValue").val();
+            var passwordValue = $("#ApiPasswordValue").val();
+            var tokenValue = $("#ApiTokenValue").val();
 
             var SQlConn = $("#SQlConnval").val();
             var SQLUsername = $("#SQLUsernameval").val();
@@ -332,7 +599,7 @@
             $("#SQlConn").val(SQlConn);
             $("#SQLUsername").val(SQLUsername);
             $("#SQLpassword").val(SQLpassword);
-          /*  $("#TermsCondition").val(TermsCondition);*/
+            /*  $("#TermsCondition").val(TermsCondition);*/
 
 
             if (conType.toUpperCase() == 'TEST') {
@@ -374,7 +641,8 @@
             var TimeZone = $("#ddlTimeZone :selected").val();
             var CCEmail = $("#CCEmail").val();
             var TermsCondition = encodeURIComponent($('#TermsCondition').summernote('code'));
-
+            let updateQty = document.getElementById("UpdateQtyToggle").checked;
+            let updatePrice = document.getElementById("UpdatePriceToggle").checked;
 
 
             $.ajax({
@@ -394,7 +662,9 @@
                     SQLpassword: SQLpassword,
                     TimeZone: TimeZone,
                     CCEmail: CCEmail,
-                    TermsCondition: TermsCondition
+                    TermsCondition: TermsCondition,
+                    IsUpdateQty: updateQty,
+                    IsUpdatePrice: updatePrice
                 },
 
                 datatype: JSON,
@@ -404,7 +674,7 @@
                     $('#ddlConn').blur();
                     $('#IPMnu').empty();
                     LoadMenus();
-                    OpenPage('\\Dashboard\\Index');
+                    //OpenPage('\\Dashboard\\Index');
                     location.reload(true);
 
 

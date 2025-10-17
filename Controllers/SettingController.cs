@@ -29,21 +29,22 @@ namespace PlusCP.Controllers
                 ViewBag.Connections = cCommon.ToDropDownList(dt.DefaultView.ToTable(), "ConType", "ConText", Session["DefaultDB"].ToString(), "ConText");
 
             }
-            oHome.GetHours();
+            oHome.GetSysSettings();
             oHome.GetAPISettings();
             oHome.GetCCEmail();
 
             ViewBag.HoursValue = oHome.Hours;
-            ViewBag.URL = oHome.ApiUrl;
+            ViewBag.IsQtyUpdate = oHome.IsQtyUpdate;
+            ViewBag.IsPriceUpdate = oHome.IsPriceUpdate;
+
+
+            ViewBag.ApiUrl = oHome.ApiUrl;
             ViewBag.username = oHome.Username;
-            ViewBag.password = oHome.password;
-            ViewBag.token = oHome.token;
-
-            ViewBag.SQlConn = oHome.SQlConn;
-            ViewBag.SQLUsername = oHome.SQLUsername;
-            ViewBag.SQLpassword = oHome.SQLpassword;
-
+            ViewBag.ApiPassword = oHome.password;
+            ViewBag.ApiToken = oHome.token;
             ViewBag.TermsCondition = oHome.TermsCondition;
+            
+
 
             // Example: List of cities and their corresponding timezones
             DateTime utcNow = DateTime.UtcNow;
@@ -80,13 +81,13 @@ namespace PlusCP.Controllers
 
             ViewBag.CCEmailAddress = oHome.CCEmail;
 
-            return View();
+            return View(oHome);
         }
 
         [HttpPost]
-        public ActionResult UpdateSetting(string conType, string Hours, string ApiUrl, string Username, string password, string token, string SQlConn, string SQLUsername, string SQLpassword, string TimeZone, string CCEmail, string TermsCondition)
+        public ActionResult UpdateSetting(string conType, string Hours, string ApiUrl, string Username, string password, string token, string SQlConn, string SQLUsername, string SQLpassword, string TimeZone, string CCEmail, string TermsCondition, bool IsUpdateQty, bool IsUpdatePrice)
         {
-
+            string ConnctionType = Session["DefaultDB"].ToString();
             if (cCommon.IsSessionExpired())
             {
                 return RedirectToAction("Login");
@@ -97,27 +98,29 @@ namespace PlusCP.Controllers
                 cAuth oAuth = new cAuth();
 
                 bool isUpdateSetting = updateHours(Hours);
-                bool isUpdateAPISetting = updateAPISetting(conType, ApiUrl, Username, password, token, SQlConn, SQLUsername, SQLpassword);
-                updateDefaultDB(conType);
+                bool isUpdateAPISetting = updateAPISetting(ConnctionType, ApiUrl, Username, password, token, SQlConn, SQLUsername, SQLpassword);
+                //updateDefaultDB(conType);
                 string decodedTerms = HttpUtility.UrlDecode(TermsCondition);
                 updatetermCondition(decodedTerms);
-                Session["CONN_ACTIVE"] = BasicEncrypt.Instance.Encrypt(oHome.GetConnectionString(conType));
+                Session["CONN_ACTIVE"] = BasicEncrypt.Instance.Encrypt(oHome.GetConnectionString(ConnctionType));
                 //  Session["CONN_TYPE"] = conType;
-                bool isUpdated = oAuth.UpdateDfltCon(conType);
+                bool isUpdated = oAuth.UpdateDfltCon(ConnctionType);
 
                 oAuth.UpdateTimeZone(TimeZone);
+                UpdatePriceQtySettings(IsUpdateQty, IsUpdatePrice);
+
                 Session["TimeZone"] = TimeZone;
                 oAuth.UpdateCCEmail(CCEmail);
 
 
                 if (isUpdated)
                 {
-                    Session["DefaultDB"] = conType;
+                    Session["DefaultDB"] = ConnctionType;
 
                 }
 
-
-                return RedirectToAction("Index", "Home");
+                var jsonResult = Json("Updated", JsonRequestBehavior.AllowGet);
+                return jsonResult;
             }
 
         }
@@ -132,8 +135,7 @@ namespace PlusCP.Controllers
             string sql = $@"
         UPDATE [dbo].[zSysIni] 
         SET SysValue = '{TermsCondition}' 
-        WHERE SysCode = '12647' 
-          AND SysDesc = 'Terms and Condition'";
+        WHERE SysDesc = 'TermsandCondition'  ";
 
             oDAL.Execute(sql);
 
@@ -142,11 +144,9 @@ namespace PlusCP.Controllers
 
             return true;
         }
-
-
-
         public bool updateDefaultDB(string conType)
         {
+
             cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
             string sql = @"UPDATE [SRM].[UserInfo]
                            SET DefaultDB = '" + conType + "' ";
@@ -171,19 +171,9 @@ namespace PlusCP.Controllers
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
             string Password = BasicEncrypt.Instance.Encrypt(password.Trim());
-            SQLpassword = BasicEncrypt.Instance.Encrypt(SQLpassword.Trim());
 
             string sql = "";
-            if (conType.ToUpper() != "TEST")
-            {
-                sql = @"UPDATE [SRM].[zConStr] SET ConValue = '<convelue>', username = '<username>', 
-                    password = '<password>' WHERE ConType = '" + conType + "'";
-
-                sql = sql.Replace("<convelue>", SQlConn);
-                sql = sql.Replace("<username>", SQLUsername);
-                sql = sql.Replace("<password>", SQLpassword);
-                oDAL.Execute(sql);
-
+       
                 sql = @"UPDATE [dbo].[URLSetup]
                            SET URL = '" + ApiUrl + "', " +
                         "Username = '" + Username + "', " +
@@ -193,21 +183,34 @@ namespace PlusCP.Controllers
                 oDAL.Execute(sql);
                 if (oDAL.HasErrors)
                     return false;
-            }
-            else
-            {
-                sql = @"UPDATE [SRM].[zConStr] SET ConValue = '<convelue>', username = '<username>', 
-                    password = '<password>' WHERE ConType = '" + conType + "'";
-
-                sql = sql.Replace("<convelue>", SQlConn);
-                sql = sql.Replace("<username>", SQLUsername);
-                sql = sql.Replace("<password>", SQLpassword);
-                oDAL.Execute(sql);
-                if (oDAL.HasErrors)
-                    return false;
-            }
+            
+            
             return true;
         }
+
+        public bool UpdatePriceQtySettings(bool IsUpdateQty, bool IsUpdatePrice)
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
+            string sql = @"UPDATE [dbo].[zSysIni]
+                           SET SysValue = '" + IsUpdateQty + "' " +
+                           "WHERE SysDesc = 'IsQtyUpdate'; ";
+
+            sql += @"UPDATE [dbo].[zSysIni]
+                           SET SysValue = '" + IsUpdatePrice + "' " +
+                           "WHERE SysDesc = 'IsPriceUpdate';";
+
+            oDAL.Execute(sql);
+            if (oDAL.HasErrors)
+            {
+                
+                return false;
+            }
+            Session["IsQtyUpdate"] = IsUpdateQty;
+            Session["IsPriceUpdate"] = IsUpdatePrice;
+            return true;
+        }
+
+
 
         public JsonResult CheckAPI(string conType, string ApiUrl, string Username, string password, string token)
         {
@@ -215,12 +218,13 @@ namespace PlusCP.Controllers
             DataTable dt = new DataTable();
 
             string menuTitle = string.Empty;
+            string ConnctionType = Session["DefaultDB"].ToString();
 
             DataTable dtURL = new DataTable();
-            dtURL = cCommon.GetEmailURL(conType.ToUpper(), "APIOPENPO");
+            dtURL = cCommon.GetEmailURL(ConnctionType.ToUpper(), "APIOPENPO");
 
             var client = new RestClient(ApiUrl);
-            var request = new RestRequest(dtURL.Rows[0]["PageURL"].ToString(), Method.Get);
+            var request = new RestRequest(dtURL.Rows[0]["PageURL"].ToString() + "?$top=1", Method.Get);
 
             // Add basic authentication header
             request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(Username + ":" + password)));

@@ -978,12 +978,39 @@
                                         @Html.EditorFor(model => model.CommitQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Vendor Qty", disabled = "disabled" } })
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Buyer Proposed:</label>
-                                        @Html.EditorFor(model => model.ProposedQty, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Qty" } })
-                                    </div>
+                                @{
+                                    // --- Get Qty & Price session values safely ---
+                                    bool isQtyUpdate = false;
+                                    bool isPriceUpdate = false;
+
+                                    // If .NET Framework
+                                    if (Session["IsQtyUpdate"] != null)
+                                    {
+                                        isQtyUpdate = Convert.ToBoolean(Session["IsQtyUpdate"]);
+                                    }
+
+
+                                    if (Session["IsPriceUpdate"] != null)
+                                    {
+                                        isPriceUpdate = Convert.ToBoolean(Session["IsPriceUpdate"]);
+                                    }
+
+                                }
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Buyer Proposed:</label>
+                                    @Html.EditorFor(model => model.ProposedQty, new
+                                    {
+                                        htmlAttributes = new
+                                        {
+                                            @class = "form-control input-sm",
+                                            placeholder = "Qty",
+                                            disabled = isQtyUpdate ? null : "disabled"
+                                        }
+                                    })
                                 </div>
+                            </div>
+
                             </div>
 
                             <div class="row">
@@ -1008,10 +1035,17 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Buyer Proposed:</label>
-                                        @Html.EditorFor(model => model.ProposedPrice, new { htmlAttributes = new { @class = "form-control input-sm", placeholder = "Price" } })
+                                        @Html.EditorFor(model => model.ProposedPrice, new
+                                        {
+                                            htmlAttributes = new
+                                            {
+                                                @class = "form-control input-sm",
+                                                placeholder = "Price",
+                                                disabled = isPriceUpdate ? null : "disabled"
+                                            }
+                                        })
                                     </div>
                                 </div>
-                            </div>
 
                             <div class="row">
                                 <div class="col-md-3">
@@ -1081,7 +1115,7 @@
         </div>
     </div>
 </div>
-
+</div>
 <!-- Modal Yes or NO -->
 <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog centered" role="document">
@@ -2135,6 +2169,9 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
                         row['ServiceType'] = '';
                         serviveUrlOpen = '';
                     }
+                    else if (serviceType === 'Others' || serviceType === 'Freight') {
+                        serviveUrlOpen = row['TrackingNo'];
+                    }
                     else {
 
                          serviveUrlOpen = '<a href="javascript:OpenURL(\'' + row['ServiceURL'] + '\' )">Open</a>';
@@ -2230,11 +2267,11 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
                     , data.SelectedlstPO[0]['PODetail_PartNum'], data.SelectedlstPO[0]['PODetail_LineDesc']
                     , data.SelectedlstPO[0]['PODetail_IUM'], data.SelectedlstPO[0]['Calculated_OrderDate']
                     , data.SelectedlstPO[0]['Calculated_DueDate'], data.SelectedlstPO[0]['PODetail_OrderQty']
-                    , '', data.SelectedlstPO[0]['Vendor_VendorID']
+                    , data.SelectedlstPO[0]['PODetail_UnitCost'], data.SelectedlstPO[0]['Vendor_VendorID']
                     , data.SelectedlstPO[0]['Vendor_Name'], data.SelectedlstPO[0]['POHeader_BuyerID']
                     , GUID, data.SelectedlstPO[0]['Calculated_ArrivedQty']
                     , data.SelectedlstPO[0]['Tracking_Number'], data.SelectedlstPO[0]['PODetail_UnitCost']
-                    , data.SelectedlstPO[0]['CalculatedExtCost'], data.SelectedlstPO[0]['PurAgent_EMailAddress']
+                    , data.SelectedlstPO[0]['PODetail_ExtCost'], data.SelectedlstPO[0]['PurAgent_EMailAddress']
                     , data.SelectedlstPO[0]['POHeader_Company']);
 
                     },
@@ -2467,9 +2504,15 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
                 if (data.Status == 'Updated') {
                     MsgToast("Success!", "Record has been updated!", "success");
                   //  OpenPage('\\NewPO\\Index?PO=' + PurchaseOrder + '&POStatus=' + selectedStatus + '');
-                    var pageUrl = '\\NewPO\\Index?PO= ' + PurchaseOrder + '&WidgetId=' + WidgetId + '';
 
-                    OpenPage(pageUrl);
+                    if (WidgetId === '') {
+                        OpenPage('\\NewPO\\Index?PO=' + PurchaseOrder + '&POStatus=' + selectedStatus + '');
+                    }
+                    else {
+                        var pageUrl = '\\NewPO\\Index?PO= ' + PurchaseOrder + '&WidgetId=' + WidgetId + '';
+                        OpenPage(pageUrl);
+                    }
+
                 }
                 else {
                     MsgToast("Oops!", data.Message, "error");
@@ -2525,12 +2568,14 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
 
     function handleAction(PONo, partNo, vendor, currentQty, currentPrice, currentDueDate, commitQty, commitPrice, commitDueDate, GUID, action) {
 
-        $('#ProposePONo').val(PONo);
+        $('#ProposePONo').val(PONo);debugger
         $('#ProposeVendorName').val(vendor);
         $('#ProposePartNo').val(partNo);
 
         $('#CurrentQty').val(currentQty);
         $('#CommitQty').val(commitQty);
+        $('#ProposedQty').val(commitQty);
+
 
         $('#CurrentPrice').val(currentPrice);
         $('#CommitPrice').val(commitPrice);
@@ -2540,7 +2585,27 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
         $('#CommitDueDate').val(commitDueDate);
         $("#ProposeEmailId").val('');
 
+        var isQtyUpdate = '@Session["isQtyUpdate"]';debugger
+        var isPriceUpdate = '@Session["isPriceUpdate"]';
+
+        // ✅ Enable/Disable based on session values
+        if (isQtyUpdate === 'True') {
+          
+            $('#ProposedQty').prop('disabled', false);
+            
+        } else {
+            $('#ProposedQty').prop('disabled', true);
+        }
+
+        if (isPriceUpdate === 'True') {
+            $('#ProposedPrice').prop('disabled', false);
+        } else {
+            $('#ProposedPrice').prop('disabled', true);
+        }
+
         $('#GUID').val(GUID);
+
+
 
         $.ajax({
             url: `/NewPO/GetSuggestEmail?id=${GUID}`,
@@ -2665,8 +2730,8 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
         var PartNo = $('#ProposePartNo').val();
         var ProposeEmailId = $('#ProposeEmailId').text();
         var CCemails = getEmails();
-
-
+        var CurrentQty = $('#CurrentQty').val();
+        
 
 
         $('#lblMsg1').empty();
@@ -2683,7 +2748,10 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
             MsgToast("Oops!", "Please enter Email Address!", "error");
             return false;
         }
-
+        if (CurrentQty > Qty) {
+            MsgToast("Oops!", "Proposed Qty should not be greater than Order Qty.", "error");
+            return false;
+        }
         var Email = ProposeEmailId;
 
         $.ajax({
@@ -2902,7 +2970,7 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
     });
     var CCemails = '';
     function collectTableData() {
-        var tableData = [];
+        var tableData = [];debugger
         var Reason = $('#contactReasonMulti :selected').text();
         // Loop through each row in the table body
         CCemails = SecondgetEmails();
@@ -2945,6 +3013,7 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
     }
 
     function sendDataToController(data) {
+
 
        // var CCemails = SecondgetEmails();
         $.ajax({
@@ -3444,7 +3513,7 @@ You already selected <span style="font-weight:bold;">${selectedVendorName}</span
             deferRender: true,
             destroy: true,
             pagingType: 'full',
-            pageLength: 50,
+            pageLength: 25,
             scrollCollapse: false,
             scrollX: isScrollX,
             colReorder: true,

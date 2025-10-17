@@ -217,6 +217,7 @@
     <Compile Include="Controllers\NewReportController.cs" />
     <Compile Include="Controllers\PDFReportController.cs" />
     <Compile Include="Controllers\NewPOController.cs" />
+    <Compile Include="Controllers\POMonitoringDashbordController.cs" />
     <Compile Include="Controllers\POSchedulerController.cs" />
     <Compile Include="Controllers\SettingController.cs" />
     <Compile Include="Controllers\UserRoleXController.cs" />
@@ -280,9 +281,11 @@
     <Compile Include="Models\DashboardModel.cs" />
     <Compile Include="Models\Home.cs" />
     <Compile Include="Models\LateChart.cs" />
+    <Compile Include="Models\MultiEmailRequest.cs" />
     <Compile Include="Models\NewPO.cs" />
     <Compile Include="Models\PDFReport.cs" />
     <Compile Include="Models\PODetails.cs" />
+    <Compile Include="Models\POMonitoringDashbord.cs" />
     <Compile Include="Models\POScheduler.cs" />
     <Compile Include="Models\Setting.cs" />
     <Compile Include="Models\SignupViewModel.cs" />
@@ -492,6 +495,7 @@
     <Content Include="Views\Setting\Index.cshtml" />
     <Content Include="Views\POScheduler\Index.cshtml" />
     <Content Include="Views\NewPO\GetPO.cshtml" />
+    <Content Include="Views\POMonitoringDashbord\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

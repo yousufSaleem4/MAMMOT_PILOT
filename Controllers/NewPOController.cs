@@ -140,11 +140,11 @@ namespace PlusCP.Controllers
             NewPOCommon oPOCommon = new NewPOCommon();
             if (ConnctionType.ToUpper() == "PROD" || ConnctionType.ToUpper() == "PILOT")
             {
-                dt = oPOCommon.GetPOAsync(POStatus);  // Fetch data from API
+                dt = oPOCommon.GetPOAsync(POStatus);  
             }
             else
             {
-                dt = oPOCommon.GetPOListFromSQL(POStatus);  // Fetch data from SQL
+                dt = oPOCommon.GetPOAsync(POStatus);  
             }
 
 
@@ -488,6 +488,9 @@ namespace PlusCP.Controllers
 
             oPO = new NewPO();
             oPO.GetUpdateData(PONo);
+
+
+
             var jsonResult = Json(oPO, JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
             //LOAD MRU & LOG QUERY
@@ -552,8 +555,9 @@ namespace PlusCP.Controllers
         {
             cLog oLog;
             string Result = "";
-            string query = "";
-            string BuyerEmail = "";
+            bool IsQtyUpdate = false;
+            bool IsPriceUpdate = false;
+
             try
             {
                 string[] POVal = PONum.Split('-');
@@ -565,145 +569,73 @@ namespace PlusCP.Controllers
                 string PO = POVal[0];
                 string Line = POVal[1];
                 string Rel = POVal[2];
-                // First Check Buyer PO Price Limit
-                string POLimit = "";
-                cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
-                query = "Select BuyerEmail From SRM.BuyerPO Where PONum = '" + PO + "' AND [LineNo] = '" + Line + "' AND RelNo = '" + Rel + "'";
-                DataTable dtBuyerEmail = oDAL.GetData(query);
-                BuyerEmail = dtBuyerEmail.Rows[0]["BuyerEmail"].ToString();
 
-                query = "Select POLimit From BuyerInfo Where EMailAddress = '" + BuyerEmail + "'";
-                DataTable dtBuyer = oDAL.GetData(query);
-                if (dtBuyer.Rows.Count > 0)
-                    POLimit = dtBuyer.Rows[0]["POLimit"].ToString();
-                if (Price != "")
+                DataTable dtSysSettings = new DataTable();
+                dtSysSettings = GetSysSettings();
+                if (dtSysSettings.Rows.Count > 0) // Check is Qty and Price update Allow
                 {
-                    if (Convert.ToDouble(Price) > Convert.ToDouble(POLimit))
+                    // Get value for SysDesc = 'IsQtyUpdate'
+                    IsQtyUpdate = dtSysSettings.AsEnumerable()
+                       .Where(r => r.Field<string>("SysDesc") == "IsQtyUpdate")
+                       .Select(r => Convert.ToBoolean(r["SysValue"]))
+                       .FirstOrDefault();
+
+                    // Get value for SysDesc = 'IsPriceUpdate'
+                    IsPriceUpdate = dtSysSettings.AsEnumerable()
+                       .Where(r => r.Field<string>("SysDesc") == "IsPriceUpdate")
+                       .Select(r => Convert.ToBoolean(r["SysValue"]))
+                       .FirstOrDefault();
+
+
+
+                    if (IsPriceUpdate && IsQtyUpdate)
                     {
-                        return Json(new { Status = "Error", Message = "Your, purchasing limit has exceeded.." }, JsonRequestBehavior.AllowGet);
-                    }
-                }
-
-
-                string DeployMode = Session["DefaultDB"]?.ToString();
-                if (string.IsNullOrEmpty(DeployMode))
-                {
-                    return Json(new { Status = "Error", Message = "DeployMode is missing." }, JsonRequestBehavior.AllowGet);
-                }
-
-                if (string.IsNullOrEmpty(PONum) || !PONum.Contains("-"))
-                {
-                    return Json(new { Status = "Error", Message = "Invalid PO Number format." }, JsonRequestBehavior.AllowGet);
-                }
-
-
-
-                int finalQty = 0;
-                if (int.TryParse(Qty, out int qtyValue)) finalQty += qtyValue;
-                if (int.TryParse(ArrivedQty, out int arrivedQtyValue)) finalQty += arrivedQtyValue;
-
-                if (!DateTime.TryParseExact(DueDate, "MM/dd/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
-                {
-                    return Json(new { Status = "Error", Message = "Invalid DueDate format." }, JsonRequestBehavior.AllowGet);
-                }
-
-                string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
-
-                // Update PO Status API Un Approved
-
-                Result = UpdateStatusPO("PONOTAPPROVED", PO);
-
-                if (Result == "OK")
-                {
-
-                    // **Call PODTL API First**
-                    DataTable dtURLDtl = cCommon.GetEmailURL(DeployMode.ToUpper(), "PODTL");
-                    if (dtURLDtl.Rows.Count == 0)
-                    {
-                        return Json(new { Status = "Error", Message = "API URL not found for PODTL." }, JsonRequestBehavior.AllowGet);
-                    }
-
-                    string TrackingNo = GetTrackingNumber(GUID, PONum);
-
-
-                    string jsonstringPODTL = MakeJsonBody(PO, Line, Rel, finalQty.ToString(), formattedDate, Price, "GETPODTL", TrackingNo);
-                    string apiUrlPODTL = dtURLDtl.Rows[0]["PageURL"].ToString()
-                                            .Replace("<company>", "159599")
-                                            .Replace("<PONUM>", PO)
-                                            .Replace("<POLine>", Line);
-
-                    string userName = dtURLDtl.Rows[0]["UserName"].ToString();
-                    string password = BasicEncrypt.Instance.Decrypt(dtURLDtl.Rows[0]["Password"].ToString().Trim());
-                    string tokenKey = dtURLDtl.Rows[0]["TokenKey"].ToString();
-
-                    var clientPODTL = new RestClient(dtURLDtl.Rows[0]["URL"].ToString());
-                    var postPODtlRequest = new RestRequest(apiUrlPODTL, Method.Patch);
-                    postPODtlRequest.AddJsonBody(jsonstringPODTL);
-                    postPODtlRequest.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(userName + ":" + password)));
-                    postPODtlRequest.AddHeader("api-key", tokenKey);
-
-                    var postPODtlResponse = clientPODTL.Execute(postPODtlRequest);
-
-                    if (postPODtlResponse.StatusCode == System.Net.HttpStatusCode.Created || postPODtlResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
-                    {
-                        // **If PODTL API is successful, then Call POREL API**
-                        DataTable dtURLREL = cCommon.GetEmailURL(DeployMode.ToUpper(), "POREL");
-                        if (dtURLREL.Rows.Count == 0)
-                        {
-                            return Json(new { Status = "Error", Message = "API URL not found for POREL." }, JsonRequestBehavior.AllowGet);
-                        }
-
-                        string jsonstringPOREL = MakeJsonBody(PO, Line, Rel, finalQty.ToString(), formattedDate, Price, "GETPOREL", "");
-                        string apiUrlPOREL = dtURLREL.Rows[0]["PageURL"].ToString()
-                                                .Replace("<company>", "159599")
-                                                .Replace("<PO>", PO)
-                                                .Replace("<Line>", Line)
-                                                .Replace("<Rel>", Rel);
-
-                        var clientPOREL = new RestClient(dtURLREL.Rows[0]["URL"].ToString());
-                        var postPORELRequest = new RestRequest(apiUrlPOREL, Method.Patch);
-                        postPORELRequest.AddJsonBody(jsonstringPOREL);
-                        postPORELRequest.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(userName + ":" + password)));
-                        postPORELRequest.AddHeader("api-key", tokenKey);
-
-                        var postPORELResponse = clientPOREL.Execute(postPORELRequest);
-                        if (postPORELResponse.StatusCode == System.Net.HttpStatusCode.Created || postPORELResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
-                        {
-                            // **If POREL API is successful, then update data in database**
-                            UpdatePORelQty(PO, Line, Rel, finalQty.ToString(), DueDate, Price, TrackingNo);
-                            NewPO oPO = new NewPO();
-                            Result = UpdateStatusPO("POAPPROVED", PO);
-
-                            oPO.UpdateHasActionAHR(ActionAHR, GUID, PO, Line, Rel, finalQty.ToString());
-                            return Json(new { Status = "Updated", Message = "Updated Successfully." }, JsonRequestBehavior.AllowGet);
-                        }
-                        else
-                        {
-                            JObject json = JObject.Parse(postPORELResponse.Content);
-                            string errorMessage = json["ErrorMessage"]?.ToString();
-                            oLog = new cLog();
-                            oLog.RecordError(errorMessage, postPORELResponse.Content.ToString(), "Patch POREL API for QTY and DueDate");
-
-                            return Json(new { Status = "Error", Message = "API Request Failed: " + errorMessage }, JsonRequestBehavior.AllowGet);
-                        }
-
+                        Result = PatchDataPriceUpdate(PO, Line, Rel, Price, GUID, PONum);
+                        if (Result == "OK")
+                            Result = PatchDataQtyDueDateUpdate(PO, Line, Rel, Qty, ArrivedQty, DueDate);
                     }
                     else
                     {
-                        JObject json = JObject.Parse(postPODtlResponse.Content);
-                        string errorMessage = json["ErrorMessage"]?.ToString();
-                        oLog = new cLog();
-                        oLog.RecordError(errorMessage, postPODtlResponse.Content.ToString(), "Patch PODTL API for Price");
-                        return Json(new { Status = "Error", Message = "Failed to update PODTL: " + errorMessage }, JsonRequestBehavior.AllowGet);
+                        if (IsPriceUpdate)
+                        {
+                            Result = PatchDataPriceUpdate(PO, Line, Rel, Price, GUID, PONum);
+                        }
+                        if (IsQtyUpdate)
+                        {
+                            Result = PatchDataQtyDueDateUpdate(PO, Line, Rel, Qty, ArrivedQty, DueDate);
+                        }
+                        else
+                        {
+                            Result = PatchDataDueDateUpdate(PO, Line, Rel, DueDate);
+
+                        }
+                        if (Result == "OK")
+                            PatchDataTrackingUpdate(PO, Line, Rel, GUID, PONum);
+
+                    }
+
+                    if (Result == "OK")
+                    {
+                        int finalQty = 0;
+                        if (int.TryParse(Qty, out int qtyValue)) finalQty += qtyValue;
+                        if (int.TryParse(ArrivedQty, out int arrivedQtyValue)) finalQty += arrivedQtyValue;
+                        string TrackingNo = GetTrackingNumber(GUID, PONum);
+                        UpdatePORelQty(PO, Line, Rel, finalQty.ToString(), DueDate, Price, TrackingNo);
+
+                        NewPO oPO = new NewPO();
+                        oPO.UpdateHasActionAHR(ActionAHR, GUID, PO, Line, Rel, finalQty.ToString());
+                        return Json(new { Status = "Updated", Message = "Updated Successfully." }, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        return Json(new { Status = "Error", Message = Result }, JsonRequestBehavior.AllowGet);
                     }
 
                 }
                 else
                 {
-                    return Json(new { Status = "Error", Message = Result }, JsonRequestBehavior.AllowGet);
-
+                    return Json(new { Status = "Error", Message = "SysINI Table is not contain values" }, JsonRequestBehavior.AllowGet);
                 }
-
             }
             catch (Exception ex)
             {
@@ -712,6 +644,265 @@ namespace PlusCP.Controllers
                 return Json(new { Status = "Error", Message = "Exception occurred: " + ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public string PatchDataPriceUpdate(string PO, string Line, string Rel, string Price, string GUID, string PONum)
+        {
+            string query = "";
+            string BuyerEmail = "";
+            string result = "";
+            // Then Buyer PO Price Limit
+            string POLimit = "";
+            string DeployMode = Session["DefaultDB"]?.ToString();
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+
+
+            query = "Select BuyerEmail From SRM.BuyerPO Where PONum = '" + PO + "' AND [LineNo] = '" + Line + "' AND RelNo = '" + Rel + "'";
+            DataTable dtBuyerEmail = oDAL.GetData(query);
+            BuyerEmail = dtBuyerEmail.Rows[0]["BuyerEmail"].ToString();
+
+            query = "Select POLimit From BuyerInfo Where EMailAddress = '" + BuyerEmail + "'";
+            DataTable dtBuyer = oDAL.GetData(query);
+            if (dtBuyer.Rows.Count > 0)
+                POLimit = dtBuyer.Rows[0]["POLimit"].ToString();
+            if (Price != "")
+            {
+                if (Convert.ToDouble(Price) > Convert.ToDouble(POLimit))
+                {
+                    return "Error: Your, purchasing limit has exceeded..";
+                }
+            }
+
+            result = UpdateStatusPO("PONOTAPPROVED", PO);
+
+            if (result.ToUpper() == "OK")
+            {
+                // **Call PODTL API First**
+                DataTable dtURLDtl = cCommon.GetEmailURL(DeployMode.ToUpper(), "PODTL");
+                if (dtURLDtl.Rows.Count == 0)
+                {
+                    return "API URL not found for PODTL.";
+                }
+                string TrackingNo = GetTrackingNumber(GUID, PONum);
+
+
+                string jsonstringPODTL = MakeJsonBody(PO, Line, Rel, "", "", Price, "GETPODTL", TrackingNo);
+                string apiUrlPODTL = dtURLDtl.Rows[0]["PageURL"].ToString()
+                                        .Replace("<company>", "159599")
+                                        .Replace("<PONUM>", PO)
+                                        .Replace("<POLine>", Line);
+
+                string userName = dtURLDtl.Rows[0]["UserName"].ToString();
+                string password = BasicEncrypt.Instance.Decrypt(dtURLDtl.Rows[0]["Password"].ToString().Trim());
+                string tokenKey = dtURLDtl.Rows[0]["TokenKey"].ToString();
+
+                var clientPODTL = new RestClient(dtURLDtl.Rows[0]["URL"].ToString());
+                var postPODtlRequest = new RestRequest(apiUrlPODTL, Method.Patch);
+                postPODtlRequest.AddJsonBody(jsonstringPODTL);
+                postPODtlRequest.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(userName + ":" + password)));
+                postPODtlRequest.AddHeader("api-key", tokenKey);
+
+                var postPODtlResponse = clientPODTL.Execute(postPODtlRequest);
+
+                if (postPODtlResponse.StatusCode == System.Net.HttpStatusCode.Created || postPODtlResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    result = UpdateStatusPO("POAPPROVED", PO);
+                    result = "OK";
+                }
+                else
+                {
+                    result = "Error";
+                    JObject json = JObject.Parse(postPODtlResponse.Content);
+                    string errorMessage = json["ErrorMessage"]?.ToString();
+                    cLog oLog = new cLog();
+                    oLog.RecordError(errorMessage, postPODtlResponse.Content.ToString(), "PatchDataPriceUpdate API for Price");
+
+                }
+
+
+            }
+            return result;
+        }
+
+        public string PatchDataTrackingUpdate(string PO, string Line, string Rel, string GUID, string PONum)
+        {
+            string result = "";
+            string DeployMode = Session["DefaultDB"]?.ToString();
+            // **Call PODTL API First**
+            DataTable dtURLDtl = cCommon.GetEmailURL(DeployMode.ToUpper(), "PODTL");
+            if (dtURLDtl.Rows.Count == 0)
+            {
+                return "API URL not found for PODTL.";
+            }
+
+            string TrackingNo = GetTrackingNumber(GUID, PONum);
+
+            if (!string.IsNullOrEmpty(TrackingNo))
+            {
+                string jsonstringPODTL = MakeJsonBody(PO, Line, Rel, "", "", "", "TRACKINGNO", TrackingNo);
+                string apiUrlPODTL = dtURLDtl.Rows[0]["PageURL"].ToString()
+                                        .Replace("<company>", "159599")
+                                        .Replace("<PONUM>", PO)
+                                        .Replace("<POLine>", Line);
+
+                string userName = dtURLDtl.Rows[0]["UserName"].ToString();
+                string password = BasicEncrypt.Instance.Decrypt(dtURLDtl.Rows[0]["Password"].ToString().Trim());
+                string tokenKey = dtURLDtl.Rows[0]["TokenKey"].ToString();
+
+                var clientPODTL = new RestClient(dtURLDtl.Rows[0]["URL"].ToString());
+                var postPODtlRequest = new RestRequest(apiUrlPODTL, Method.Patch);
+                postPODtlRequest.AddJsonBody(jsonstringPODTL);
+                postPODtlRequest.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(userName + ":" + password)));
+                postPODtlRequest.AddHeader("api-key", tokenKey);
+
+                var postPODtlResponse = clientPODTL.Execute(postPODtlRequest);
+
+                if (postPODtlResponse.StatusCode == System.Net.HttpStatusCode.Created || postPODtlResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    result = "OK";
+                }
+                else
+                {
+                    result = "Error";
+                    JObject json = JObject.Parse(postPODtlResponse.Content);
+                    string errorMessage = json["ErrorMessage"]?.ToString();
+                    cLog oLog = new cLog();
+                    oLog.RecordError(errorMessage, postPODtlResponse.Content.ToString(), "PartchDataTrackingUpdate API for Tracking No");
+
+                }
+            }
+            else
+            {
+                // No Update In ERP
+                result = "OK";
+            }
+
+            return result;
+        }
+
+        public string PatchDataQtyDueDateUpdate(string PO, string Line, string Rel, string Qty, string ArrivedQty, string DueDate)
+        {
+            string DeployMode = Session["DefaultDB"]?.ToString();
+            string result = "";
+            int finalQty = 0;
+            if (int.TryParse(Qty, out int qtyValue)) finalQty += qtyValue;
+            if (int.TryParse(ArrivedQty, out int arrivedQtyValue)) finalQty += arrivedQtyValue;
+            if (!DateTime.TryParseExact(DueDate, "MM/dd/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return "Invalid DueDate format.";
+            }
+
+            string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+            // **If PODTL API is successful, then Call POREL API**
+            DataTable dtURLREL = cCommon.GetEmailURL(DeployMode.ToUpper(), "POREL");
+            string Password = BasicEncrypt.Instance.Decrypt(dtURLREL.Rows[0]["Password"].ToString());
+            string UserName = dtURLREL.Rows[0]["UserName"].ToString();
+            string Token = dtURLREL.Rows[0]["TokenKey"].ToString();
+
+            if (dtURLREL.Rows.Count == 0)
+            {
+                return "API URL not found for POREL.";
+            }
+
+            string jsonstringPOREL = MakeJsonBody(PO, Line, Rel, finalQty.ToString(), formattedDate, "", "GETPOREL", "");
+            string apiUrlPOREL = dtURLREL.Rows[0]["PageURL"].ToString()
+                                    .Replace("<company>", "159599")
+                                    .Replace("<PO>", PO)
+                                    .Replace("<Line>", Line)
+                                    .Replace("<Rel>", Rel);
+
+            var clientPOREL = new RestClient(dtURLREL.Rows[0]["URL"].ToString());
+
+            var postPORELRequest = new RestRequest(apiUrlPOREL, Method.Patch);
+            postPORELRequest.AddJsonBody(jsonstringPOREL);
+            postPORELRequest.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(UserName + ":" + Password)));
+            postPORELRequest.AddHeader("api-key", Token);
+
+            var postPORELResponse = clientPOREL.Execute(postPORELRequest);
+            if (postPORELResponse.StatusCode == System.Net.HttpStatusCode.Created || postPORELResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                result = "OK";
+            }
+            else
+            {
+                result = "Error";
+                JObject json = JObject.Parse(postPORELResponse.Content);
+                string errorMessage = json["ErrorMessage"]?.ToString();
+                cLog oLog = new cLog();
+                oLog.RecordError(errorMessage, postPORELResponse.Content.ToString(), "PatchDataQtyDueDateUpdate API");
+
+            }
+
+            return result;
+        }
+
+        public string PatchDataDueDateUpdate(string PO, string Line, string Rel, string DueDate)
+        {
+            string DeployMode = Session["DefaultDB"]?.ToString();
+            string result = "";
+
+            if (!DateTime.TryParseExact(DueDate, "MM/dd/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return "Invalid DueDate format.";
+            }
+
+            string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+            // **If PODTL API is successful, then Call POREL API**
+            DataTable dtURLREL = cCommon.GetEmailURL(DeployMode.ToUpper(), "POREL");
+            if (dtURLREL.Rows.Count == 0)
+            {
+                return "API URL not found for POREL.";
+            }
+            string Password = BasicEncrypt.Instance.Decrypt(dtURLREL.Rows[0]["Password"].ToString());
+            string UserName = dtURLREL.Rows[0]["UserName"].ToString();
+            string Token = dtURLREL.Rows[0]["TokenKey"].ToString();
+
+            string jsonstringPOREL = MakeJsonBody(PO, Line, Rel, "", formattedDate, "", "DUEDATE", "");
+            string apiUrlPOREL = dtURLREL.Rows[0]["PageURL"].ToString()
+                                    .Replace("<company>", "159599")
+                                    .Replace("<PO>", PO)
+                                    .Replace("<Line>", Line)
+                                    .Replace("<Rel>", Rel);
+
+            var clientPOREL = new RestClient(dtURLREL.Rows[0]["URL"].ToString());
+            var postPORELRequest = new RestRequest(apiUrlPOREL, Method.Patch);
+            postPORELRequest.AddJsonBody(jsonstringPOREL);
+            postPORELRequest.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(UserName + ":" + Password)));
+            postPORELRequest.AddHeader("api-key", Token);
+
+            var postPORELResponse = clientPOREL.Execute(postPORELRequest);
+            if (postPORELResponse.StatusCode == System.Net.HttpStatusCode.Created || postPORELResponse.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                result = "OK";
+            }
+            else
+            {
+                result = "Error";
+                JObject json = JObject.Parse(postPORELResponse.Content);
+                string errorMessage = json["ErrorMessage"]?.ToString();
+                cLog oLog = new cLog();
+                oLog.RecordError(errorMessage, postPORELResponse.Content.ToString(), "PatchDataDueDateUpdate API");
+
+            }
+
+            return result;
+
+
+        }
+
+
+        public DataTable GetSysSettings()
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
+            DataTable dt = new DataTable();
+            string sql = @"SELECT * from [dbo].[zSysIni] Where  SysDesc = 'IsPriceUpdate' OR SysDesc = 'IsQtyUpdate'
+                              ORDER BY SysCode DESC  ";
+            dt = oDAL.GetData(sql);
+            return dt;
+
+        }
+
 
         public void UpdatePORelQty(string PONo, string POLine, string PoRel, string RelQty, string DueDate, string Price, string TrackingNo)
         {
@@ -722,8 +913,14 @@ namespace PlusCP.Controllers
                         PORel_RelQty = <RelQty>, 
                         Calculated_DueDate = '<DueDate>', 
                         Calculated_UnitCost = '<Price>', 
-                        PODetail_UnitCost = '<Price>'  
-                    WHERE POHeader_PONum = <PONum> 
+                        PODetail_UnitCost = '<Price>' ";
+
+            // If TrackingNo is not null or empty, include it in the update query
+            if (!string.IsNullOrEmpty(TrackingNo))
+            {
+                sql += ", PODetail_OrigComment = '" + TrackingNo + "'";  // Append TrackingNo update
+            }
+            sql += @" WHERE POHeader_PONum = <PONum> 
                         AND PODetail_POLine = <Line> 
                         AND PORel_PORelNum = <Rel>";
 
@@ -742,11 +939,7 @@ namespace PlusCP.Controllers
             sql = sql.Replace("<Line>", POLine);
             sql = sql.Replace("<Rel>", PoRel);
 
-            // If TrackingNo is not null or empty, include it in the update query
-            if (!string.IsNullOrEmpty(TrackingNo))
-            {
-                sql += ", PODetail_OrigComment = '" + TrackingNo + "'";  // Append TrackingNo update
-            }
+
 
             // Execute the final SQL
             oDAL.Execute(sql);
@@ -866,6 +1059,26 @@ namespace PlusCP.Controllers
                 jsonObject["RowMod"] = "U";
             }
 
+            else if (APIType == "TRACKINGNO")
+            {
+                jsonObject["PONUM"] = PONo;
+                jsonObject["POLine"] = POLine;
+                if (!string.IsNullOrEmpty(TrackingNo))
+                    jsonObject["OrigComment"] = TrackingNo;
+                else
+                    jsonObject.Remove("OrigComment");
+
+                jsonObject["RowMod"] = "U";
+            }
+            else if (APIType == "DUEDATE")
+            {
+                jsonObject["PONum"] = PONo;
+                jsonObject["POLine"] = POLine;
+                jsonObject["PORelNum"] = PoRel;
+                jsonObject["DueDate"] = DueDate;
+                jsonObject["RowMod"] = "U";
+            }
+
             // Convert the modified JSON object back to string
             string modifiedJsonString = "";
             modifiedJsonString = jsonObject.ToString();
@@ -881,10 +1094,18 @@ namespace PlusCP.Controllers
             {
                 cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
                 string Result = "";
-                string query = @"SELECT TOP 1 CONCAT(serviceType, ':',  TrackingNo) AS TrackingNo    FROM [SRM].[VendorCommunication]
-WHERE GUID = '<GUID>' AND PONo = '<PO>'  
-ORDER BY Id DESC";
-                
+                string query = @"SELECT TOP 1 
+    CASE 
+        WHEN serviceType IS NOT NULL AND serviceType <> '' 
+             AND TrackingNo IS NOT NULL AND TrackingNo <> '' 
+        THEN CONCAT(serviceType, ':', TrackingNo)
+        ELSE ''
+    END AS TrackingNo
+FROM [SRM].[VendorCommunication]
+WHERE GUID = '<GUID>' 
+  AND PONo = '<PO>'
+ORDER BY Id DESC;";
+
                 query = query.Replace("<GUID>", GUID);
                 query = query.Replace("<PO>", PO);
                 DataTable dt = oDAL.GetData(query);
@@ -992,12 +1213,16 @@ where POHeader_PONum = '<PONum>' and PODetail_POLine = '<POLine>' and PORel_PORe
             oPO = new NewPO();
             oPO.UpdatePropose(GUID, Qty, Price, DueDate, Message, userName, PONo, PartNo, ProposeEmailId, CCemails);
 
+
             var jsonResult = Json("Updated", JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
 
 
             return jsonResult;
         }
+
+
+
 
         public DataTable GetPODataFilter(string tDate, string fDate, string partNo, string partDesc)
         {

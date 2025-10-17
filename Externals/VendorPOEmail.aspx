@@ -164,7 +164,8 @@
                                             <option value="UPS Next Day Air">UPS Next Day Air</option>
                                             <option value="UPS 2nd Day Air">UPS 2nd Day Air</option>
                                             <option value="UPS Ground">UPS Ground</option>
-
+                                            <option value="Freight">Freight</option>
+                                            <option value="Others">Others</option>
                                         </select>
                                     </div>
                                 </div>

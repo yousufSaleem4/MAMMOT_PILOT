@@ -114,7 +114,7 @@
                                 <asp:Label ID="lblQty" runat="server" Text='<%# Eval("Qty") %>'></asp:Label>
                             </ItemTemplate>
                             <EditItemTemplate>
-                                <asp:TextBox ID="txtQty" runat="server" Text='<%# Bind("Qty") %>'></asp:TextBox>
+                                <asp:TextBox ID="txtQty"  runat="server" Text='<%# Bind("Qty") %>'></asp:TextBox>
                             </EditItemTemplate>
                             <ItemStyle Width="70px" />
                         </asp:TemplateField>
@@ -149,6 +149,8 @@
                                     <asp:ListItem Value="UPS Next Day Air">UPS Next Day Air</asp:ListItem>
                                     <asp:ListItem Value="UPS 2nd Day Air">UPS 2nd Day Air</asp:ListItem>
                                     <asp:ListItem Value="UPS Ground">UPS Ground</asp:ListItem>
+                                    <asp:ListItem Value="Freight">Freight</asp:ListItem>
+                                    <asp:ListItem Value="Others">Others</asp:ListItem>
                                 </asp:DropDownList>
                             </EditItemTemplate>
                             <ItemStyle Width="140px" />

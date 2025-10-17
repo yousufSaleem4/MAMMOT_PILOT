@@ -62,22 +62,21 @@ where Calculated_DueDate <= Calculated_ArrivedDate ";
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
             string sql = @"
---1. Supplier Response Rate
-WITH SupplierResponse AS (
-    SELECT 
-        SUBSTRING(v.VendorName, 1, 20) AS ShortVendorName,  -- Shorten vendor name
-        COUNT(*) AS TotalPOs,
-        SUM(CASE WHEN v.IsAnswered = 1 THEN 1 ELSE 0 END) AS AnsweredPOs
-    FROM [SRM].[VendorCommunication] v
-    GROUP BY v.VendorName
-)
 SELECT 
-    ShortVendorName AS VendorName,  -- Display the shortened name
-    TotalPOs,
-    AnsweredPOs,
-    (AnsweredPOs * 100.0 / TotalPOs) AS ResponseRate
-FROM SupplierResponse
-ORDER BY ResponseRate DESC;
+    Vendor_Name,
+    COUNT(*) AS TotalPOLines,
+    SUM(COALESCE(PODetail_XOrderQty, 0) - COALESCE(Calculated_ArrivedQty, 0)) AS TotalRemainingQty,
+    SUM(
+        (COALESCE(PODetail_XOrderQty, 0) - COALESCE(Calculated_ArrivedQty, 0))
+        * COALESCE(PODetail_UnitCost, 0)
+    ) AS TotalCost
+FROM [dbo].[PODetail]
+WHERE COALESCE(PODetail_XOrderQty, 0) > COALESCE(Calculated_ArrivedQty, 0) 
+GROUP BY Vendor_Name
+ORDER BY  SUM(
+        (COALESCE(PODetail_XOrderQty, 0) - COALESCE(Calculated_ArrivedQty, 0))
+        * COALESCE(PODetail_UnitCost, 0)
+    ) desc;
 
  ";
             DataTable dt = new DataTable();

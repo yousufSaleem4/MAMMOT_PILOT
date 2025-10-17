@@ -280,6 +280,7 @@ HAVING COUNT(DISTINCT CASE WHEN POP.CommunicationStatus = 'Completed' THEN POP.[
         }
         public DataTable GetPOAsync(string POStatus)
         {
+            string ConnctionType = HttpContext.Current.Session["DefaultDB"].ToString();
             try
             {
                 DataTable dt = new DataTable();
@@ -292,8 +293,11 @@ HAVING COUNT(DISTINCT CASE WHEN POP.CommunicationStatus = 'Completed' THEN POP.[
                 else if (POStatus.ToUpper() == "ALL")
                     dt = GetAllPOWithStatus();
                 else if (POStatus.ToUpper() == "REFRESH")
-                    dt = GETPORefresh();
-                
+                    if (ConnctionType.ToUpper() == "TEST")
+                        dt = GetAllPOWithStatus();
+                    else
+                        dt = GETPORefresh();
+
                 return dt;
             }
             catch (Exception ex)
@@ -1027,94 +1031,354 @@ HAVING COUNT(DISTINCT CASE WHEN POP.CommunicationStatus = 'Completed' THEN POP.[
                 return new DataTable(); // Return an empty table on failure
             }
         }
-        // Dashboard Count
-        public DataTable GetCounts()
+
+
+        #region DashboardPOCounts
+        public int GETPOPendingCount()
         {
-            string query = "";
-            DataTable dt = new DataTable();
+            int count = 0;
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+
+            string userType = HttpContext.Current.Session["UserType"].ToString();
+            string Email = HttpContext.Current.Session["Email"].ToString();
+
+            string buyerClause = "";
+            if (userType.ToUpper() == "BUYER")
+            {
+                buyerClause = $" AND PurAgent_EMailAddress = '{Email}' ";
+            }
+
+            string query = $@"
+        SELECT COUNT(*) 
+        FROM (
+            SELECT 
+                sub.POHeader_PONum
+            FROM (
+                SELECT 
+                    PD.*,
+                    ROW_NUMBER() OVER (PARTITION BY PD.POHeader_PONum ORDER BY PD.RowIdent) AS rn
+                FROM [dbo].[PODetail] PD
+                INNER JOIN [SRM].[BuyerPO] BP 
+                    ON PD.POHeader_PONum = BP.PONum 
+                    AND PD.PODetail_POLine = BP.[LineNo]
+                    AND PD.PORel_PORelNum = BP.RelNo
+                WHERE PD.PODetail_XOrderQty <> PD.Calculated_ReceivedQty
+                {buyerClause}
+            ) AS sub
+            LEFT JOIN [dbo].[BuyerPOHeader] BPH 
+                ON sub.POHeader_PONum = BPH.PONumber
+            WHERE sub.rn = 1
+        ) AS T;";
+
+            object result = oDAL.GetObject(query);  // Make sure GetScalar returns a single value
+            if (result != null && result != DBNull.Value)
+            {
+                count = Convert.ToInt32(result);
+            }
+
+            return count;
+        }
+        public int GETPOEarlyCount()
+        {
+            int count = 0;
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+
+            string userType = HttpContext.Current.Session["UserType"].ToString();
+            string Email = HttpContext.Current.Session["Email"].ToString();
+
+            string buyerClause = "";
+            if (userType.ToUpper() == "BUYER")
+            {
+                buyerClause = $" AND PurAgent_EMailAddress = '{Email}' ";
+            }
+
+            string query = $@"
+        SELECT COUNT(*) 
+        FROM (
+            SELECT 
+                PO.POHeader_PONum
+            FROM (
+                SELECT *,
+                       ROW_NUMBER() OVER (PARTITION BY POHeader_PONum ORDER BY RowIdent) AS rn
+                FROM [dbo].[PODetail]
+                WHERE 
+                    Calculated_DueDate >= Calculated_ArrivedDate
+                    AND Calculated_ArrivedQty >= PODetail_OrderQty
+                    {buyerClause}
+            ) AS PO
+            LEFT JOIN (
+                SELECT * FROM [dbo].[BuyerPOHeader] WHERE IsActive = 1
+            ) BPH 
+            ON PO.POHeader_PONum = BPH.PONumber 
+            WHERE PO.rn = 1
+        ) AS T;";
+
+            object result = oDAL.GetObject(query); // assuming GetScalar returns a single value
+            if (result != null && result != DBNull.Value)
+            {
+                count = Convert.ToInt32(result);
+            }
+
+            return count;
+        }
+        public int GETPOLateCount()
+        {
+            int count = 0;
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+
+            string userType = HttpContext.Current.Session["UserType"].ToString();
+            string Email = HttpContext.Current.Session["Email"].ToString();
+
+            string buyerClause = "";
+            if (userType.ToUpper() == "BUYER")
+            {
+                buyerClause = $" AND PurAgent_EMailAddress = '{Email}' ";
+            }
+
+            string query = $@"
+        SELECT COUNT(*) 
+        FROM (
+            SELECT 
+                PO.POHeader_PONum
+            FROM (
+                SELECT *,
+                       ROW_NUMBER() OVER (PARTITION BY POHeader_PONum ORDER BY RowIdent) AS rn
+                FROM [dbo].[PODetail]
+                WHERE 
+                    Calculated_ArrivedDate > Calculated_DueDate
+                    AND Calculated_DueDate < GETDATE()
+                    AND Calculated_ArrivedQty < PODetail_OrderQty
+                    {buyerClause}
+            ) AS PO
+            LEFT JOIN (
+                SELECT * FROM [dbo].[BuyerPOHeader] WHERE IsActive = 1
+            ) BPH 
+            ON PO.POHeader_PONum = BPH.PONumber 
+            WHERE PO.rn = 1
+        ) AS T;";
+
+            object result = oDAL.GetObject(query); // Assuming your DAL has GetScalar
+            if (result != null && result != DBNull.Value)
+            {
+                count = Convert.ToInt32(result);
+            }
+
+            return count;
+        }
+        public int GetUpdateDataForDashboardCount()
+        {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
             string userType = HttpContext.Current.Session["UserType"].ToString();
-            string email = HttpContext.Current.Session["Email"].ToString();
+            string Email = HttpContext.Current.Session["Email"].ToString();
 
-            query = @"
-    SELECT 
-        (SELECT COUNT(DISTINCT PD.POHeader_PONum)
-         FROM [dbo].[PODetail] PD
-         INNER JOIN [SRM].[BuyerPO] BP 
-             ON PD.POHeader_PONum = BP.PONum 
-            AND PD.PODetail_POLine = BP.[LineNo]
-            AND PD.PORel_PORelNum = BP.RelNo
-         WHERE 1=1 <BuyerClause>) AS InProcessCount,
-
-        (SELECT COUNT(DISTINCT POHeader_PONum)
-         FROM [dbo].[PODetail] PD
-         WHERE Calculated_ArrivedDate > Calculated_DueDate
-           AND Calculated_DueDate < GETDATE()
-           AND Calculated_ArrivedQty < PODetail_OrderQty
-           <BuyerClause>) AS LatePOCount,
-
-        (SELECT COUNT(DISTINCT POHeader_PONum)
-         FROM [dbo].[PODetail] PD
-         WHERE Calculated_DueDate >= Calculated_ArrivedDate
-           AND Calculated_ArrivedQty >= PODetail_OrderQty
-           <BuyerClause>) AS EarlyCount,
-
-        (SELECT COUNT(*) AS CompletedCount
-FROM (
-    SELECT 
-        B.GUID, 
-        CONCAT(B.PONum, '-', B.[LineNo], '-', B.RelNo) AS PONo,
-        B.PartNo, 
-        B.PartDesc,
-        B.VendorName, 
-        B.OrderQty, 
-        B.Qty AS CurrentQty, 
-        B.Price AS CurrentPrice,
-        B.DueDate AS CurrentDueDate,
-        V.Qty AS CommitQty, 
-        V.Price AS CommitPrice,
-        V.DueDate AS CommitDueDate, 
-        V.TrackingNo, 
-        V.AttachFile, 
-        V.FileExt,
-        V.CreatedOn,
-        T.LastCommunication
-    FROM 
-        [SRM].[BuyerPO] B
-    JOIN (
-        SELECT *,
-               ROW_NUMBER() OVER (PARTITION BY PONo ORDER BY CreatedOn DESC) AS RowNum
+            string sql = @"
+    WITH LatestVendorComm AS (
+        SELECT *, ROW_NUMBER() OVER (
+            PARTITION BY PONo ORDER BY CreatedOn DESC
+        ) AS rn
         FROM [SRM].[VendorCommunication]
-    ) V ON B.GUID = V.GUID 
-        AND CONCAT(B.PONum, '-', B.[LineNo], '-', B.RelNo) = V.PONo
-        AND V.RowNum = 1
-    LEFT JOIN (
+    ),
+    LatestTransaction AS (
         SELECT PONo, MAX(CreatedOn) AS LastCommunication
         FROM [SRM].[Transaction]
         WHERE HasAction <> 'Document'
         GROUP BY PONo
-    ) T ON T.PONo = CONCAT(B.PONum, '-', B.[LineNo], '-', B.RelNo)
-    JOIN [dbo].[PODetail] PD 
-        ON PD.POHeader_PONum = B.PONum
-        AND PD.PODetail_POLine = B.[LineNo]
-        AND PD.PORel_PORelNum = B.RelNo
-    WHERE 
-        ISNULL(ROUND(PD.PODetail_XOrderQty, 2), 0) = ISNULL(ROUND(PD.Calculated_ReceivedQty, 2), 0)
-        <BuyerClause>
-) AS CountQuery) AS CompletedCount";
+    )
+    SELECT COUNT(*) 
+    FROM (
+        SELECT 
+            B.GUID
+        FROM [SRM].[BuyerPO] B
+        JOIN LatestVendorComm V 
+            ON B.GUID = V.GUID
+            AND V.PONo = CONCAT(B.PONum, '-', B.[LineNo], '-', B.RelNo)
+            AND V.rn = 1
+        JOIN [dbo].[PODetail] P 
+            ON P.POHeader_PONum = B.PONum
+            AND P.PODetail_POLine = B.[LineNo]
+            AND P.PORel_PORelNum = B.RelNo
+        LEFT JOIN LatestTransaction T 
+            ON T.PONo = CONCAT(B.PONum, '-', B.[LineNo], '-', B.RelNo)
+        WHERE 
+            ISNULL(ROUND(P.PODetail_XOrderQty, 2), 0) = ISNULL(ROUND(P.Calculated_ReceivedQty, 2), 0)
+            <BuyerSupplierClasue>
 
-            // Apply filter for buyers
-            string buyerClause = userType.ToUpper() == "BUYER"
-                ? $" AND PD.PurAgent_EMailAddress = '{email}'"
-                : "";
-           
-            // Replace <BuyerClause> placeholders
-            query = query.Replace("<BuyerClause>", buyerClause);
+        UNION ALL
 
+        SELECT 
+            NULL AS GUID
+        FROM [dbo].[PODetail] P
+        WHERE 
+            ISNULL(ROUND(P.PODetail_XOrderQty, 2), 0) = ISNULL(ROUND(P.Calculated_ReceivedQty, 2), 0)
+            AND NOT EXISTS (
+                SELECT 1 FROM [SRM].[BuyerPO] B
+                WHERE 
+                    B.PONum = P.POHeader_PONum
+                    AND B.[LineNo] = P.PODetail_POLine
+                    AND B.RelNo = P.PORel_PORelNum
+            )
+            <BuyerSupplierClasue>
+    ) AS X;
+    ";
 
-            dt = oDAL.GetData(query);
+            if (userType.ToUpper() == "BUYER")
+                sql = sql.Replace("<BuyerSupplierClasue>", " AND P.PurAgent_EMailAddress = '" + Email + "' ");
+            else
+                sql = sql.Replace("<BuyerSupplierClasue>", " ");
+
+            object result = oDAL.GetObject(sql); // Use your DAL's scalar method
+            int count = 0;
+
+            if (result != null && result != DBNull.Value)
+                count = Convert.ToInt32(result);
+
+            return count;
+        }
+        public DataTable GetCounts()
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string userType = HttpContext.Current.Session["UserType"].ToString();
+            string Email = HttpContext.Current.Session["Email"].ToString();
+
+            string buyerClause = "";
+            string buyerSupplierClause = "";
+
+            if (userType.ToUpper() == "BUYER")
+            {
+                buyerClause = $" AND PurAgent_EMailAddress = '{Email}' ";
+                buyerSupplierClause = $" AND P.PurAgent_EMailAddress = '{Email}' ";
+            }
+
+            string sql = $@"
+    -----------------------------
+    -- PENDING COUNT
+    -----------------------------
+    DECLARE @PendingCount INT;
+    SELECT @PendingCount = COUNT(*) 
+    FROM (
+        SELECT sub.POHeader_PONum
+        FROM (
+            SELECT 
+                PD.*,
+                ROW_NUMBER() OVER (PARTITION BY PD.POHeader_PONum ORDER BY PD.RowIdent) AS rn
+            FROM [dbo].[PODetail] PD
+            INNER JOIN [SRM].[BuyerPO] BP 
+                ON PD.POHeader_PONum = BP.PONum 
+                AND PD.PODetail_POLine = BP.[LineNo]
+                AND PD.PORel_PORelNum = BP.RelNo
+            WHERE PD.PODetail_XOrderQty <> PD.Calculated_ReceivedQty
+            {buyerClause}
+        ) AS sub
+        LEFT JOIN [dbo].[BuyerPOHeader] BPH ON sub.POHeader_PONum = BPH.PONumber
+        WHERE sub.rn = 1
+    ) AS T;
+
+    -----------------------------
+    -- EARLY COUNT
+    -----------------------------
+    DECLARE @EarlyCount INT;
+    SELECT @EarlyCount = COUNT(*) 
+    FROM (
+        SELECT PO.POHeader_PONum
+        FROM (
+            SELECT *,
+                   ROW_NUMBER() OVER (PARTITION BY POHeader_PONum ORDER BY RowIdent) AS rn
+            FROM [dbo].[PODetail]
+            WHERE 
+                Calculated_DueDate >= Calculated_ArrivedDate
+                AND Calculated_ArrivedQty >= PODetail_OrderQty
+                {buyerClause}
+        ) AS PO
+        LEFT JOIN [dbo].[BuyerPOHeader] BPH ON PO.POHeader_PONum = BPH.PONumber 
+        WHERE PO.rn = 1
+    ) AS T;
+
+    -----------------------------
+    -- LATE COUNT
+    -----------------------------
+    DECLARE @LateCount INT;
+    SELECT @LateCount = COUNT(*) 
+    FROM (
+        SELECT PO.POHeader_PONum
+        FROM (
+            SELECT *,
+                   ROW_NUMBER() OVER (PARTITION BY POHeader_PONum ORDER BY RowIdent) AS rn
+            FROM [dbo].[PODetail]
+            WHERE 
+                Calculated_ArrivedDate > Calculated_DueDate
+                AND Calculated_DueDate < GETDATE()
+                AND Calculated_ArrivedQty < PODetail_OrderQty
+                {buyerClause}
+        ) AS PO
+        LEFT JOIN [dbo].[BuyerPOHeader] BPH ON PO.POHeader_PONum = BPH.PONumber 
+        WHERE PO.rn = 1
+    ) AS T;
+
+    -----------------------------
+    -- UPDATED (DASHBOARD) COUNT
+    -----------------------------
+    DECLARE @UpdatedCount INT;
+    WITH LatestVendorComm AS (
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY PONo ORDER BY CreatedOn DESC) AS rn
+        FROM [SRM].[VendorCommunication]
+    ),
+    LatestTransaction AS (
+        SELECT PONo, MAX(CreatedOn) AS LastCommunication
+        FROM [SRM].[Transaction]
+        WHERE HasAction <> 'Document'
+        GROUP BY PONo
+    )
+    SELECT @UpdatedCount = COUNT(*) 
+    FROM (
+        SELECT B.GUID
+        FROM [SRM].[BuyerPO] B
+        JOIN LatestVendorComm V 
+            ON B.GUID = V.GUID
+            AND V.PONo = CONCAT(B.PONum, '-', B.[LineNo], '-', B.RelNo)
+            AND V.rn = 1
+        JOIN [dbo].[PODetail] P 
+            ON P.POHeader_PONum = B.PONum
+            AND P.PODetail_POLine = B.[LineNo]
+            AND P.PORel_PORelNum = B.RelNo
+        LEFT JOIN LatestTransaction T 
+            ON T.PONo = CONCAT(B.PONum, '-', B.[LineNo], '-', B.RelNo)
+        WHERE 
+            ISNULL(ROUND(P.PODetail_XOrderQty, 2), 0) = ISNULL(ROUND(P.Calculated_ReceivedQty, 2), 0)
+            {buyerSupplierClause}
+
+        UNION ALL
+
+        SELECT NULL AS GUID
+        FROM [dbo].[PODetail] P
+        WHERE 
+            ISNULL(ROUND(P.PODetail_XOrderQty, 2), 0) = ISNULL(ROUND(P.Calculated_ReceivedQty, 2), 0)
+            AND NOT EXISTS (
+                SELECT 1 FROM [SRM].[BuyerPO] B
+                WHERE 
+                    B.PONum = P.POHeader_PONum
+                    AND B.[LineNo] = P.PODetail_POLine
+                    AND B.RelNo = P.PORel_PORelNum
+            )
+            {buyerSupplierClause}
+    ) AS X;
+
+    -----------------------------
+    -- FINAL OUTPUT
+    -----------------------------
+    SELECT 
+        @PendingCount AS PendingCount,
+        @EarlyCount AS EarlyCount,
+        @LateCount AS LateCount,
+        @UpdatedCount AS UpdatedCount;
+    ";
+
+            DataTable dt = oDAL.GetData(sql);
             return dt;
         }
+
+        #endregion
+
+
 
         // End
 

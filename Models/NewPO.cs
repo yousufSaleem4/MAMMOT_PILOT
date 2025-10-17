@@ -1948,6 +1948,8 @@ ORDER BY CreatedOn DESC
 	                        ,V.ServiceURL
                             ,V.FileExt
                             ,V.AttachFile
+                            ,V.TrackingNo
+
 	                        from [SRM].[Transaction] T 
                             Left Join [SRM].[VendorCommunication] V ON V.Id = T.VendorCommId 
                             Where T.PONo = '<PONO>'

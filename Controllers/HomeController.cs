@@ -93,8 +93,30 @@ namespace PlusCP.Controllers
                 Session["TimeZone"] = oAuth.TimeZoneId;
                 //Session["CONN_TYPE"] =oAuth.DefaultDB;
                 Session["dtBuyerInfo"] = null;
-              
-                
+
+
+                DataTable dtSysSettings = new DataTable();
+                dtSysSettings = GetSysSettings();
+                bool IsQtyUpdate = false;
+                bool IsPriceUpdate = false;
+                if (dtSysSettings.Rows.Count > 0) // Check is Qty and Price update Allow
+                {
+                    // Get value for SysDesc = 'IsQtyUpdate'
+                    IsQtyUpdate = dtSysSettings.AsEnumerable()
+                      .Where(r => r.Field<string>("SysDesc") == "IsQtyUpdate")
+                      .Select(r => Convert.ToBoolean(r["SysValue"]))
+                      .FirstOrDefault();
+
+                    // Get value for SysDesc = 'IsPriceUpdate'
+                    IsPriceUpdate = dtSysSettings.AsEnumerable()
+                      .Where(r => r.Field<string>("SysDesc") == "IsPriceUpdate")
+                      .Select(r => Convert.ToBoolean(r["SysValue"]))
+                      .FirstOrDefault();
+                }
+
+                Session["IsQtyUpdate"] = IsQtyUpdate;
+                Session["IsPriceUpdate"] = IsPriceUpdate;
+
                 return RedirectToAction("Index");
             }
             else
@@ -103,6 +125,16 @@ namespace PlusCP.Controllers
                 ModelState.AddModelError("Password", oAuth.Message);
                 return View("Login");
             }
+        }
+        public DataTable GetSysSettings()
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
+            DataTable dt = new DataTable();
+            string sql = @"SELECT * from [dbo].[zSysIni] Where  SysDesc = 'IsPriceUpdate' OR SysDesc = 'IsQtyUpdate'
+                              ORDER BY SysCode DESC  ";
+            dt = oDAL.GetData(sql);
+            return dt;
+
         }
         public ActionResult CreatePassword(string OldPassword, string NewPassword)
         {
