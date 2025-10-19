@@ -1,0 +1,273 @@
+﻿@model PlusCP.Models.TicketSystem
+@{
+    ViewBag.Title = "Ticket Detail";
+    Layout = cCommon.SwitchToDetailPage(Request.Url.PathAndQuery);
+}
+
+<style>
+    body {
+        background: linear-gradient(120deg, #eef2f7 0%, #f7f9fc 100%);
+        font-family: "Segoe UI", "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .ticket-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        padding: 40px 50px;
+        max-width: 1400px;
+        margin: auto;
+    }
+
+    .ticket-main, .ticket-sidebar {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        padding: 30px 35px;
+        transition: all 0.3s ease;
+    }
+
+    .ticket-main {
+        flex: 2 1 700px;
+    }
+
+    .ticket-sidebar {
+        flex: 1 1 350px;
+        height: fit-content;
+    }
+
+    .ticket-main:hover, .ticket-sidebar:hover {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .ticket-header h1 {
+        color: #003B59;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .ticket-header h1 i {
+        margin-right: 10px;
+    }
+
+    .ticket-created {
+        font-size: 15px;
+        color: #555;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+    }
+
+        .ticket-created i {
+            color: #003B59;
+            margin-right: 6px;
+        }
+
+    .section-title {
+        font-weight: 600;
+        color: #3949ab;
+        margin-bottom: 15px;
+        border-left: 5px solid #5c6bc0;
+        padding-left: 12px;
+        font-size: 17px;
+    }
+
+    .desc-box {
+        background: #f4f6fb;
+        border: 1px solid #e0e3f0;
+        border-radius: 10px;
+        padding: 18px 20px;
+        color: #333;
+        font-size: 15px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .progress {
+        width: 80%; /* full width ki jagah 80% kar diya */
+        height: 18px; /* chhoti height */
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #e9e9f4;
+        margin: 0 auto; /* center align karne ke liye */
+    }
+
+    .progress-bar {
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+
+    .field-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #e6e9f8;
+        font-size: 15px;
+    }
+
+    .field-row:last-child {
+        border-bottom: none;
+    }
+
+    .field-label {
+        font-weight: 600;
+        color: #5c6bc0;
+    }
+
+    .field-value {
+        font-weight: 500;
+        color: #1a237e;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .badge {
+        padding: 5px 12px;
+        font-size: 13px;
+        border-radius: 12px;
+    }
+
+    #commentsSection {
+        background: #f7f9ff;
+        border: 1px solid #e0e4ff;
+        border-radius: 10px;
+        padding: 18px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .comment-box {
+        border-left: 4px solid #5c6bc0;
+        background: #fff;
+        padding: 12px 18px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    #toastMessage {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        font-weight: 500;
+        padding: 12px 18px;
+        color: #fff;
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 9999;
+        display: none;
+    }
+
+    @@media (max-width: 1200px) {
+        .ticket-container {
+            padding: 30px 25px;
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .ticket-container {
+            flex-direction: column;
+        }
+
+        .field-row {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .field-value {
+            text-align: left;
+            width: 100%;
+            margin-top: 4px;
+        }
+    }
+</style>
+
+<div class="container-fluid mt-4 mb-5">
+    <div class="ticket-container">
+        <!-- LEFT SIDE -->
+        <div class="ticket-main">
+            <div class="ticket-header">
+                <h1><i class="fa fa-ticket-alt"></i> #@Model.ticket_id  -  @Model.title</h1>
+            </div>
+
+            <p class="ticket-created">
+                <i class="fa fa-clock"></i>
+                Created @Model.createdDays day(s) ago, Updated @Model.updatedDays day(s) ago
+            </p>
+
+            <div class="mb-4">
+                <h5 class="section-title">Description</h5>
+                <div class="desc-box">@Html.DisplayFor(m => m.description)</div>
+            </div>
+
+            <div class="mb-4">
+                <h5 class="section-title">Notes</h5>
+                <div class="desc-box">@Html.DisplayFor(m => m.notes)</div>
+            </div>
+
+       
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="ticket-sidebar">
+            <h5 class="section-title mb-3">Ticket Info</h5>
+
+            <div class="field-row">
+                <div class="field-label">Status</div>
+                <div class="field-value"><span class="badge bg-info">@Model.status</span></div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">Progress</div>
+                <div class="field-value" style="width:100%">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             style="width:@Model.progress%;"
+                             role="progressbar" aria-valuenow="@Model.progress" aria-valuemin="0" aria-valuemax="100">
+                            @Model.progress%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">Priority</div>
+                <div class="field-value"><span class="badge bg-danger">@Model.priority</span></div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">Type</div>
+                <div class="field-value">@Model.ticket_type</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">Created By</div>
+                <div class="field-value">@Model.created_by</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">Assigned To</div>
+                <div class="field-value">@Model.assigned_to</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">ETA</div>
+                <div class="field-value">@Model.eta</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">Created At</div>
+                <div class="field-value">@Model.created_at</div>
+            </div>
+        </div>
+    </div>
+</div>
