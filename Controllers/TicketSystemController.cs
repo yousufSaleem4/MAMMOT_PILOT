@@ -68,12 +68,9 @@ namespace PlusCP.Controllers
 
         [HttpPost]
         public JsonResult SaveTicket(string title, string description, string ticket_type, string status,
-                                 string priority, /*int assigned_to,*/ DateTime eta,
-                                 int progress_percentage, string notes)
+                             string priority, DateTime eta, int progress_percentage, string notes)
         {
             TicketSystem oTicket = new TicketSystem();
-
-            
             int created_by = Convert.ToInt32(Session["SigninId"]);
 
             bool result = oTicket.CreateTicket(
@@ -83,16 +80,44 @@ namespace PlusCP.Controllers
                 status,
                 priority,
                 created_by,
-                //assigned_to,
                 eta,
                 progress_percentage,
                 notes
             );
 
             if (result)
-                return Json(new { success = true, message = "✅ Ticket created successfully!" });
+            {
+                string adminEmail = "mohsinsaleemshahani@gmail.com"; 
+                string subject = $"New Ticket Created - {title}";
+                string htmlBody = $@"
+<html>
+<body style='font-family:Segoe UI, Arial, sans-serif; background-color:#f8f9fb; padding:20px;'>
+    <div style='max-width:600px; margin:auto; background:#fff; border-radius:8px; box-shadow:0 3px 8px rgba(0,0,0,0.1); padding:20px;'>
+        <h3 style='color:#0078D7;'>New Ticket Created</h3>
+        <p><b>Title:</b> {title}</p>
+        <p><b>Description:</b> {description}</p>
+        <p><b>Priority:</b> {priority}</p>
+        <p><b>Status:</b> {status}</p>
+        <p><b>ETA:</b> {eta:yyyy-MM-dd}</p>
+        <p><b>Created By ID:</b> {created_by}</p>
+        <hr style='border:none; border-top:1px solid #e0e0e0; margin:20px 0;' />
+        <p style='font-size:13px; color:#666;'>This is an auto-generated email from the Ticket System.</p>
+    </div>
+</body>
+</html>";
+
+
+                string emailResult = cCommon.SendEmail(adminEmail, subject, htmlBody, "", null);
+
+                if (emailResult == "SENT")
+                    return Json(new { success = true, message = "✅ Ticket created and email sent successfully!" });
+                else
+                    return Json(new { success = true, message = "✅ Ticket created but email failed to send." });
+            }
             else
+            {
                 return Json(new { success = false, message = oTicket.ErrorMessage });
+            }
         }
 
 

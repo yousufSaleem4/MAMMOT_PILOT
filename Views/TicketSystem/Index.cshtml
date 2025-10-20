@@ -447,31 +447,38 @@
     $(document).ready(function () {
         LoadData();
         loadAssigneeDropdown();
+
         // 🔹 Auto reload on filter change
         $('#filterStatus, #filterType, #filterPriority').change(function () {
             LoadData();
         });
 
-
         $('#btnCreateTicket').click(function () {
             $('#ticketForm')[0].reset();
             $('#createTicketModal').modal('show');
-            loadAssigneeDropdown()
+            loadAssigneeDropdown();
         });
 
         $('#btnSaveTicket').click(function () {
-            debugger
+            debugger;
             var ticketData = {
-                title: $('#title').val(),
-                description: $('#description').val(),
+                title: $('#title').val().trim(),
+                description: $('#description').val().trim(),
                 ticket_type: $('#ticket_type').val(),
                 status: $('#status').val(),
                 priority: $('#priority').val(),
-                /*assigned_to: $('#ddlAssignee').val(),*/
                 eta: $('#eta').val(),
                 progress_percentage: $('#progress_percentage').val(),
-                notes: $('#notes').val()
+                notes: $('#notes').val().trim()
             };
+
+            // ✅ Client-side validation
+            if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
+                !ticketData.status || !ticketData.priority || !ticketData.eta) {
+
+                showToast('⚠️ Please fill all required fields before saving.', 'danger');
+                return;
+            }
 
             console.log("🚀 Sending Ticket Data:", ticketData);
 
@@ -489,27 +496,29 @@
                     }
                 },
                 error: function (xhr) {
-                    showToast('Error: ' + xhr.responseText, 'danger');
-                },
-                error: function (xhr) {
                     showToast('❌ Error: ' + xhr.responseText, 'danger');
                 }
             });
         });
 
-
         // ✅ Toast function
         function showToast(message, type = 'success') {
             var toast = $('#toastMessage');
+            if (toast.length === 0) {
+                // agar toast div missing ho, dynamically bana do
+                $('body').append('<div id="toastMessage" style="position:fixed;top:20px;right:20px;padding:12px 20px;color:white;border-radius:6px;z-index:9999;display:none;"></div>');
+                toast = $('#toastMessage');
+            }
+
             toast.text(message);
-            toast.css('background-color', type === 'success' ? 'green' : 'red');
-            toast.fadeIn(400).delay(2000).fadeOut(400);
+            toast.css({
+                'background-color': type === 'success' ? 'green' : 'red',
+                'font-weight': '500',
+                'box-shadow': '0 2px 6px rgba(0,0,0,0.3)'
+            });
+
+            toast.fadeIn(300).delay(2500).fadeOut(400);
         }
-
-
-
-
-
 
         function loadAssigneeDropdown() {
             $.ajax({
@@ -526,12 +535,12 @@
                     });
                 },
                 error: function () {
-                    alert('Error loading assignee list.');
+                    showToast('❌ Error loading assignee list.', 'danger');
                 }
             });
         }
-
     });
+
 
 
     function LoadData() {
