@@ -60,9 +60,9 @@ where email = 'mohsin@collablly.com' ";
     t.Priority,
     CONCAT(cu.FirstName, ' ', cu.LastName) AS Created_By_Name,
     CONCAT(au.FirstName, ' ', au.LastName) AS Assigned_To_Name,
-    FORMAT(t.Created_At, 'yyyy.MM.dd HH:mm') AS Created_At,
-    FORMAT(t.Updated_At, 'yyyy.MM.dd HH:mm') AS Updated_At,
-    FORMAT(t.ETA, 'yyyy.MM.dd') AS ETA,
+    FORMAT(t.Created_At, 'yyyy-MM-dd HH:mm') AS Created_At,
+    FORMAT(t.Updated_At, 'yyyy-MM-dd HH:mm') AS Updated_At,
+    FORMAT(t.ETA, 'yyyy-MM-dd') AS ETA,
     t.Progress_Percentage,
     DATEDIFF(DAY, t.Created_At, GETDATE()) AS Days_Since_Created
 FROM SRM.Tickets t
@@ -97,7 +97,36 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
         }
 
 
-        public bool GetDetail(string ticketId)
+        public bool UpdateTicket(string Ticket_ID, string Title, string Description, string Ticket_Type, string Status, string Priority, DateTime ETA, int Progress_Percentage, string Notes)
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+
+            string sql = $@"
+            UPDATE SRM.Tickets
+            SET 
+                Title = '{Title.Replace("'", "''")}',
+                Description = '{Description.Replace("'", "''")}',
+                Ticket_Type = '{Ticket_Type}',
+                Status = '{Status}',
+                Priority = '{Priority}',
+                ETA = '{ETA:yyyy-MM-dd}',
+                Progress_Percentage = {Progress_Percentage},
+                Notes = '{Notes.Replace("'", "''")}',
+                Updated_At = GETDATE()
+            WHERE Ticket_Id = '{Ticket_ID}'";
+
+            oDAL.Execute(sql);
+
+            if (oDAL.HasErrors)
+            {
+                ErrorMessage = oDAL.ErrMessage;
+                return false;
+            }
+            return true;
+        }
+  
+
+    public bool GetDetail(string ticketId)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
 
@@ -111,9 +140,9 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
     t.Priority,
     CONCAT(cu.FirstName, ' ', cu.LastName) AS Created_By_Name,
     CONCAT(au.FirstName, ' ', au.LastName) AS Assigned_To_Name,
-    FORMAT(t.Created_At, 'yyyy.MM.dd HH:mm') AS Created_At,
-    FORMAT(t.Updated_At, 'yyyy.MM.dd HH:mm') AS Updated_At,
-    FORMAT(t.ETA, 'yyyy.MM.dd') AS ETA,
+    FORMAT(t.Created_At, 'yyyy-MM-dd HH:mm') AS Created_At,
+    FORMAT(t.Updated_At, 'yyyy-MM-dd HH:mm') AS Updated_At,
+    FORMAT(t.ETA, 'yyyy-MM-dd') AS ETA,
     t.Progress_Percentage,
     t.Notes,
     DATEDIFF(DAY, t.Created_At, GETDATE()) AS Days_Since_Created,  
@@ -186,6 +215,44 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
 
 
 
+
+
+
+
+        public bool SaveTicketHistory(string Ticket_ID, string Status, int Progress_Percentage)
+        {
+            try
+            {
+                cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+
+                // 🔹 Safely get current user ID
+                int updated_by = 0;
+                if (HttpContext.Current.Session["SigninId"] != null)
+                    updated_by = Convert.ToInt32(HttpContext.Current.Session["SigninId"]);
+
+                // 🔹 Build SQL Query (same pattern as your Tickets insert)
+                string sql = "INSERT INTO SRM.Ticket_History " +
+                             "(TicketID, Status, Progress_Percentage, Updated_By, Updated_At) " +
+                             "VALUES ('" + Ticket_ID + "', '" + Status + "', " + Progress_Percentage + ", " + updated_by + ", GETDATE())";
+
+                oDAL.Execute(sql);
+
+                if (oDAL.HasErrors)
+                {
+                    ErrorMessage = oDAL.ErrMessage;
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                return false;
+            }
+        }
+
+
         public bool SaveComment(int ticketId, int userId, string commentText)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
@@ -207,6 +274,16 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
 
 
 
+        public DataTable NewTicketEmailTemplate()
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
+            string sql = @"
+        SELECT TOP 1 SysValue 
+        FROM [dbo].[zSysIni] 
+        WHERE SysDesc = 'NEWTICKETEMAIL'
+        ORDER BY SysCode DESC";
+            return oDAL.GetData(sql);
+        }
 
 
 

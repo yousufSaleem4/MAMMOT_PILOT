@@ -43,7 +43,41 @@ namespace PlusCP.Controllers
             return jsonResult;
         }
 
-  
+        //public ActionResult GetTicketInfo(string ticketId)
+        //{
+        //    try
+        //    {
+        //        TicketSystem oTicket = new TicketSystem();
+
+        //        bool success = oTicket.GetDetail(ticketId);
+        //        oTicket.serializer = new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
+
+        //        if (success)
+        //            return View(oTicket);
+        //        else
+        //            return View(oTicket);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        ViewBag.ErrMessage = e.Message;
+        //        return View();
+        //    }
+        //}
+
+        [HttpPost]
+        public JsonResult UpdateTicket(string Ticket_ID, string Title, string Description, string Ticket_Type,
+                                 string Status, string Priority, DateTime ETA,
+                                 int Progress_Percentage, string Notes)
+        {
+            TicketSystem oTicket = new TicketSystem();
+            bool success = oTicket.UpdateTicket(Ticket_ID, Title, Description, Ticket_Type, Status, Priority, ETA, Progress_Percentage, Notes);
+            oTicket.SaveTicketHistory(Ticket_ID, Status, Progress_Percentage);
+            if (success)
+                return Json(new { success = true, message = "✅ Ticket updated successfully!" });
+            else
+                return Json(new { success = false, message = "❌ Error: " + oTicket.ErrorMessage });
+        }
+
         public ActionResult Detail(string ticketId)
         {
             try
@@ -65,10 +99,44 @@ namespace PlusCP.Controllers
             }
         }
 
+        [HttpGet]
+        public JsonResult GetTicketById(string ticketId)
+        {
+            try
+            {
+                TicketSystem oTicket = new TicketSystem();
+                bool success = oTicket.GetDetail(ticketId);
+
+                if (success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        ticket_id = oTicket.ticket_id,
+                        title = oTicket.title,
+                        description = oTicket.description,
+                        ticket_type = oTicket.ticket_type,
+                        status = oTicket.status,
+                        priority = oTicket.priority,
+                        eta = oTicket.eta,
+                        progress = oTicket.progress,
+                        notes = oTicket.notes
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Ticket not found" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
 
         [HttpPost]
         public JsonResult SaveTicket(string title, string description, string ticket_type, string status,
-                             string priority, DateTime eta, int progress_percentage, string notes)
+                                     string priority, DateTime eta, int progress_percentage, string notes)
         {
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);
@@ -84,29 +152,32 @@ namespace PlusCP.Controllers
                 progress_percentage,
                 notes
             );
+          
 
             if (result)
             {
-                string adminEmail = "mohsinsaleemshahani@gmail.com"; 
+                string adminEmail = "mohsinsaleemshahani@gmail.com";
                 string subject = $"New Ticket Created - {title}";
-                string htmlBody = $@"
-<html>
-<body style='font-family:Segoe UI, Arial, sans-serif; background-color:#f8f9fb; padding:20px;'>
-    <div style='max-width:600px; margin:auto; background:#fff; border-radius:8px; box-shadow:0 3px 8px rgba(0,0,0,0.1); padding:20px;'>
-        <h3 style='color:#0078D7;'>New Ticket Created</h3>
-        <p><b>Title:</b> {title}</p>
-        <p><b>Description:</b> {description}</p>
-        <p><b>Priority:</b> {priority}</p>
-        <p><b>Status:</b> {status}</p>
-        <p><b>ETA:</b> {eta:yyyy-MM-dd}</p>
-        <p><b>Created By ID:</b> {created_by}</p>
-        <hr style='border:none; border-top:1px solid #e0e0e0; margin:20px 0;' />
-        <p style='font-size:13px; color:#666;'>This is an auto-generated email from the Ticket System.</p>
-    </div>
-</body>
-</html>";
 
+                // 🧩 Fetch HTML template from DB
+                DataTable dtTemplate = oTicket.NewTicketEmailTemplate();
+                string htmlBody = "";
 
+                if (dtTemplate.Rows.Count > 0)
+                    htmlBody = dtTemplate.Rows[0]["SysValue"].ToString();
+                else
+                    htmlBody = "<p>Email template not found in zSysIni.</p>";
+
+                // 🔄 Replace placeholders
+                htmlBody = htmlBody
+                    .Replace("{title}", title)
+                    .Replace("{description}", description)
+                    .Replace("{priority}", priority)
+                    .Replace("{status}", status)
+                    .Replace("{eta}", eta.ToString("yyyy-MM-dd"))
+                    .Replace("{created_by}", created_by.ToString());
+
+                // ✉️ Send email
                 string emailResult = cCommon.SendEmail(adminEmail, subject, htmlBody, "", null);
 
                 if (emailResult == "SENT")
@@ -137,6 +208,8 @@ namespace PlusCP.Controllers
             return Json(assigneeList, JsonRequestBehavior.AllowGet);
         }
 
+
+    
 
         [HttpPost]
         public JsonResult InsertComment(int ticketId, string commentText)
