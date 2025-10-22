@@ -177,13 +177,13 @@ namespace PlusCP.Controllers
                 ? cCommon.SendEmail(adminEmail, subject, htmlBody, "", null)
                 : "NO_EMAIL_FOUND";
 
-            // 🔹 8. Response
             if (emailResult == "SENT")
-                return Json(new { success = true, message = $"Ticket created and email sent to {adminEmail}" });
+                return Json(new { success = true, message = $"Ticket created." });
             else if (emailResult == "NO_EMAIL_FOUND")
                 return Json(new { success = true, message = "Ticket created but no admin email found." });
             else
-                return Json(new { success = true, message = $"Ticket created but email failed to send to {adminEmail}." });
+                return Json(new { success = true, message = $"Ticket created." });
+
         }
 
 
