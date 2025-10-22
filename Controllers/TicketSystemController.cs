@@ -56,9 +56,9 @@ namespace PlusCP.Controllers
             bool success = oTicket.UpdateTicket(Ticket_ID, Title, Description, Ticket_Type, Status, Priority, ETA, Progress_Percentage, Notes);
             oTicket.SaveTicketHistory(Ticket_ID, Status, Progress_Percentage);
             if (success)
-                return Json(new { success = true, message = "✅ Ticket updated successfully!" });
+                return Json(new { success = true, message = "Ticket updated successfully!" });
             else
-                return Json(new { success = false, message = "❌ Error: " + oTicket.ErrorMessage });
+                return Json(new { success = false, message = " Error: " + oTicket.ErrorMessage });
         }
 
         public ActionResult Detail(string ticketId)
@@ -124,7 +124,7 @@ namespace PlusCP.Controllers
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);
             string decodedDescription = HttpUtility.UrlDecode(description);
-            // 🔹 1. Create Ticket via SP (returns TicketId)
+
             string ticketId = oTicket.CreateTicket(
                 title,
                 decodedDescription,
@@ -140,29 +140,24 @@ namespace PlusCP.Controllers
             if (string.IsNullOrEmpty(ticketId))
                 return Json(new { success = false, message = oTicket.ErrorMessage });
 
-            // 🔹 2. Insert Ticket History
             oTicket.SaveTicketHistory(ticketId, status, progress_percentage);
 
-            // 🔹 3. Read configuration values
             string deployMode = ConfigurationManager.AppSettings["DEPLOYMODE"]?.Trim().ToUpper() ?? "TEST";
             string testEmail = ConfigurationManager.AppSettings["TESTEMAIL"]?.Trim();
 
             string adminEmail = string.Empty;
 
-            // 🔹 4. Logic: if TEST mode → use TESTEMAIL from config
             if (deployMode == "TEST")
             {
                 adminEmail = testEmail;
             }
             else
             {
-                // 🔹 5. Else, get admin email from UserInfo table
                 DataTable dtAdmin = oTicket.GetAdminEmail();
                 if (dtAdmin.Rows.Count > 0)
                     adminEmail = dtAdmin.Rows[0]["Email"].ToString();
             }
 
-            // 🔹 6. Prepare Email
             string subject = $"New Ticket Created - {title}";
             DataTable dtTemplate = oTicket.NewTicketEmailTemplate();
 
@@ -178,18 +173,17 @@ namespace PlusCP.Controllers
                 .Replace("{eta}", eta.ToString("yyyy-MM-dd"))
                 .Replace("{created_by}", created_by.ToString());
 
-            // 🔹 7. Send email (if address found)
             string emailResult = !string.IsNullOrEmpty(adminEmail)
                 ? cCommon.SendEmail(adminEmail, subject, htmlBody, "", null)
                 : "NO_EMAIL_FOUND";
 
             // 🔹 8. Response
             if (emailResult == "SENT")
-                return Json(new { success = true, message = $"✅ Ticket created and email sent to {adminEmail}" });
+                return Json(new { success = true, message = $"Ticket created and email sent to {adminEmail}" });
             else if (emailResult == "NO_EMAIL_FOUND")
-                return Json(new { success = true, message = "✅ Ticket created but no admin email found." });
+                return Json(new { success = true, message = "Ticket created but no admin email found." });
             else
-                return Json(new { success = true, message = $"✅ Ticket created but email failed to send to {adminEmail}." });
+                return Json(new { success = true, message = $"Ticket created but email failed to send to {adminEmail}." });
         }
 
 
@@ -216,7 +210,6 @@ namespace PlusCP.Controllers
         {
             TicketSystem oTicket = new TicketSystem();
 
-            // ✅ Created_By session se lo (user ID)
             int userId = Convert.ToInt32(Session["SigninId"]);
 
             bool result = oTicket.SaveComment(
@@ -226,7 +219,7 @@ namespace PlusCP.Controllers
             );
 
             if (result)
-                return Json(new { success = true, message = "✅ Ticket created successfully!" });
+                return Json(new { success = true, message = "Ticket created successfully!" });
             else
                 return Json(new { success = false, message = oTicket.ErrorMessage });
         }

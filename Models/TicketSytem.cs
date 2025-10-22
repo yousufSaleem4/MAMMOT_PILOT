@@ -45,7 +45,6 @@ where email = 'mohsin@collablly.com' ";
         }
 
 
-        // 🔹 Load ticket list with filters
         public bool GetData(string status, string ticket_type, string priority)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
@@ -70,7 +69,6 @@ LEFT JOIN SRM.UserInfo cu ON t.Created_By = cu.UserId
 LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
                 WHERE 1=1";
 
-            // 🔹 Apply filters dynamically
             if (!string.IsNullOrEmpty(status))
                 sql += " AND  t.Status = '" + status + "'";
 
@@ -216,7 +214,6 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
                 return null;
             }
 
-            // ✅ Return Ticket_Id from SP
             return dt.Rows[0]["Ticket_Id"].ToString();
         }
 
@@ -236,7 +233,6 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
                 if (HttpContext.Current.Session["SigninId"] != null)
                     updated_by = Convert.ToInt32(HttpContext.Current.Session["SigninId"]);
 
-                // 🔹 Build SQL Query (same pattern as your Tickets insert)
                 string sql = "INSERT INTO SRM.Ticket_History " +
                              "(TicketID, Status, Progress_Percentage, Updated_By, Updated_At) " +
                              "VALUES ('" + Ticket_ID + "', '" + Status + "', " + Progress_Percentage + ", " + updated_by + ", GETDATE())";
@@ -263,7 +259,6 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
 
-            // Build SQL string like your CreateTicket method
             string sql = "INSERT INTO SRM.Comments (TicketID, UserID, Comment_Text, Created_At, Updated_At) " +
                          "VALUES (" + ticketId + ", " + userId + ", '" + commentText.Replace("'", "''") + "', GETDATE(), GETDATE())";
 
