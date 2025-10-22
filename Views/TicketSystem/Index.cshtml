@@ -10,121 +10,109 @@
 
 <style>
 
-
-    body {
-        background-color: #f8f9fa;
-        font-family: 'Segoe UI', sans-serif;
+    .box-header {
+        background-color: #f8f9fc !important;
+        color: #003B59 !important;
+        border-bottom: 2px solid #f8f9fc;
+        box-shadow: 0px 5px #ededed;
     }
 
-    .ticket-card {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        padding: 20px;
-        height: 80%;
+
+    .btn-badges {
+        background-color: #003B59 !important;
+        color: white !important;
+        border-radius: 25px !important;
+        margin-left: 5px !important;
+        height: 25px !important;
+        padding: 2px 12px !important;
     }
 
-    .ticket-header {
-        border-bottom: 2px solid #dee2e6;
-        padding-bottom: 12px;
-        margin-bottom: 20px;
-    }
-
-        .ticket-header h3 {
-            font-weight: 600;
-            color: #333;
+        .btn-badges:hover {
+            background-color: #003B59 !important;
+            color: white !important;
         }
 
-    .filters select {
-        border-radius: 10px;
+    table.table thead th {
+        background-color: #003B59 !important; /* Change to your desired color */
+        color: white; /* Change to desired text color */
+        font-size: 15px;
+        font-family: 'Poppins', sans-serif;
+        height: 40px;
     }
 
-    #lstTicket_wrapper {
-        margin-top: 15px;
+    table.table tbody td, lbl_ {
+        /*background-color: white !important; /* Change to your desired color */
+        font-size: 15px;
+        color: #003B59 !important;
     }
 
-    .dataTables_wrapper .dataTables_filter {
-        display: none !important;
+    table.table tbody tr {
+        height: 50px; /* Adjust height as needed */
     }
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        border-radius: 6px !important;
-    }
-
-    table.dataTable {
-        border-collapse: collapse !important;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-        table.dataTable thead {
-            background-color: #003B59;
-            color: #fff !important;
-            text-align: center;
+        /* Hover effect */
+        table.table tbody tr:hover {
+            background-color: #f5f5f5 !important; /* Light gray background on hover */
+            transition: background-color 0.8s ease-in-out;
+            cursor: pointer;
         }
 
-        table.dataTable tbody tr:hover {
-            /*background-color: #f1f1f1;*/
-        }
 
-    .search-box {
-        display: flex;
-        align-items: center;
-        background: #fff;
-        border-radius: 8px;
-        padding: 6px 12px;
-        border: 1px solid #ced4da;
-        width: 220px;
+
+
+    table th {
+        /*padding: 1rem 0.5rem !important;*/
+        border: 1px solid white;
+        border-bottom: 1px solid white;
+        /*padding: 8px;*/
+        text-align: left;
     }
 
-        .search-box input {
-            border: none;
-            outline: none;
-            width: 100%;
-            font-size: 14px;
-            margin-left: 8px;
-        }
-
-        .search-box i {
-            color: #6c757d;
-        }
-
-    #buttons {
-        margin-bottom: 10px;
+    table td {
+        padding: 1rem 0.5rem !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        vertical-align: middle;
     }
 
-    /* Force white text for all header cells */
-    table.dataTable thead th {
-        color: #ffffff !important;
+    
+
+        table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td {
+            border-bottom-width: 1px;
+        }
+
+
+    #ticketForm label {
+        font-weight: 600;
+        color: #333;
     }
 
-        /* Also make sure sorting icons stay white */
-        table.dataTable thead th.sorting::after,
-        table.dataTable thead th.sorting_asc::after,
-        table.dataTable thead th.sorting_desc::after {
-            color: #ffffff !important;
-            opacity: 1;
-        }
+    #ticketForm .form-control,
+    #ticketForm .form-select {
+        border-radius: 6px;
+        box-shadow: none;
+    }
 
 
 
     /* XXL Modal Width */
-    .modal-xxl {
+   /* .modal-xxl {
         max-width: 95%;
         width: 95%;
-    }
+    }*/
 
     /* Scroll + Padding */
     .modal-body {
-        max-height: 70vh;
+        max-height: 72vh;
         overflow-y: hidden;
         padding: 2rem 3rem;
     }
 
-    .modal-header,
+    /*.modal-header,
     .modal-footer {
-        padding: 1rem 2rem;
-    }
+        background-color: #D6EFE8;
+        color: #003B59
+    }*/
 
     .form-label {
         font-weight: 600;
@@ -135,8 +123,8 @@
     .form-select {
         border-radius: 50px !important;
         border: 1px solid #00b4d8 !important;
-        padding: 8px 18px !important;
-        font-weight: 500;
+        padding: 4px 9px !important;
+        /*font-weight: 500;*/
         color: #003b59;
         background-color: #ffffff;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
@@ -146,6 +134,7 @@
         /* Hover + focus effects */
         .form-select:hover {
             box-shadow: 0 3px 8px rgba(0, 180, 216, 0.2);
+
         }
 
         .form-select:focus {
@@ -154,26 +143,18 @@
             outline: none;
         }
 
-
-    /* Card Styling */
-    .card {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
-    }
-
+  
+    
     /* Gradient Header */
     .modal-header {
-        background: #003B59;
-        color: white;
-        border-bottom: none;
+        background-color: #D6EFE8;
+        color: #003B59
     }
 
-    .modal-footer {
+    /*.modal-footer {
         background: #f8f9fa;
         border-top: none;
-    }
+    }*/
 
     /* Add spacing between form fields */
     .mb-3 {
@@ -185,101 +166,78 @@
         top: 1rem;
         right: 1rem;
     }
-
-    .filter-container {
-        position: relative; /* parent ko relative karo */
-    }
-
-    #btnCreateTicket {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        /* Dropdown jaisa style */
-        background-color: #fff; /* white background */
-        color: #0d6efd; /* Bootstrap primary blue text */
-        border: 1px solid #0d6efd; /* blue border */
-        border-radius: 50px; /* rounded pill */
-        padding: 0.375rem 1rem; /* height similar to selects */
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-        /* Hover effect similar to form-select */
-        #btnCreateTicket:hover {
-            background-color: #e7f1ff; /* light blue on hover */
-            color: #0d6efd;
-            border-color: #0d6efd;
-        }
-
+    
     /* Priority badges */
+    /* Priority badges - border only */
     .priority-badge {
         display: inline-block;
-        padding: 5px 10px;
+        padding: 4px 10px;
         border-radius: 12px;
         font-weight: 600;
-        color: #fff;
         font-size: 0.85rem;
         text-align: center;
+        background-color: transparent !important;
     }
 
+    /* Border colors instead of background */
     .priority-critical {
-        background-color: #dc3545; /* red */
+        border: 2px solid #dc3545;
+        color: #dc3545;
     }
 
     .priority-high {
-        background-color: #fd7e14; /* orange */
+        border: 2px solid #fd7e14;
+        color: #fd7e14;
     }
 
     .priority-medium {
-        background-color: #0dcaf0; /* cyan/blue */
-        color: #000; /* dark text for contrast */
+        border: 2px solid #0047AB;
+        color: #0047AB;
     }
 
     .priority-low {
-        background-color: #198754; /* green */
+        border: 2px solid #198754;
+        color: #198754;
     }
+
+
+    .btnCreate {
+        background-color: #003B59; /* Default background color */
+        border-color: #003B59; /* Default border color */
+        color: #fff; /* Default text color */
+    }
+
+    .btnCreate:hover {
+        background-color: transparent; /* Make background transparent on hover */
+        border-color: #003B59; /* Dark border color on hover */
+        color: #003B59; /* Dark font color on hover */
+    }
+
+
+    .btnClose {
+        background-color: whitesmoke; /* Make background transparent on hover */
+        color: #003B59; /* Dark font color on hover */
+        transform: scale(1.05); /* Slightly scale up the card on hover */
+    }
+
+        .btnClose:hover {
+            border: 1px solid #003B59; /* Thicker border with dark color on hover */
+            color: #003B59; /* Dark font color on hover */
+            transform: scale(1.05); /* Slightly scale up the card on hover */
+            -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* More pronounced shadow on hover */
+        }
 </style>
 
-<div class="container mt-5 mb-5">
-    <div class="ticket-card">
-        <div class="ticket-header d-flex justify-content-between align-items-center">
-            <h3><i class="fa fa-ticket text-primary"></i> Ticket Management</h3>
-        </div>
 
-        <div class="d-flex align-items-center mb-3 filter-container">
-            <select id="filterStatus" class="form-select rounded-pill border-primary text-primary fw-semibold shadow me-2">
-                <option value="">All Status</option>
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Closed">Closed</option>
-            </select>
+        
 
-            <select id="filterType" class="form-select rounded-pill border-primary text-primary fw-semibold shadow me-2">
-                <option value="">All Types</option>
-                <option value="Bug">Bug</option>
-                <option value="Feature">Feature</option>
-            </select>
-
-            <select id="filterPriority" class="form-select rounded-pill border-primary text-primary fw-semibold shadow me-2">
-                <option value="">All Priorities</option>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
-            </select>
-
-            <button id="btnCreateTicket" class="btn btn-success">
-                <i class="fa fa-plus"></i> Create Ticket
-            </button>
-        </div>
 
 
 
         <!-- Create Ticket Modal -->
         <div class="modal fade" id="createTicketModal" tabindex="-1" aria-labelledby="createTicketModalLabel">
-            <div class="modal-dialog modal-xxl modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 rounded-4 shadow-lg">
 
                     <!-- Header -->
@@ -292,118 +250,108 @@
                     </div>
 
                     <!-- Body -->
-                    <div class="modal-body bg-light">
+                    <div class="modal-body bg-light" style="font-size: 14px; padding: 10px;">
                         <form id="ticketForm">
-                            <div class="row g-4">
+                            <div class="card shadow-sm" style="max-width: 600px; margin: 0 auto; padding: 10px; border-radius: 10px;">
 
-                                <!-- Left Column -->
-                                <div class="col-md-6">
-                                    <div class="card h-100 p-3">
-                                        <h5 class="text-primary fw-bold mb-3">
-                                            <i class="fas fa-info-circle me-2"></i>
-                                            Ticket Information
-                                        </h5>
+                                <!-- 🔹 Tracker + Status -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold small">
+                                            Tracker <span class="text-danger">*</span>
+                                        </label>
+                                        <select id="ticket_type" class="form-select form-select-sm">
+                                            <option value="">Select Type</option>
+                                            <option value="Bug">Bug</option>
+                                            <option value="Feature">Feature</option>
+                                        </select>
+                                    </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Tracker <span class="text-danger">*</span>
-                                            </label>
-                                            <select id="ticket_type" class="form-select">
-                                                <option value="">Select Type</option>
-                                                <option value="Bug">Bug</option>
-                                                <option value="Feature">Feature</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Title <span class="text-danger">*</span>
-                                            </label>
-                                            <input type="text" id="title" class="form-control" placeholder="Enter ticket title" />
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Description <span class="text-danger">*</span>
-                                            </label>
-                                            <textarea id="description" class="form-control" rows="8" placeholder="Describe the issue..."></textarea>
-                                        </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold small">
+                                            Status <span class="text-danger">*</span>
+                                        </label>
+                                        <select id="status" class="form-select form-select-sm">
+                                            <option value="Open">Open</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Resolved">Resolved</option>
+                                            <option value="Closed">Closed</option>
+                                        </select>
                                     </div>
                                 </div>
 
-                                <!-- Right Column -->
-                                <div class="col-md-6">
-                                    <div class="card h-100 p-3">
-                                        <h5 class="text-primary fw-bold mb-3">
-                                            <i class="fas fa-cogs me-2"></i>
-                                            Ticket Details
-                                        </h5>
+                                <!-- 🔹 Title -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">
+                                        Title <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" id="title" class="form-control form-control-sm" placeholder="Enter ticket title" />
+                                </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Status <span class="text-danger">*</span>
-                                            </label>
-                                            <select id="status" class="form-select">
-                                                <option value="Open">Open</option>
-                                                <option value="In Progress">In Progress</option>
-                                                <option value="Resolved">Resolved</option>
-                                                <option value="Closed">Closed</option>
-                                            </select>
-                                        </div>
+                                <!-- 🔹 Description -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">
+                                        Description <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea id="description" class="form-control form-control-sm" rows="3" placeholder="Describe the issue..."></textarea>
+                                </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Priority <span class="text-danger">*</span>
-                                            </label>
-                                            <select id="priority" class="form-select">
-                                                <option value="Low">Low</option>
-                                                <option value="Medium">Medium</option>
-                                                <option value="High">High</option>
-                                                <option value="Critical">Critical</option>
-                                            </select>
-                                        </div>
+                                <!-- 🔹 % Done + Priority + ETA -->
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-semibold small">% Done</label>
+                                        <select id="progress_percentage" class="form-select form-select-sm">
+                                            <option value="0">0%</option>
+                                            <option value="10">10%</option>
+                                            <option value="20">20%</option>
+                                            <option value="30">30%</option>
+                                            <option value="40">40%</option>
+                                            <option value="50">50%</option>
+                                            <option value="60">60%</option>
+                                            <option value="70">70%</option>
+                                            <option value="80">80%</option>
+                                            <option value="90">90%</option>
+                                            <option value="100">100%</option>
+                                        </select>
+                                    </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">% Done</label>
-                                            <select id="progress_percentage" class="form-select">
-                                                <option value="0">0%</option>
-                                                <option value="10">10%</option>
-                                                <option value="20">20%</option>
-                                                <option value="30">30%</option>
-                                                <option value="40">40%</option>
-                                                <option value="50">50%</option>
-                                                <option value="60">60%</option>
-                                                <option value="70">70%</option>
-                                                <option value="80">80%</option>
-                                                <option value="90">90%</option>
-                                                <option value="100">100%</option>
-                                            </select>
-                                        </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-semibold small">
+                                            Priority <span class="text-danger">*</span>
+                                        </label>
+                                        <select id="priority" class="form-select form-select-sm">
+                                            <option value="Low">Low</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="High">High</option>
+                                            <option value="Critical">Critical</option>
+                                        </select>
+                                    </div>
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-semibold">
-                                                    ETA (Due Date) <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="date" id="eta" class="form-control" />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label class="form-label fw-semibold">Additional Notes</label>
-                                            <textarea id="notes" class="form-control" rows="3" placeholder="Optional notes or comments"></textarea>
-                                        </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-semibold small">
+                                            ETA (Due Date) <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="date" id="eta" class="form-control form-control-sm" />
                                     </div>
                                 </div>
+
+                                <!-- 🔹 Notes -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Additional Notes</label>
+                                    <textarea id="notes" class="form-control form-control-sm" rows="2" placeholder="Optional notes or comments"></textarea>
+                                </div>
+
                             </div>
                         </form>
                     </div>
 
+
+
                     <!-- Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary px-4" data-dismiss="modal">Cancel</button>
-                        <button type="button" id="btnSaveTicket" class="btn btn-success px-4">
-                            <i class="fas fa-plus me-2"></i> Create
+                        <button type="button" class="btnClose" data-dismiss="modal">Cancel</button>
+                        <button type="button" id="btnSaveTicket" class="btnCreate">
+                            Create
                         </button>
                     </div>
                 </div>
@@ -413,428 +361,464 @@
 
 
 
+        <div id="parentDiv" class="container-fluid">
+            
+
+            <div id="dataList" class="box panel panel-default">
+                <div class="box-header with-border">
+                    <h5 class="box-title"><strong style="font-size:14px !important;">Ticket Management     </strong><strong id="filterString"></strong></h5>
+                    <select id="filterStatus" class="form-select rounded-pill border-primary text-primary fw-semibold shadow me-2">
+                        <option value="">All Status</option>
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+
+                    <select id="filterType" class="form-select rounded-pill border-primary text-primary fw-semibold shadow me-2">
+                        <option value="">All Types</option>
+                        <option value="Bug">Bug</option>
+                        <option value="Feature">Feature</option>
+                    </select>
+
+                    <select id="filterPriority" class="form-select rounded-pill border-primary text-primary fw-semibold shadow me-2">
+                        <option value="">All Priorities</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                    <button id="btnCreateTicket" class="btn btn-badges">
+                        <i class="fa fa-plus"></i> Create Ticket
+                    </button>
 
 
-        <!-- 🔹 Data Grid -->
-
-        <table id="lstTicket" class="table table-bordered table-striped text-sm table-hover" width="100%">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
 
 
-
-        <!-- Toast Container -->
-        <div id="toastMessage" style="display:none; position:fixed; top:10px; right:10px; padding:10px; color:white; z-index:9999;"></div>
-
+                    @*<div id="buttons" class="box-tools pull-right">
+                    </div>*@
 
 
-    </div>
-</div>
+                </div>
+                <!-- 🔹 Data Grid -->
+                <div class="box-body bg-light card mt-4" id="lstP">
+                    <table id="lstTicket" class="table table-bordered table-striped text-sm table-hover" width="100%">
+                        <thead class="sorted-asc fw-light small">
+                            <tr style="background-color: white">
+                                
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
 
-<script src="~/Scripts/jquery.dataTables.colResize.js"></script>
-<script src="~/Scripts/Message.js"></script>
-<script src="~/Scripts/DatatableColReorder.js"></script>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
 
-<script>
-    $(document).ready(function () {
-        LoadData();
-        loadAssigneeDropdown();
+                            </tr>
+                        </thead>
+                        
+                    </table>
+                </div>
 
-        // 🔹 Auto reload on filter change
-        $('#filterStatus, #filterType, #filterPriority').change(function () {
-            LoadData();
-        });
 
-        $('#btnCreateTicket').click(function () {
-            $('#ticketForm')[0].reset();
-            $('#createTicketModal').modal('show');
-            loadAssigneeDropdown();
-        });
 
-        $('#btnSaveTicket').click(function () {
-            debugger;
-            var ticketData = {
-                title: $('#title').val().trim(),
-                description: $('#description').val().trim(),
-                ticket_type: $('#ticket_type').val(),
-                status: $('#status').val(),
-                priority: $('#priority').val(),
-                eta: $('#eta').val(),
-                progress_percentage: $('#progress_percentage').val(),
-                notes: $('#notes').val().trim()
-            };
+            </div>
+        </div>
+     
+      <script src="~/Scripts/jquery.dataTables.colResize.js"></script>
+            <script src="~/Scripts/Message.js"></script>
+            <script src="~/Scripts/DatatableColReorder.js"></script>
 
-            // ✅ Client-side validation
-            if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
-                !ticketData.status || !ticketData.priority || !ticketData.eta || !ticketData.progress_percentage
-                || !ticketData.notes) {
+            <script>
+                $(document).ready(function () {
+                    LoadData();
+                    loadAssigneeDropdown();
 
-                MsgToast('⚠️ Please fill all required fields before saving.', 'Validation Error', 'warning');
-
-                return;
-            }
-
-            console.log("🚀 Sending Ticket Data:", ticketData);
-
-            $.ajax({
-                url: '/TicketSystem/SaveTicket',
-                type: 'POST',
-                data: ticketData,
-                success: function (response) {
-                    if (response.success) {
-                        MsgToast(response.message || '✅ Ticket created successfully.', 'Success', 'success');
-                        $('#createTicketModal').modal('hide');
+                    // 🔹 Auto reload on filter change
+                    $('#filterStatus, #filterType, #filterPriority').change(function () {
                         LoadData();
-                    } else {
-                        MsgToast(response.message || '❌ Failed to save ticket.', 'Error', 'error');
-                    }
-                },
-                error: function (xhr) {
-                    MsgToast('❌ Something went wrong while saving the ticket.', 'Error', 'error');
-                }
-
-            });
-        });
-
-
-
-        function loadAssigneeDropdown() {
-            $.ajax({
-                url: '/TicketSystem/GetAssigneeList',
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    var ddl = $('#ddlAssignee');
-                    ddl.empty();
-                    ddl.append('<option value="">Select User</option>');
-
-                    $.each(data, function (i, item) {
-                        ddl.append('<option value="' + item.userId + '">' + item.assignee + '</option>');
                     });
-                },
-                error: function () {
-                    MsgToast('❌ Error loading assignee list.', 'Error', 'error');
 
-                }
-            });
-        }
-    });
+                    $('#btnCreateTicket').click(function () {
+                        $('#ticketForm')[0].reset();
+                        $('#createTicketModal').modal('show');
+                        loadAssigneeDropdown();
+                    });
 
+                    $('#btnSaveTicket').click(function () {
+                        debugger;
+                        var ticketData = {
+                            title: $('#title').val().trim(),
+                            description: $('#description').val().trim(),
+                            ticket_type: $('#ticket_type').val(),
+                            status: $('#status').val(),
+                            priority: $('#priority').val(),
+                            eta: $('#eta').val(),
+                            progress_percentage: $('#progress_percentage').val(),
+                            notes: $('#notes').val().trim()
+                        };
 
+                        // ✅ Client-side validation
+                        if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
+                            !ticketData.status || !ticketData.priority || !ticketData.eta || !ticketData.progress_percentage
+                            || !ticketData.notes) {
 
-    function LoadData() {
-        $.ajax({
-            cache: false,
-            type: "GET",
-            url: "/TicketSystem/GetList",
-            data: {
-                status: $('#filterStatus').val(),
-                ticket_type: $('#filterType').val(),
-                priority: $('#filterPriority').val()
-            },
-            dataType: "json",
-            success: function (data) {
-                if (data && data.lstTicket) {
-                    var columnDef = [
-                        {
-                            "data": "Ticket_Id", "title": "Ticket #", "width": "80px",
-                            render: function (data, type, row) {
-                                var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
-                                return '<a href="' + url + '" target="_blank">' + data + '</a>';
+                            MsgToast('⚠️ Please fill all required fields before saving.', 'Validation Error', 'warning');
+
+                            return;
+                        }
+
+                        console.log("🚀 Sending Ticket Data:", ticketData);
+
+                        $.ajax({
+                            url: '/TicketSystem/SaveTicket',
+                            type: 'POST',
+                            data: ticketData,
+                            success: function (response) {
+                                if (response.success) {
+                                    MsgToast(response.message || '✅ Ticket created successfully.', 'Success', 'success');
+                                    $('#createTicketModal').modal('hide');
+                                    LoadData();
+                                } else {
+                                    MsgToast(response.message || '❌ Failed to save ticket.', 'Error', 'error');
+                                }
+                            },
+                            error: function (xhr) {
+                                MsgToast('❌ Something went wrong while saving the ticket.', 'Error', 'error');
                             }
-                        },
-                        {
-                            "data": "Title", "title": "Title",
-                            render: function (data, type, row) {
-                                var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
-                                return '<a href="' + url + '" target="_blank">' + data + '</a>';
+
+                        });
+                    });
+
+
+
+                    function loadAssigneeDropdown() {
+                        $.ajax({
+                            url: '/TicketSystem/GetAssigneeList',
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                var ddl = $('#ddlAssignee');
+                                ddl.empty();
+                                ddl.append('<option value="">Select User</option>');
+
+                                $.each(data, function (i, item) {
+                                    ddl.append('<option value="' + item.userId + '">' + item.assignee + '</option>');
+                                });
+                            },
+                            error: function () {
+                                MsgToast('❌ Error loading assignee list.', 'Error', 'error');
+
                             }
+                        });
+                    }
+                });
+
+
+
+                function LoadData() {
+                    $.ajax({
+                        cache: false,
+                        type: "GET",
+                        url: "/TicketSystem/GetList",
+                        data: {
+                            status: $('#filterStatus').val(),
+                            ticket_type: $('#filterType').val(),
+                            priority: $('#filterPriority').val()
                         },
-                        { "data": "Ticket_Type", "title": "Type" },
-                        { "data": "Status", "title": "Status" },
-                        {
-                            "data": "Priority", "className": "text-center",
-                            "title": "Priority",
-                            render: function (data, type, row) {
-                                var className = '';
-                                switch (data.toLowerCase()) {
-                                    case 'critical': className = 'priority-critical'; break;
-                                    case 'high': className = 'priority-high'; break;
-                                    case 'medium': className = 'priority-medium'; break;
-                                    case 'low': className = 'priority-low'; break;
-                                    default: className = '';
+                        dataType: "json",
+                        success: function (data) {
+                            if (data && data.lstTicket) {
+                                var columnDef = [
+                                    {
+                                        "data": "Ticket_Id", "title": "Ticket #", "width": "80px",
+                                        render: function (data, type, row) {
+                                            var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
+                                            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+                                        }
+                                    },
+                                    {
+                                        "data": "Title", "title": "Title",
+                                        render: function (data, type, row) {
+                                            var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
+                                            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+                                        }
+                                    },
+                                    { "data": "Ticket_Type", "title": "Type" },
+                                    { "data": "Status", "title": "Status" },
+                                    {
+                                        "data": "Priority", "className": "text-center",
+                                        "title": "Priority",
+                                        render: function (data, type, row) {
+                                            var className = '';
+                                            switch (data.toLowerCase()) {
+                                                case 'critical': className = 'priority-critical'; break;
+                                                case 'high': className = 'priority-high'; break;
+                                                case 'medium': className = 'priority-medium'; break;
+                                                case 'low': className = 'priority-low'; break;
+                                                default: className = '';
+                                            }
+
+                                            return '<span class="priority-badge ' + className + '">' + data + '</span>';
+                                        }
+                                    },
+
+                                    {
+                                        "data": "Progress_Percentage",
+                                        "title": "Progress",
+                                        "className": "text-center",
+                                        render: function (data, type, row) {
+                                            if (data == null || data === '') return '0%';
+                                            return data + '%';
+                                        }
+                                    },
+
+                                    { "data": "ETA", "title": "ETA" },
+                                    { "data": "Created_At", "title": "Created At" },
+                                    {
+                                        "data": "Updated_At",
+                                        "title": "Updated At",
+                                        render: function (data, type, row) {
+                                            if (!data) return '';
+                                            var date = new Date(data);
+                                            var yyyy = date.getFullYear();
+                                            var mm = ('0' + (date.getMonth() + 1)).slice(-2);
+                                            var dd = ('0' + date.getDate()).slice(-2);
+                                            var hh = ('0' + date.getHours()).slice(-2);
+                                            var min = ('0' + date.getMinutes()).slice(-2);
+                                            return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
+                                        }
+                                    },
+
+                                    { "data": "Assigned_To_Name", "title": "Assigned To" },
+                                    { "data": "Created_By_Name", "title": "Created By" }
+                                ];
+
+                                // agar DataTable pehle se initialized hai to destroy karke reload karo
+                                if ($.fn.DataTable.isDataTable('#lstTicket')) {
+                                    $('#lstTicket').DataTable().clear().destroy();
                                 }
 
-                                return '<span class="priority-badge ' + className + '">' + data + '</span>';
+                                // chahe data empty ho, grid show karo
+                                MakeDataGridForTraining('lstTicket', data.lstTicket, 0, columnDef, 'buttons', true, true, false, false);
+                            }
+                        }
+
+
+                    });
+                }
+
+
+
+
+
+
+
+
+                function MakeDataGridForTraining(tableId, data, tableHeight, columns, buttonId, search, isScrollX, footerFunction, isFramed, detailed, reportTitleId, rowSelection, lstHeight) {
+                    var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
+                    var isFramed = isFramed === undefined || isFramed === false ? false : true;
+                    var isDetailed = detailed === undefined ? false : true;
+                    var reportTitle = '';
+
+                    if (reportTitleId === undefined)
+                        reportTitle = $('.box-title').text();
+                    else
+                        reportTitle = reportTitleId;
+
+                    var gridHeight = 0;
+
+                    isScrollX = isScrollX === undefined ? false : true;
+                    if (search === undefined) { search = true; }
+
+                    var gridButtonsClass = '';
+                    var gridSearchBoxClass = '';
+                    if (isDetailed === true) {
+                        gridButtonsClass = 'btn-header btn-box-tool';
+                        gridSearchBoxClass = 'bg-white';
+                        gridButtonSize = 30;
+                    }
+                    else {
+                        gridButtonsClass = 'btn-header btn-box-tool';
+                        gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
+                        gridButtonSize = 30;
+                    }
+
+                    var boxtool;
+                    if (search === true) {
+                        if (isFramed) {
+                            $('#trHeadSearch').empty();
+                            boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search..">
+        </div>`;
+                            $('#trHeadSearch').append(boxtool);
+                        } else {
+                            $('#' + buttonId).empty();
+                            boxtool = `
+        <div class="search-container">
+            <i class="fa fa-search search-icon"></i>
+            <input class="txtSearch-frame" id="txtFrameSearch${tableId}" type="text" placeholder="Search..">
+        </div>`;
+                            $('#' + buttonId).append(boxtool);
+                        }
+                    }
+                    else {
+                        if (isFramed) {
+                            $('#trHeadSearch').empty();
+                            boxtool = '<input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
+                            $('#trHeadSearch').append(boxtool);
+                        }
+                        else {
+                            $('#' + buttonId).empty();
+
+                        }
+                    }
+
+                    var table = $('#' + tableId).DataTable({
+                        order: [],
+                        createdRow: rowSelection,
+                        data: data,
+                        columns: columns,
+                        paging: true,
+                        ordering: true,
+                        searching: search,
+                        deferRender: true,
+                        destroy: true,
+                        pagingType: 'full',
+                        pageLength: 20,
+                        scrollCollapse: false,
+                        scrollX: isScrollX,
+                        colReorder: true,
+                        orderClasses: false,
+                        deferRender: true,
+                        select: true,
+                        colResize: true,
+                        //scrollY: gridHeight,
+
+                        footerCallback: footerFunction,
+                        language: {
+                            emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
+                            zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
+                            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                            oPaginate: {
+                                sNext: '<i class="fa fa-angle-right"></i>',
+                                sPrevious: '<i class="fa fa-angle-left"></i>',
+                                sFirst: '<i class="fa fa-angle-double-left"></i>',
+                                sLast: '<i class="fa fa-angle-double-right"></i>'
                             }
                         },
-
-                        {
-                            "data": "Progress_Percentage",
-                            "title": "Progress",
-                            "className": "text-center",
-                            render: function (data, type, row) {
-                                if (data == null || data === '') return '0%';
-                                return data + '%';
+                        "dom": "<'row'<'col-sm-12'tr>>" +
+                            "<'row'<'col-sm-5 dataTables_info' i><'col-sm-2 ms-3 dataTables_paginate' p>>",
+                        buttons: [
+                            {
+                                extend: 'copyHtml5',
+                                footer: true,
+                                text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
+                                titleAttr: 'Copy',
+                                title: reportTitle,
+                                filename: 'DataExport',
+                                exportOptions: {
+                                    //columns: ':visible'
+                                    columns: 'th:not(.notexport)' // Excluding columns while exporting
+                                }
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                footer: true,
+                                text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
+                                titleAttr: 'Export to excel',
+                                title: reportTitle,
+                                filename: 'DataExport', //Added By Tahir
+                                exportOptions: {
+                                    //columns: ':visible'
+                                    columns: 'th:not(.notexport)'
+                                }
+                            },
+                            {
+                                extend: 'print',
+                                footer: true,
+                                text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
+                                titleAttr: 'Print',
+                                title: '',
+                                messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
+                                filename: 'DataExport',
+                                exportOptions: {
+                                    // columns: ':visible'
+                                    columns: 'th:not(.notexport)'
+                                }
                             }
-                        },
+                        ],
+                        select: true
+                    });
+                    table.buttons().container()
+                        .appendTo('#buttons');
 
-                        { "data": "ETA", "title": "ETA" },
-                        { "data": "Created_At", "title": "Created At" },
-                        {
-                            "data": "Updated_At",
-                            "title": "Updated At",
-                            render: function (data, type, row) {
-                                if (!data) return '';
-                                var date = new Date(data);
-                                var yyyy = date.getFullYear();
-                                var mm = ('0' + (date.getMonth() + 1)).slice(-2);
-                                var dd = ('0' + date.getDate()).slice(-2);
-                                var hh = ('0' + date.getHours()).slice(-2);
-                                var min = ('0' + date.getMinutes()).slice(-2);
-                                return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
-                            }
-                        },
+                    table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
+                    table.button(0).nodes().addClass(gridButtonsClass);
 
-                        { "data": "Assigned_To_Name", "title": "Assigned To" },
-                        { "data": "Created_By_Name", "title": "Created By" }
-                    ];
+                    table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+                    table.button(1).nodes().addClass(gridButtonsClass);
 
-                    // agar DataTable pehle se initialized hai to destroy karke reload karo
-                    if ($.fn.DataTable.isDataTable('#lstTicket')) {
-                        $('#lstTicket').DataTable().clear().destroy();
+                    table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
+                    table.button(2).nodes().addClass(gridButtonsClass);
+
+                    var dsgndby = $('.modal-footer > #designedby ').html();
+
+                    if (dsgndby === "") {
+                        $('#designedBy').html($('.desgndBy').html());
                     }
 
-                    // chahe data empty ho, grid show karo
-                    MakeDataGridForTraining('lstTicket', data.lstTicket, 300, columnDef, false, false, false);
+                    var layoutHeader = $('nav').innerHeight();
+                    var cardHeader = $('.box-header').innerHeight();
+                    var tableHeader = $('.dataTables_scrollHead').innerHeight();
+                    var tableFooter = 0;
+                    var cardFooterH = 30;
+
+                    if (isFooter === true)
+                        tableFooter = $('.dataTables_scrollFoot').innerHeight();
+
+
+                    var parentHeight = $('#' + lstHeight).innerHeight();
+                    if (parentHeight == undefined)
+                        parentHeight = window.innerHeight;
+                    else
+                        parentHeight = $('#' + lstHeight).innerHeight();
+
+                    if (isFooter === true)
+                        tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
+
+                    var browserHeight = parentHeight;
+                    if (tableHeight === 0) {
+                        if (layoutHeader === undefined)
+                            gridHeight = browserHeight - (cardHeader + tableHeader + tableFooter + cardFooterH);
+                        else
+                            gridHeight = browserHeight - (layoutHeader + cardHeader + tableHeader + tableFooter + cardFooterH);
+                    }
+                    else { gridHeight = tableHeight; }
+
+                    var topHeader = $('#topHeader').innerHeight();
+                    if (topHeader > 0)
+                        gridHeight = gridHeight - (topHeader + 1);
+
+                    gridHeight = gridHeight - 6;
+
+                    $('.dataTables_scrollBody').css('height', gridHeight + 'px');
+                    table.columns.adjust().draw();
+
+                    $('#txtFrameSearch' + tableId).on('keyup change', function () {
+                        table.search(this.value).draw();
+                    });
+                    $('.dataTables_filter').hide();
+                    table.columns.adjust().draw();
+
+
+                    //return table;
                 }
-            }
-
-
-        });
-    }
-
-
-
-
-
-
-
-
-    function MakeDataGridForTraining(tableId, data, tableHeight, columns, buttonId, search, isScrollX, footerFunction, isFramed, detailed, reportTitleId, rowSelection, lstHeight) {
-        var isFooter = footerFunction === undefined || footerFunction === false ? false : true;
-        var isFramed = isFramed === undefined || isFramed === false ? false : true;
-        var isDetailed = detailed === undefined ? false : true;
-        var reportTitle = '';
-
-        if (reportTitleId === undefined)
-            reportTitle = $('.box-title').text();
-        else
-            reportTitle = reportTitleId;
-
-        var gridHeight = 0;
-
-        isScrollX = isScrollX === undefined ? false : true;
-        if (search === undefined) { search = true; }
-
-        var gridButtonsClass = '';
-        var gridSearchBoxClass = '';
-        if (isDetailed === true) {
-            gridButtonsClass = 'btn-header btn-box-tool';
-            gridSearchBoxClass = 'bg-white';
-            gridButtonSize = 30;
-        }
-        else {
-            gridButtonsClass = 'btn-header btn-box-tool';
-            gridSearchBoxClass = 'btn-box-tool bg-white txtSearch';
-            gridButtonSize = 30;
-        }
-
-        var boxtool;
-        if (search === true) {
-            if (isFramed) {
-                $('#trHeadSearch').empty();
-                boxtool = `
-            <div class="search-container">
-                <i class="fa fa-search search-icon"></i>
-                <input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search..">
-            </div>`;
-                $('#trHeadSearch').append(boxtool);
-            } else {
-                $('#' + buttonId).empty();
-                boxtool = `
-            <div class="search-container">
-                <i class="fa fa-search search-icon"></i>
-                <input class="txtSearch-frame" id="txtFrameSearch${tableId}" type="text" placeholder="Search..">
-            </div>`;
-                $('#' + buttonId).append(boxtool);
-            }
-        }
-        else {
-            if (isFramed) {
-                $('#trHeadSearch').empty();
-                boxtool = '<input class="txtSearch-frame" id="txtFrameSearch" type="text" placeholder="Search.." style="padding-left: 10px !important;" >';
-                $('#trHeadSearch').append(boxtool);
-            }
-            else {
-                $('#' + buttonId).empty();
-
-            }
-        }
-
-        var table = $('#' + tableId).DataTable({
-            order: [],
-            createdRow: rowSelection,
-            data: data,
-            columns: columns,
-            paging: true,
-            ordering: true,
-            searching: search,
-            deferRender: true,
-            destroy: true,
-            pagingType: 'full',
-            pageLength: 25,
-            scrollCollapse: false,
-            scrollX: isScrollX,
-            colReorder: true,
-            orderClasses: false,
-            deferRender: true,
-            select: true,
-            colResize: true,
-            //scrollY: gridHeight,
-
-            footerCallback: footerFunction,
-            language: {
-                emptyTable: "<p style=\"text-align:left;\">No record(s) found.</p>",
-                zeroRecords: "<p style=\"text-align:left;\">No matching record(s) found</p>",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                oPaginate: {
-                    sNext: '<i class="fa fa-angle-right"></i>',
-                    sPrevious: '<i class="fa fa-angle-left"></i>',
-                    sFirst: '<i class="fa fa-angle-double-left"></i>',
-                    sLast: '<i class="fa fa-angle-double-right"></i>'
-                }
-            },
-            "dom": "<'row'<'col-sm-12'tr>>" +
-                "<'row'<'col-sm-5 dataTables_info' i><'col-sm-6 ms-3 dataTables_paginate' p>>",
-            buttons: [
-                {
-                    extend: 'copyHtml5',
-                    footer: true,
-                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(244, 164, 37);"></i><i class="fa fa-copy fa-stack-1x" style="color: white;"></i></span></span>',
-                    titleAttr: 'Copy',
-                    title: reportTitle,
-                    filename: 'DataExport',
-                    exportOptions: {
-                        //columns: ':visible'
-                        columns: 'th:not(.notexport)' // Excluding columns while exporting
-                    }
-                },
-                {
-                    extend: 'excelHtml5',
-                    footer: true,
-                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 179, 98);"></i><i class="fa fa-file-excel fa-stack-1x" style="color: white;"></i></span></span>',
-                    titleAttr: 'Export to excel',
-                    title: reportTitle,
-                    filename: 'DataExport', //Added By Tahir
-                    exportOptions: {
-                        //columns: ':visible'
-                        columns: 'th:not(.notexport)'
-                    }
-                },
-                {
-                    extend: 'print',
-                    footer: true,
-                    text: '<span><span class="fa-stack"><i class="fa fa-circle fa-stack-2x" style="color: rgb(0, 204, 255);"></i><i class="fa fa-print fa-stack-1x" style="color: white;"></i></span></span>',
-                    titleAttr: 'Print',
-                    title: '',
-                    messageTop: function () { return '<h4>' + reportTitle + '</h4>'; },
-                    filename: 'DataExport',
-                    exportOptions: {
-                        // columns: ':visible'
-                        columns: 'th:not(.notexport)'
-                    }
-                }
-            ],
-            select: true
-        });
-        table.buttons().container()
-            .appendTo('#buttons');
-
-        table.button(0).nodes().removeClass('btn btn-default buttons-copy buttons-html5');
-        table.button(0).nodes().addClass(gridButtonsClass);
-
-        table.button(1).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
-        table.button(1).nodes().addClass(gridButtonsClass);
-
-        table.button(2).nodes().removeClass('btn btn-default buttons-excel buttons-html5');
-        table.button(2).nodes().addClass(gridButtonsClass);
-
-        var dsgndby = $('.modal-footer > #designedby ').html();
-
-        if (dsgndby === "") {
-            $('#designedBy').html($('.desgndBy').html());
-        }
-
-        var layoutHeader = $('nav').innerHeight();
-        var cardHeader = $('.box-header').innerHeight();
-        var tableHeader = $('.dataTables_scrollHead').innerHeight();
-        var tableFooter = 0;
-        var cardFooterH = 30;
-
-        if (isFooter === true)
-            tableFooter = $('.dataTables_scrollFoot').innerHeight();
-
-
-        var parentHeight = $('#' + lstHeight).innerHeight();
-        if (parentHeight == undefined)
-            parentHeight = window.innerHeight;
-        else
-            parentHeight = $('#' + lstHeight).innerHeight();
-
-        if (isFooter === true)
-            tableFooter = $('#' + tableId + ' > tfoot').innerHeight();
-
-        var browserHeight = parentHeight;
-        if (tableHeight === 0) {
-            if (layoutHeader === undefined)
-                gridHeight = browserHeight - (cardHeader + tableHeader);
-            else
-                gridHeight = browserHeight - (layoutHeader + cardHeader);
-        }
-        else { gridHeight = tableHeight; }
-
-        var topHeader = $('#topHeader').innerHeight();
-        if (topHeader > 0)
-            gridHeight = gridHeight - (topHeader + 1);
-
-        gridHeight = gridHeight - 6;
-
-        $('.dataTables_scrollBody').css('height', gridHeight + 'px');
-        table.columns.adjust().draw();
-
-        $('#txtFrameSearch' + tableId).on('keyup change', function () {
-            table.search(this.value).draw();
-        });
-        $('.dataTables_filter').hide();
-        table.columns.adjust().draw();
-
-
-        //return table;
-    }
-</script>
+            </script>

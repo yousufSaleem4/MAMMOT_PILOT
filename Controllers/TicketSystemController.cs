@@ -5,6 +5,8 @@ using System;
 using System.Data;
 using System.Web.Mvc;
 using System.Linq;
+using System.Configuration;
+using System.Web;
 
 namespace PlusCP.Controllers
 {
@@ -43,26 +45,7 @@ namespace PlusCP.Controllers
             return jsonResult;
         }
 
-        //public ActionResult GetTicketInfo(string ticketId)
-        //{
-        //    try
-        //    {
-        //        TicketSystem oTicket = new TicketSystem();
-
-        //        bool success = oTicket.GetDetail(ticketId);
-        //        oTicket.serializer = new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
-
-        //        if (success)
-        //            return View(oTicket);
-        //        else
-        //            return View(oTicket);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        ViewBag.ErrMessage = e.Message;
-        //        return View();
-        //    }
-        //}
+        
 
         [HttpPost]
         public JsonResult UpdateTicket(string Ticket_ID, string Title, string Description, string Ticket_Type,
@@ -136,14 +119,15 @@ namespace PlusCP.Controllers
 
         [HttpPost]
         public JsonResult SaveTicket(string title, string description, string ticket_type, string status,
-                                     string priority, DateTime eta, int progress_percentage, string notes)
+                             string priority, DateTime eta, int progress_percentage, string notes)
         {
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);
-
-            bool result = oTicket.CreateTicket(
+            string decodedDescription = HttpUtility.UrlDecode(description);
+            // 🔹 1. Create Ticket via SP (returns TicketId)
+            string ticketId = oTicket.CreateTicket(
                 title,
-                description,
+                decodedDescription,
                 ticket_type,
                 status,
                 priority,
@@ -152,45 +136,61 @@ namespace PlusCP.Controllers
                 progress_percentage,
                 notes
             );
-          
 
-            if (result)
+            if (string.IsNullOrEmpty(ticketId))
+                return Json(new { success = false, message = oTicket.ErrorMessage });
+
+            // 🔹 2. Insert Ticket History
+            oTicket.SaveTicketHistory(ticketId, status, progress_percentage);
+
+            // 🔹 3. Read configuration values
+            string deployMode = ConfigurationManager.AppSettings["DEPLOYMODE"]?.Trim().ToUpper() ?? "TEST";
+            string testEmail = ConfigurationManager.AppSettings["TESTEMAIL"]?.Trim();
+
+            string adminEmail = string.Empty;
+
+            // 🔹 4. Logic: if TEST mode → use TESTEMAIL from config
+            if (deployMode == "TEST")
             {
-                string adminEmail = "mohsinsaleemshahani@gmail.com";
-                string subject = $"New Ticket Created - {title}";
-
-                // 🧩 Fetch HTML template from DB
-                DataTable dtTemplate = oTicket.NewTicketEmailTemplate();
-                string htmlBody = "";
-
-                if (dtTemplate.Rows.Count > 0)
-                    htmlBody = dtTemplate.Rows[0]["SysValue"].ToString();
-                else
-                    htmlBody = "<p>Email template not found in zSysIni.</p>";
-
-                // 🔄 Replace placeholders
-                htmlBody = htmlBody
-                    .Replace("{title}", title)
-                    .Replace("{description}", description)
-                    .Replace("{priority}", priority)
-                    .Replace("{status}", status)
-                    .Replace("{eta}", eta.ToString("yyyy-MM-dd"))
-                    .Replace("{created_by}", created_by.ToString());
-
-                // ✉️ Send email
-                string emailResult = cCommon.SendEmail(adminEmail, subject, htmlBody, "", null);
-
-                if (emailResult == "SENT")
-                    return Json(new { success = true, message = "✅ Ticket created and email sent successfully!" });
-                else
-                    return Json(new { success = true, message = "✅ Ticket created but email failed to send." });
+                adminEmail = testEmail;
             }
             else
             {
-                return Json(new { success = false, message = oTicket.ErrorMessage });
+                // 🔹 5. Else, get admin email from UserInfo table
+                DataTable dtAdmin = oTicket.GetAdminEmail();
+                if (dtAdmin.Rows.Count > 0)
+                    adminEmail = dtAdmin.Rows[0]["Email"].ToString();
             }
-        }
 
+            // 🔹 6. Prepare Email
+            string subject = $"New Ticket Created - {title}";
+            DataTable dtTemplate = oTicket.NewTicketEmailTemplate();
+
+            string htmlBody = dtTemplate.Rows.Count > 0
+                ? dtTemplate.Rows[0]["SysValue"].ToString()
+                : "<p>Email template not found in zSysIni.</p>";
+
+            htmlBody = htmlBody
+                .Replace("{title}", title)
+                .Replace("{description}", description)
+                .Replace("{priority}", priority)
+                .Replace("{status}", status)
+                .Replace("{eta}", eta.ToString("yyyy-MM-dd"))
+                .Replace("{created_by}", created_by.ToString());
+
+            // 🔹 7. Send email (if address found)
+            string emailResult = !string.IsNullOrEmpty(adminEmail)
+                ? cCommon.SendEmail(adminEmail, subject, htmlBody, "", null)
+                : "NO_EMAIL_FOUND";
+
+            // 🔹 8. Response
+            if (emailResult == "SENT")
+                return Json(new { success = true, message = $"✅ Ticket created and email sent to {adminEmail}" });
+            else if (emailResult == "NO_EMAIL_FOUND")
+                return Json(new { success = true, message = "✅ Ticket created but no admin email found." });
+            else
+                return Json(new { success = true, message = $"✅ Ticket created but email failed to send to {adminEmail}." });
+        }
 
 
 

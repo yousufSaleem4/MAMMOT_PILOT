@@ -191,28 +191,34 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
         }
 
 
-        public bool CreateTicket(string title, string description, string ticket_type, string status, string priority,
-                           int created_by, /*int assigned_to,*/ DateTime eta, int progress_percentage, string notes)
+        public string CreateTicket(string title, string description, string ticket_type, string status, string priority,
+                             int created_by, DateTime eta, int progress_percentage, string notes)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
 
-            string sql = "INSERT INTO SRM.Tickets " +
-              "(Title, Description, Ticket_Type, Status, Priority, Created_By, Assigned_To, Created_At, Updated_At, ETA, Progress_Percentage, Notes) " +
-              "VALUES ('" + title + "', '" + description + "', '" + ticket_type + "', '" + status + "', '" + priority + "', " +
-              created_by + ", 30, GETDATE(), GETDATE(), '" + eta + "', " + progress_percentage + ", '" + notes + "')";
+            string sql = "EXEC SRM.usp_CreateTicket " +
+                         "@Title = '" + title + "', " +
+                         "@Description = '" + description + "', " +
+                         "@Ticket_Type = '" + ticket_type + "', " +
+                         "@Status = '" + status + "', " +
+                         "@Priority = '" + priority + "', " +
+                         "@Created_By = " + created_by + ", " +
+                         "@Assigned_To = 1026, " +
+                         "@ETA = '" + eta + "', " +
+                         "@Progress_Percentage = " + progress_percentage + ", " +
+                         "@Notes = '" + notes + "'";
 
+            DataTable dt = oDAL.GetData(sql);
 
-            oDAL.Execute(sql);
-
-            if (oDAL.HasErrors)
+            if (oDAL.HasErrors || dt.Rows.Count == 0)
             {
                 ErrorMessage = oDAL.ErrMessage;
-                return false;
+                return null;
             }
 
-            return true;
+            // ✅ Return Ticket_Id from SP
+            return dt.Rows[0]["Ticket_Id"].ToString();
         }
-
 
 
 
@@ -276,7 +282,7 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
 
         public DataTable NewTicketEmailTemplate()
         {
-            cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
             string sql = @"
         SELECT TOP 1 SysValue 
         FROM [dbo].[zSysIni] 
@@ -285,7 +291,16 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
             return oDAL.GetData(sql);
         }
 
-
+        public DataTable GetAdminEmail()
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string sql = @"
+        SELECT TOP 1 Email 
+        FROM [SRM].[userinfo] 
+        WHERE Firstname = 'Super' AND IsAdmin = 1
+        ORDER BY UserId DESC ";
+            return oDAL.GetData(sql);
+        }
 
     }
 }
