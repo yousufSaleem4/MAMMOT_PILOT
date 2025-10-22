@@ -123,11 +123,11 @@ namespace PlusCP.Controllers
         {
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);
-            string decodedDescription = HttpUtility.UrlDecode(description);
+            //string decodedDescription = HttpUtility.UrlDecode(description);
 
             string ticketId = oTicket.CreateTicket(
                 title,
-                decodedDescription,
+                description,
                 ticket_type,
                 status,
                 priority,
