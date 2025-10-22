@@ -1,11 +1,15 @@
 ﻿@model PlusCP.Models.TicketSystem
 @{
-    ViewBag.Title = "Ticket Detail";
+    ViewBag.Title = "Detail";
     Layout = cCommon.SwitchToDetailPage(Request.Url.PathAndQuery);
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+
+
 <style>
     body {
         background: linear-gradient(120deg, #eef2f7 0%, #f7f9fc 100%);
@@ -89,12 +93,12 @@
     }
 
     .progress {
-        width: 80%; 
-        height: 18px; 
+        width: 80%;
+        height: 18px;
         border-radius: 12px;
         overflow: hidden;
         background-color: #e9e9f4;
-        margin: 0 auto; 
+        margin: 0 auto;
     }
 
     .progress-bar {
@@ -183,14 +187,14 @@
 
 
 
-    
+
     .modal-body {
         max-height: 70vh;
         overflow-y: hidden;
         padding: 2rem 3rem;
     }
 
-   
+
     .modal-header {
         background-color: #D6EFE8;
         color: #003B59
@@ -202,7 +206,7 @@
             right: 1rem;
         }
 
-    
+
     .mb-3 {
         margin-bottom: 1.25rem !important;
     }
@@ -216,29 +220,29 @@
     }
 
 
-    
+
     .row.g-4 {
         margin-left: 0;
         margin-right: 0;
-        gap: 2rem; 
+        gap: 2rem;
     }
 
-    
+
     .card.h-100 {
         padding: 2rem 2.5rem !important;
     }
 
-    
+
     .col-md-6 {
         flex: 1;
     }
 
-    
+
     .mb-3 {
         margin-bottom: 1.2rem !important;
     }
 
- 
+
     .form-select {
         border-radius: 50px !important;
         border: 1px solid #00b4d8 !important;
@@ -266,7 +270,7 @@
         box-shadow: none;
     }
 
-  
+
     .btnUpdate {
         background-color: #003B59; /* Default background color */
         border-color: #003B59; /* Default border color */
@@ -401,81 +405,81 @@
             </div>
 
             <!-- Body -->
-          <div class="modal-body bg-light" style="font-size: 14px; padding: 10px;">
-    <form id="editTicketForm">
-        <input type="hidden" id="ticket_id" />
+            <div class="modal-body bg-light" style="font-size: 14px; padding: 10px;">
+                <form id="editTicketForm">
+                    <input type="hidden" id="ticket_id" />
 
-        <div class="card shadow-sm" style="max-width: 600px; margin: 0 auto; padding: 10px; border-radius: 10px;">
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold small">Tracker <span class="text-danger">*</span></label>
-                    <select id="edit_ticket_type" class="form-select form-select-sm">
-                        <option value="">Select Type</option>
-                        <option value="Bug">Bug</option>
-                        <option value="Feature">Feature</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold small">Status <span class="text-danger">*</span></label>
-                    <select id="edit_status" class="form-select form-select-sm">
-                        <option value="Open">Open</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Resolved">Resolved</option>
-                        <option value="Closed">Closed</option>
-                    </select>
-                </div>
+                    <div class="card shadow-sm" style="max-width: 600px; margin: 0 auto; padding: 10px; border-radius: 10px;">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">Tracker <span class="text-danger">*</span></label>
+                                <select id="edit_ticket_type" class="form-select form-select-sm">
+                                    <option value="">Select Type</option>
+                                    <option value="Bug">Bug</option>
+                                    <option value="Feature">Feature</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">Status <span class="text-danger">*</span></label>
+                                <select id="edit_status" class="form-select form-select-sm">
+                                    <option value="Open">Open</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Resolved">Resolved</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Title <span class="text-danger">*</span></label>
+                            <input type="text" id="edit_title" class="form-control form-control-sm" placeholder="Enter ticket title" />
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="api-settings-card shadow-lg p-4 rounded w-100" style="max-width: 900px; margin:auto;">
+                                <label class="form-label fw-semibold small">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="edit_description" rows="4"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold small">% Done</label>
+                                <select id="edit_progress_percentage" class="form-select form-select-sm">
+                                    @for (int i = 0; i <= 100; i += 10)
+                                    {
+                                        <option value="@i">@i%</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold small">Priority <span class="text-danger">*</span></label>
+                                <select id="edit_priority" class="form-select form-select-sm">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold small">Requested Due Date <span class="text-danger">*</span></label>
+                                <input type="date" id="edit_eta" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-semibold small">Additional Notes</label>
+                                <textarea id="edit_notes" class="form-control form-control-sm" rows="2" placeholder="Optional notes or comments"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold small">Title <span class="text-danger">*</span></label>
-                <input type="text" id="edit_title" class="form-control form-control-sm" placeholder="Enter ticket title" />
-            </div>
-
-            <div class="mb-3">
-                <div class="api-settings-card shadow-lg p-4 rounded w-100" style="max-width: 900px; margin:auto;">
-                    <label class="form-label fw-semibold small">Description <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="edit_description" rows="4"></textarea>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold small">% Done</label>
-                    <select id="edit_progress_percentage" class="form-select form-select-sm">
-                        @for (int i = 0; i <= 100; i += 10)
-                        {
-                            <option value="@i">@i%</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold small">Priority <span class="text-danger">*</span></label>
-                    <select id="edit_priority" class="form-select form-select-sm">
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                        <option value="Critical">Critical</option>
-                    </select>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold small">ETA (Due Date) <span class="text-danger">*</span></label>
-                    <input type="date" id="edit_eta" class="form-control form-control-sm" />
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <label class="form-label fw-semibold small">Additional Notes</label>
-                    <textarea id="edit_notes" class="form-control form-control-sm" rows="2" placeholder="Optional notes or comments"></textarea>
-                </div>
-            </div>
-
-        </div>
-    </form>
-</div>
 
 
             <div class="modal-footer">
@@ -493,12 +497,37 @@
 
 <script>
 
+    ////function DescriptionFormatting() {
+    ////    var $el = $('#Description'); // Correct ID
+    ////    if ($el.length) {
+    ////        // Agar pehle se init hua ho to reset kar do
+    ////        if ($el.next('.note-editor').length) {
+    ////            $el.summernote('destroy');
+    ////        }
+
+    ////        $el.summernote({
+    ////            placeholder: 'Write terms and conditions here...',
+    ////            SetHeight: 100,  // Minimum height
+    ////            toolbar: [
+    ////                ['style', ['bold', 'italic', 'underline', 'clear']],
+    ////                ['para', ['ul', 'ol', 'paragraph']],
+    ////                ['font', ['strikethrough', 'superscript', 'subscript']],
+    ////                ['insert', ['link']],
+    ////                ['view', ['undo', 'redo']]
+    ////            ]
+    ////        });
+    ////    }
+    ////}
+
+
 
 
     $(document).on("click", "#btnEditTicket", function () {
         debugger
+        //DescriptionFormatting();
         var ticketId = $(this).data("id");
         console.log("Fetching ticket ID:", ticketId);
+
 
         $.ajax({
             url: '/TicketSystem/GetTicketById',
@@ -508,6 +537,7 @@
                 if (response.success) {
                     $("#ticket_id").val(response.ticket_id);
                     $("#edit_title").val(response.title);
+                    //$('#edit_description').summernote();
                     $("#edit_description").val(response.description);
                     $("#edit_ticket_type").val(response.ticket_type);
                     $("#edit_status").val(response.status);
@@ -530,9 +560,10 @@
 
     $(document).on("click", "#btnUpdateTicket", function () {
         debugger;
-
+      /*  DescriptionFormatting();*/
         var ticket_id = $('#ticket_id').val();
         var title = $('#edit_title').val();
+        //var description = encodeURIComponent($('#Description').summernote('code')); // ✅ small d
         var description = $('#edit_description').val();
         var ticket_type = $('#edit_ticket_type').val();
         var status = $('#edit_status').val();
@@ -545,7 +576,7 @@
         if (!ticket_type || !title || !description ||
             !status || !priority || !eta || isNaN(progress_percentage) || !notes) {
 
-            MsgToast('⚠️ Please fill all required fields before saving.', 'Validation Error', 'warning');
+            MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
             return;
         }
 

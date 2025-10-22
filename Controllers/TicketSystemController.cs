@@ -178,11 +178,11 @@ namespace PlusCP.Controllers
                 : "NO_EMAIL_FOUND";
 
             if (emailResult == "SENT")
-                return Json(new { success = true, message = $"Ticket created." });
+                return Json(new { success = true, message = $"Ticket submitted successfully. A member of the Collablly Team will reach out soon." });
             else if (emailResult == "NO_EMAIL_FOUND")
-                return Json(new { success = true, message = "Ticket created but no admin email found." });
+                return Json(new { success = true, message = "Ticket submitted successfully. A member of the Collablly Team will reach out soon." });
             else
-                return Json(new { success = true, message = $"Ticket created." });
+                return Json(new { success = true, message = $"Ticket submitted successfully. A member of the Collablly Team will reach out soon." });
 
         }
 
