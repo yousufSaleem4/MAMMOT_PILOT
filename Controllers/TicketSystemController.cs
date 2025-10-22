@@ -53,7 +53,8 @@ namespace PlusCP.Controllers
                                  int Progress_Percentage, string Notes)
         {
             TicketSystem oTicket = new TicketSystem();
-            bool success = oTicket.UpdateTicket(Ticket_ID, Title, Description, Ticket_Type, Status, Priority, ETA, Progress_Percentage, Notes);
+            string decodedDescription = HttpUtility.UrlDecode(Description);
+            bool success = oTicket.UpdateTicket(Ticket_ID, Title, decodedDescription, Ticket_Type, Status, Priority, ETA, Progress_Percentage, Notes);
             oTicket.SaveTicketHistory(Ticket_ID, Status, Progress_Percentage);
             if (success)
                 return Json(new { success = true, message = "Ticket updated successfully!" });
@@ -123,11 +124,11 @@ namespace PlusCP.Controllers
         {
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);
-            //string decodedDescription = HttpUtility.UrlDecode(description);
+            string decodedDescription = HttpUtility.UrlDecode(description);
 
             string ticketId = oTicket.CreateTicket(
                 title,
-                description,
+                decodedDescription,
                 ticket_type,
                 status,
                 priority,

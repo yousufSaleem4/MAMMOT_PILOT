@@ -1,14 +1,11 @@
 ﻿@model PlusCP.Models.TicketSystem
 @{
     ViewBag.Title = "Detail";
-    Layout = cCommon.SwitchToDetailPage(Request.Url.PathAndQuery);
+    Layout = "~/Views/Shared/_LayoutEmpty.cshtml";
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-
-
 
 <style>
     body {
@@ -324,8 +321,9 @@
 
             <div class="mb-4">
                 <h5 class="section-title">Description</h5>
-                <div class="desc-box">@Html.DisplayFor(m => m.description)</div>
+                <div class="desc-box">@Html.Raw(Model.description)</div>
             </div>
+
 
             <div class="mb-4">
                 <h5 class="section-title">Notes</h5>
@@ -438,7 +436,9 @@
 
                         <div class="mb-3">
                             <div class="api-settings-card shadow-lg p-4 rounded w-100" style="max-width: 900px; margin:auto;">
-                                <label class="form-label fw-semibold small">Description <span class="text-danger">*</span></label>
+                                <label class="form-label fw-semibold small">
+                                    Description <span class="text-danger">*</span>
+                                </label>
                                 <textarea class="form-control" id="edit_description" rows="4"></textarea>
                             </div>
                         </div>
@@ -497,34 +497,29 @@
 
 <script>
 
-    ////function DescriptionFormatting() {
-    ////    var $el = $('#Description'); // Correct ID
-    ////    if ($el.length) {
-    ////        // Agar pehle se init hua ho to reset kar do
-    ////        if ($el.next('.note-editor').length) {
-    ////            $el.summernote('destroy');
-    ////        }
-
-    ////        $el.summernote({
-    ////            placeholder: 'Write terms and conditions here...',
-    ////            SetHeight: 100,  // Minimum height
-    ////            toolbar: [
-    ////                ['style', ['bold', 'italic', 'underline', 'clear']],
-    ////                ['para', ['ul', 'ol', 'paragraph']],
-    ////                ['font', ['strikethrough', 'superscript', 'subscript']],
-    ////                ['insert', ['link']],
-    ////                ['view', ['undo', 'redo']]
-    ////            ]
-    ////        });
-    ////    }
-    ////}
+    function DescriptionFormatting() {
+        var $el = $('#edit_description');
+        if ($el.length && !$el.next('.note-editor').length) {
+            $el.summernote({
+                placeholder: 'Write description...',
+                height: 60,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['insert', ['link']],
+                    ['view', ['undo', 'redo']]
+                ]
+            });
+        }
+    }
 
 
 
 
     $(document).on("click", "#btnEditTicket", function () {
         debugger
-        //DescriptionFormatting();
+        DescriptionFormatting();
         var ticketId = $(this).data("id");
         console.log("Fetching ticket ID:", ticketId);
 
@@ -537,8 +532,23 @@
                 if (response.success) {
                     $("#ticket_id").val(response.ticket_id);
                     $("#edit_title").val(response.title);
-                    //$('#edit_description').summernote();
-                    $("#edit_description").val(response.description);
+
+                    // ✅ Initialize Summernote first, then set value
+                    $('#edit_description').summernote({
+                        placeholder: 'Write description...',
+                        height: 120,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['font', ['strikethrough', 'superscript', 'subscript']],
+                            ['insert', ['link']],
+                            ['view', ['undo', 'redo']]
+                        ]
+                    });
+
+                    // ✅ Set Summernote content from server
+                    $('#edit_description').summernote('code', response.description || '');
+
                     $("#edit_ticket_type").val(response.ticket_type);
                     $("#edit_status").val(response.status);
                     $("#edit_priority").val(response.priority);
@@ -547,6 +557,7 @@
                     $("#edit_notes").val(response.notes);
 
                     $("#editTicketModal").modal("show");
+
                 } else {
                     alert("Ticket not found!");
                 }
@@ -560,11 +571,11 @@
 
     $(document).on("click", "#btnUpdateTicket", function () {
         debugger;
-      /*  DescriptionFormatting();*/
+        DescriptionFormatting();
         var ticket_id = $('#ticket_id').val();
         var title = $('#edit_title').val();
-        //var description = encodeURIComponent($('#Description').summernote('code')); // ✅ small d
-        var description = $('#edit_description').val();
+        var description = encodeURIComponent($('#edit_description').summernote('code')); // ✅ small d
+        //var description = $('#edit_description').val();
         var ticket_type = $('#edit_ticket_type').val();
         var status = $('#edit_status').val();
         var priority = $('#edit_priority').val();
