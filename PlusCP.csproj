@@ -59,6 +59,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Assemblies\CaptchaMvc.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Azure.KeyVault.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Azure.KeyVault.Core.1.0.0\lib\net40\Microsoft.Azure.KeyVault.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -72,6 +75,9 @@
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Assemblies\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=9.3.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\WindowsAzure.Storage.9.3.3\lib\net45\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -202,6 +208,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Classess\AzureHelper.cs" />
     <Compile Include="Classess\BasicEncrypt.cs" />
     <Compile Include="Classess\cCommon.cs" />
     <Compile Include="Classess\cDAL.cs" />
@@ -220,6 +227,7 @@
     <Compile Include="Controllers\POMonitoringDashbordController.cs" />
     <Compile Include="Controllers\POSchedulerController.cs" />
     <Compile Include="Controllers\SettingController.cs" />
+    <Compile Include="Controllers\TicketSystemController.cs" />
     <Compile Include="Controllers\UserRoleXController.cs" />
     <Compile Include="Externals\ChangePassword.aspx.cs">
       <DependentUpon>ChangePassword.aspx</DependentUpon>
@@ -289,6 +297,7 @@
     <Compile Include="Models\POScheduler.cs" />
     <Compile Include="Models\Setting.cs" />
     <Compile Include="Models\SignupViewModel.cs" />
+    <Compile Include="Models\TicketSytem.cs" />
     <Compile Include="Models\UserRoleX.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -496,6 +505,9 @@
     <Content Include="Views\POScheduler\Index.cshtml" />
     <Content Include="Views\NewPO\GetPO.cshtml" />
     <Content Include="Views\POMonitoringDashbord\Index.cshtml" />
+    <Content Include="Views\TicketSystem\Detail.cshtml" />
+    <Content Include="Views\TicketSystem\GetTicketInfo.cshtml" />
+    <Content Include="Views\TicketSystem\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
