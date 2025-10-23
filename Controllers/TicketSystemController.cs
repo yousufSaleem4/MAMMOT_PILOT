@@ -204,26 +204,95 @@ namespace PlusCP.Controllers
         }
 
 
-    
-
         [HttpPost]
-        public JsonResult InsertComment(int ticketId, string commentText)
+        public JsonResult InsertComment(string ticketId, string commentText)
         {
             TicketSystem oTicket = new TicketSystem();
-
             int userId = Convert.ToInt32(Session["SigninId"]);
 
-            bool result = oTicket.SaveComment(
-                ticketId,
-                userId,
-                commentText
-            );
+            // 1️⃣ Save comment first
+            bool result = oTicket.SaveComment(ticketId, userId, commentText);
 
-            if (result)
-                return Json(new { success = true, message = "Ticket created successfully!" });
-            else
+            if (!result)
                 return Json(new { success = false, message = oTicket.ErrorMessage });
+
+            // 2️⃣ Get username
+            DataTable dtUser = oTicket.GetUserName(userId);
+            string userName = dtUser.Rows.Count > 0 ? dtUser.Rows[0]["UserName"].ToString() : "Unknown User";
+
+            // 3️⃣ Get comment email template
+            DataTable dtTemplate = oTicket.NewCommentEmailTemplate();
+            string htmlBody = dtTemplate.Rows.Count > 0
+                ? dtTemplate.Rows[0]["SysValue"].ToString()
+                : "<p>Email template not found.</p>";
+
+            // 4️⃣ Get ticket details for context
+            DataTable dtTicket = oTicket.GetTicketDetails(ticketId);
+            string title = dtTicket.Rows.Count > 0 ? dtTicket.Rows[0]["Title"].ToString() : "";
+            string priority = dtTicket.Rows.Count > 0 ? dtTicket.Rows[0]["Priority"].ToString() : "";
+            string status = dtTicket.Rows.Count > 0 ? dtTicket.Rows[0]["Status"].ToString() : "";
+
+            // 5️⃣ Replace placeholders in email template
+            htmlBody = htmlBody
+                .Replace("{ticket_id}", ticketId)
+                .Replace("{title}", title)
+                .Replace("{comment_text}", commentText)
+                .Replace("{comment_by}", userName)
+                .Replace("{priority}", priority)
+                .Replace("{status}", status)
+                .Replace("{datetime}", DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+
+            // 6️⃣ Email Subject
+            string subject = $"New Comment on Ticket {ticketId} - {title}";
+
+            // 7️⃣ Determine email recipient (same logic as ticket creation)
+            string deployMode = ConfigurationManager.AppSettings["DEPLOYMODE"]?.Trim().ToUpper() ?? "TEST";
+            string testEmail = ConfigurationManager.AppSettings["TESTEMAIL"]?.Trim();
+            string adminEmail = "";
+
+            if (deployMode == "TEST")
+            {
+                adminEmail = testEmail;
+            }
+            else
+            {
+                DataTable dtAdmin = oTicket.GetAdminEmail();
+                if (dtAdmin.Rows.Count > 0)
+                    adminEmail = dtAdmin.Rows[0]["Email"].ToString();
+            }
+
+            // 8️⃣ Send Email
+            string emailResult = !string.IsNullOrEmpty(adminEmail)
+                ? cCommon.SendEmail(adminEmail, subject, htmlBody, "", null)
+                : "NO_EMAIL_FOUND";
+
+            // 9️⃣ Return response
+            if (emailResult == "SENT" || emailResult == "NO_EMAIL_FOUND")
+                return Json(new { success = true, message = "Comment added successfully and email notification sent!" });
+            else
+                return Json(new { success = true, message = "Comment added successfully (email failed to send)." });
         }
+
+
+
+
+        public JsonResult GetComments(string ticketId)
+        {
+            TicketSystem oTicket = new TicketSystem();
+            DataTable dt = oTicket.GetComments(ticketId);
+
+            var comments = dt.AsEnumerable().Select(row => new
+            {
+                CommentID = row["CommentID"].ToString(),
+                UserName = row["UserName"].ToString(),
+                CommentText = row["Comment_Text"].ToString(),
+                CreatedAt = Convert.ToDateTime(row["Created_At"]).ToString("yyyy-MM-dd HH:mm")
+            }).ToList();
+
+            return Json(new { success = true, comments = comments }, JsonRequestBehavior.AllowGet);
+        }
+
+
 
 
     }

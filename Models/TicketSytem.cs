@@ -255,12 +255,12 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
         }
 
 
-        public bool SaveComment(int ticketId, int userId, string commentText)
+        public bool SaveComment(string ticketId, int userId, string commentText)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
 
-            string sql = "INSERT INTO SRM.Comments (TicketID, UserID, Comment_Text, Created_At, Updated_At) " +
-                         "VALUES (" + ticketId + ", " + userId + ", '" + commentText.Replace("'", "''") + "', GETDATE(), GETDATE())";
+            string sql = "INSERT INTO SRM.TicketComments (TicketID, UserID, Comment_Text, Created_At, Updated_At) " +
+                         "VALUES ('" + ticketId + "', " + userId + ", '" + commentText.Replace("'", "''") + "', GETDATE(), GETDATE())";
 
             oDAL.Execute(sql);
 
@@ -272,6 +272,27 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
 
             return true;
         }
+
+        public DataTable GetComments(string ticketId)
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+
+            string sql = @"
+        SELECT 
+            c.CommentID, 
+              u.FirstName + ' ' + u.LastName AS UserName, 
+            c.Comment_Text, 
+            c.Created_At
+        FROM SRM.TicketComments c
+        INNER JOIN SRM.UserInfo u ON c.UserID = u.UserID
+        WHERE c.TicketID = '" + ticketId.Replace("'", "''") + @"'
+        ORDER BY c.Created_At DESC";
+
+            DataTable dt = oDAL.GetData(sql);
+            return dt;
+        }
+
+
 
 
 
@@ -285,6 +306,29 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
         ORDER BY SysCode DESC";
             return oDAL.GetData(sql);
         }
+
+        public DataTable GetTicketDetails(string ticketId)
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string sql = "SELECT Ticket_ID, Title, Priority, Status FROM SRM.Tickets WHERE Ticket_ID = '" + ticketId + "'";
+            return oDAL.GetData(sql);
+        }
+
+        public DataTable GetUserName(int userId)
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string sql = "SELECT FirstName + ' ' + LastName AS UserName FROM SRM.UserInfo WHERE userId = '" + userId + "'";
+            return oDAL.GetData(sql);
+        }
+
+        public DataTable NewCommentEmailTemplate()
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string sql = "SELECT SysValue FROM zSysIni WHERE SysDesc = 'NewCommentEmail'" +
+                "ORDER BY SysCode DESC";
+            return oDAL.GetData(sql);
+        }
+
 
         public DataTable GetAdminEmail()
         {
