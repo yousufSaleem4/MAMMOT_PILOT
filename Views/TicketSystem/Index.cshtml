@@ -382,7 +382,7 @@
 
     <div id="dataList" class="box panel panel-default">
         <div class="box-header with-border">
-            <h5 class="box-title"><strong style="font-size:14px !important;">Ticket Management     </strong><strong id="filterString"></strong></h5>
+            <h5 class="box-title" style="padding-right:10px;"><strong style="font-size:14px !important;">Report Issue     </strong><strong id="filterString"></strong></h5>
             <select id="filterStatus" class="form-select rounded-pill border-primary text-primary fw-semibold shadow me-2">
                 <option value="">All Status</option>
                 <option value="Open">Open</option>
@@ -418,7 +418,7 @@
         </div>
         <!-- 🔹 Data Grid -->
         <div class="box-body bg-light card mt-4" id="lstP">
-            <table id="lstTicket" class="table table-bordered table-striped text-sm table-hover" width="100%">
+            <table id="lstTicket" class="table table-bordered table-striped text-sm table-hover" >
                 <thead class="sorted-asc fw-light small">
                     <tr style="background-color: white">
 
@@ -585,7 +585,7 @@
                                 return '<a href="' + url + '" target="_blank">' + data + '</a>';
                             }
                         },
-                        { "data": "Description", "title": "Description" },
+                        { "data": "Description", "title": "Description", "width": "300px" },
                         { "data": "Ticket_Type", "title": "Type", "width": "60px" },
                         { "data": "Status", "title": "Status", "width": "60px" },
                         {
@@ -615,11 +615,11 @@
                             }
                         },
 
-                        { "data": "ETA", "title": "ETA", "width": "70px" },
-                        { "data": "Created_At", "title": "Created At", "width": "100px" },
+                        { "data": "ETA", "title": "ETA", "width": "150px" },
+                        { "data": "Created_At", "title": "Created At", "width": "150px" },
                         {
                             "data": "Updated_At",
-                            "title": "Updated At",
+                            "title": "Updated At", "width": "150px",
                             render: function (data, type, row) {
                                 if (!data) return '';
                                 var date = new Date(data);
@@ -632,8 +632,8 @@
                             }
                         },
 
-                        { "data": "Assigned_To_Name", "title": "Assigned To", "width": "100px" },
-                        { "data": "Created_By_Name", "title": "Created By", "width": "100px" }
+                        { "data": "Assigned_To_Name", "title": "Assigned To", "width": "150px" },
+                        { "data": "Created_By_Name", "title": "Created By", "width": "150px" }
                     ];
 
                     // agar DataTable pehle se initialized hai to destroy karke reload karo
