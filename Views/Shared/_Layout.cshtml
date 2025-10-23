@@ -327,8 +327,23 @@
                             @*<li class="list"><a onclick="Navigate('Index','/POScheduler/Index', 'Index', 'Index', '', '')"><i class="fa fa-file-alt green"></i>PO Scheduler</a></li>*@
                             <li class="list"><a onclick="Navigate('Index','/LateChart/Index', 'Index', 'Index', '', '')"><i class="fa fa-line-chart green"></i>visualization</a></li>
                             @*<li class="list"><a onclick="Navigate('Index','/POMonitoringDashbord/Index', 'Index', 'Index', '', '')"><i class="fa fa-line-chart green"></i>PO Monitoring Dashbord</a></li>*@
-                            <li class="list">
-                                <a onclick="Navigate('Index','/TicketSystem/Index', 'Index', 'Index', '', '')"><i class="fas fa-ticket-alt"></i> Ticket Management</a></li>
+                            <li class="list dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fas fa-question-circle"></i> Help <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="https://777.collablly.com/" target="_blank">
+                                            <i class="fas fa-book-open"></i> User Guide
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a onclick="Navigate('Index','/TicketSystem/Index', 'Index', 'Index', '', '')">
+                                            <i class="fas fa-ticket-alt"></i> Report Issue
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                             <li style="display:none">
                                 @Html.DropDownList("Connections", null, new { id = "ddlConnection", @name = "ddlConnection", @class = "dropdown-list" })
 
