@@ -1371,7 +1371,14 @@ public class cCommon
 
         return string.Empty;
     }
-
+    public static DataTable GetAzureSetting()
+    {
+        string sql = "Select * from AzureSetting WHERE IsActive = 1 ";
+        cDAL oDAL = new cDAL(cDAL.ConnectionType.INIT);
+        DataTable dt = new DataTable();
+        dt = oDAL.GetData(sql);
+        return dt;
+    }
 }
 
 

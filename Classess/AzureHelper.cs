@@ -2,6 +2,7 @@
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 
@@ -10,15 +11,20 @@ namespace PlusCP.Classess
     public class AzureHelper
     {
 
-        private static string storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=mammoth777;AccountKey=UL0iuqNp87dTbp8puyJ5lPyTVaZGxh34TGeH+Bvl+UpYXaygDACNlCrbiOhf54rJ3HNA4/9pjboW+AStGpLtuA==;EndpointSuffix=core.windows.net";
-        private static string containerName = "mammothfiles"; // e.g. "documents"
-
         public static string GetBlobUrlWithSas(string fullBlobUrl)
         {
             if (string.IsNullOrEmpty(fullBlobUrl))
                 return "";
-
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            // Azure Blob Info
+            DataTable dtAzure = cCommon.GetAzureSetting();
+            string connectionString = "";
+            string containerName = "";
+            if (dtAzure.Rows.Count > 0)
+            {
+                connectionString = dtAzure.Rows[0]["Token"].ToString();
+                containerName = dtAzure.Rows[0]["ContainerName"].ToString();
+            }
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
 
