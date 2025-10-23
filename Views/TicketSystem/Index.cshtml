@@ -572,24 +572,24 @@
                 if (data && data.lstTicket) {
                     var columnDef = [
                         {
-                            "data": "Ticket_Id", "title": "Ticket #", "width": "80px",
+                            "data": "Ticket_Id", "title": "Ticket #", "width": "80px", "className": "text-center",
                             render: function (data, type, row) {
                                 var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
                                 return '<a href="' + url + '" target="_blank">' + data + '</a>';
                             }
                         },
                         {
-                            "data": "Title", "title": "Title", "width": "90px",
+                            "data": "Title", "title": "Title", "width": "90px", "className": "text-center",
                             render: function (data, type, row) {
                                 var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
                                 return '<a href="' + url + '" target="_blank">' + data + '</a>';
                             }
                         },
-                        { "data": "Description", "title": "Description", "width": "300px" },
-                        { "data": "Ticket_Type", "title": "Type", "width": "60px" },
-                        { "data": "Status", "title": "Status", "width": "60px" },
+                        { "data": "Description", "title": "Description", "width": "300px", "className": "text-center" },
+                        { "data": "Ticket_Type", "title": "Type", "width": "60px", "className": "text-center" },
+                        { "data": "Status", "title": "Status", "width": "60px", "className": "text-center" },
                         {
-                            "data": "Priority", "className": "text-center", "width": "60px",
+                            "data": "Priority", "className": "text-center", "width": "60px", "className": "text-center",
                             "title": "Priority",
                             render: function (data, type, row) {
                                 var className = '';
@@ -615,11 +615,11 @@
                             }
                         },
 
-                        { "data": "ETA", "title": "ETA", "width": "150px" },
-                        { "data": "Created_At", "title": "Created At", "width": "150px" },
+                        { "data": "ETA", "title": "ETA", "width": "150px", "className": "text-center" },
+                        { "data": "Created_At", "title": "Created At", "width": "150px", "className": "text-center" },
                         {
                             "data": "Updated_At",
-                            "title": "Updated At", "width": "150px",
+                            "title": "Updated At", "width": "150px", "className": "text-center",
                             render: function (data, type, row) {
                                 if (!data) return '';
                                 var date = new Date(data);
@@ -632,8 +632,8 @@
                             }
                         },
 
-                        { "data": "Assigned_To_Name", "title": "Assigned To", "width": "150px" },
-                        { "data": "Created_By_Name", "title": "Created By", "width": "150px" }
+                        { "data": "Assigned_To_Name", "title": "Assigned To", "width": "150px", "className": "text-center" },
+                        { "data": "Created_By_Name", "title": "Created By", "width": "150px", "className": "text-center" }
                     ];
 
                     // agar DataTable pehle se initialized hai to destroy karke reload karo
