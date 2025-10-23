@@ -9,6 +9,7 @@ namespace PlusCP.Classess
 {
     public class AzureHelper
     {
+
         private static string storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=mammoth777;AccountKey=UL0iuqNp87dTbp8puyJ5lPyTVaZGxh34TGeH+Bvl+UpYXaygDACNlCrbiOhf54rJ3HNA4/9pjboW+AStGpLtuA==;EndpointSuffix=core.windows.net";
         private static string containerName = "mammothfiles"; // e.g. "documents"
 
