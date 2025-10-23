@@ -8,9 +8,18 @@
 
     <title>SRM</title>
     @System.Web.Optimization.Styles.Render("~/Content/css")
-   
-    
+
+
     <style>
+        .pipe-separator {
+            float: right;
+            width: 1px;
+            height: 22px;
+            background-color: rgba(0, 59, 89, 0.3);
+            margin: 4px 15px 0 15px;
+        }
+
+
         .label {
             padding-left: 20px;
             font-size: small;
@@ -290,18 +299,18 @@
             .hover-effect:hover {
                 background-color: #f0f0f0;
             }
+
         .logo-img {
             max-width: 100%;
             height: auto;
             width: 200px; /* Adjust size as needed */
-            margin-left:10px;
-            margin-top:10px;
+            margin-left: 10px;
+            margin-top: 10px;
         }
-
     </style>
 </head>
 
-<body class="hold-transition skin-blue layout-top-nav"  onresize="resize_grid_height()" style=" background: linear-gradient(to top, white, #D6EFE8);" onload="get_initial_attributes()">
+<body class="hold-transition skin-blue layout-top-nav" onresize="resize_grid_height()" style=" background: linear-gradient(to top, white, #D6EFE8);" onload="get_initial_attributes()">
     <div class="wrapper">
         <header class="main-header">
             <nav class="navbar navbar-static-top">
@@ -327,27 +336,12 @@
                             @*<li class="list"><a onclick="Navigate('Index','/POScheduler/Index', 'Index', 'Index', '', '')"><i class="fa fa-file-alt green"></i>PO Scheduler</a></li>*@
                             <li class="list"><a onclick="Navigate('Index','/LateChart/Index', 'Index', 'Index', '', '')"><i class="fa fa-line-chart green"></i>visualization</a></li>
                             @*<li class="list"><a onclick="Navigate('Index','/POMonitoringDashbord/Index', 'Index', 'Index', '', '')"><i class="fa fa-line-chart green"></i>PO Monitoring Dashbord</a></li>*@
-                            <li class="list dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <i class="fas fa-question-circle"></i> Help <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="https://777.collablly.com/" target="_blank">
-                                            <i class="fas fa-book-open"></i> User Guide
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a onclick="Navigate('Index','/TicketSystem/Index', 'Index', 'Index', '', '')">
-                                            <i class="fas fa-ticket-alt"></i> Report Issue
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+
                             <li style="display:none">
                                 @Html.DropDownList("Connections", null, new { id = "ddlConnection", @name = "ddlConnection", @class = "dropdown-list" })
 
                             </li>
+
 
 
                             <li class="dropdown user user-menu" style="float:right; padding-right:40px">
@@ -384,6 +378,28 @@
                                     </li>
                                 </ul>
                             </li>
+                            <li class="list pipe-separator"></li>
+
+
+                            <li class="list dropdown" style="float:right;">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fas fa-question-circle"></i> Help <span class="caret"></span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="https://777.collablly.com/" target="_blank">
+                                            <i class="fas fa-book-open"></i> User Guide
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a onclick="Navigate('Index','/TicketSystem/Index', 'Index', 'Index', '', '')">
+                                            <i class="fas fa-ticket-alt"></i> Report Issue
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
                         </ul>
                         <ul style="display:none;">
                             <li class="dropdown user user-menu " style="float:right">

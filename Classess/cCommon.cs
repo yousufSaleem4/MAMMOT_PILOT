@@ -22,6 +22,7 @@ using System.Web.Configuration;
 using SendGrid.Helpers.Mail;
 using SendGrid;
 using System.Globalization;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 public class cCommon
 {
@@ -420,11 +421,7 @@ public class cCommon
             // Add the recipient (To) email
             msg.AddTo(new EmailAddress(EmailAddress));
 
-            // Add CC email only if it’s not the same as the recipient email
-            //if (!string.IsNullOrEmpty(ccEmail) && !EmailAddress.Equals(ccEmail, StringComparison.OrdinalIgnoreCase))
-            //{
-            //    msg.AddCc(new EmailAddress(ccEmail));
-            //}
+            
 
             // Add default CC email only if it’s not the same as the recipient email or custom CC email
             if (!string.IsNullOrEmpty(CCEmailDB) && IsValidEmail(CCEmailDB) &&
@@ -1350,6 +1347,31 @@ public class cCommon
         HttpContext.Current.Session["CustList"] = null;
 
     }
+
+    private string UploadToAzureBlob(CloudBlobContainer container, HttpPostedFileBase file)
+    {
+        if (file != null && file.ContentLength > 0)
+        {
+            // Optional: Add GUID to avoid name collisions
+            string uniqueFileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(uniqueFileName);
+
+            // Upload the stream first
+            blockBlob.UploadFromStream(file.InputStream);
+
+            // Set headers to support inline viewing
+            blockBlob.Properties.ContentType = MimeMapping.GetMimeMapping(file.FileName);
+            blockBlob.Properties.ContentDisposition = $"inline; filename={file.FileName}";
+            blockBlob.SetProperties(); // commit the metadata changes
+
+
+
+            return blockBlob.Uri.ToString(); // full Azure URL to blob
+        }
+
+        return string.Empty;
+    }
+
 }
 
 
