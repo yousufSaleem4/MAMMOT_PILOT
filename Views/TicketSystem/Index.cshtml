@@ -424,10 +424,10 @@
             <table id="lstTicket" class="table table-bordered table-striped text-sm table-hover" >
                 <thead class="sorted-asc fw-light small">
                     <tr style="background-color: white">
-
                         <th></th>
                         <th></th>
                         <th></th>
+                        <th class="notexport"></th>
                         <th></th>
                         <th></th>
                         <th></th>
@@ -454,6 +454,76 @@
 <script src="~/Scripts/DatatableColReorder.js"></script>
 
 <script>
+
+    function showModalForZPL(head, str) {
+        $('#modalHeader').html(head);
+        $('#modalBody').html('<div style="white-space:normal; font-size:14px;">' + str + '</div>');
+        $('#option').modal('show');
+    }
+
+    $.fn.dataTable.render.ellipsisAdr = function (cutoff, header) {
+        return function (data, type, row) {
+            if (type === 'display') {
+                if (!data) return '';
+
+                // Encode quotes and remove line breaks
+                var safeData = data
+                    .replace(/(\r\n|\n|\r)/gm, " ")
+                    .replace(/'/g, "&#39;")
+                    .replace(/"/g, "&quot;");
+
+                // Convert HTML into plain text (for length) but keep original HTML for output
+                var temp = $('<div>').html(data);
+                var plainText = temp.text();
+
+                // ✅ If short enough, show as is
+                if (plainText.length <= cutoff) {
+                    return data;
+                }
+
+                // ✅ Build shortened formatted HTML
+                var trimmedHTML = '';
+                var remaining = cutoff;
+                temp.contents().each(function () {
+                    if (remaining <= 0) return false;
+
+                    if (this.nodeType === 3) {
+                        // Text node
+                        var text = this.nodeValue.substring(0, remaining);
+                        trimmedHTML += text;
+                        remaining -= text.length;
+                    } else if (this.nodeType === 1) {
+                        // Element node (preserve tags like <b>, <i>, <span>)
+                        var innerHTML = $(this).html();
+                        var textInside = $(this).text();
+
+                        if (textInside.length <= remaining) {
+                            trimmedHTML += this.outerHTML;
+                            remaining -= textInside.length;
+                        } else {
+                            // Trim inside element if it exceeds cutoff
+                            var partialInner = textInside.substring(0, remaining);
+                            trimmedHTML += '<' + this.nodeName.toLowerCase() + '>' +
+                                partialInner + '</' + this.nodeName.toLowerCase() + '>';
+                            remaining = 0;
+                        }
+                    }
+                });
+
+                // ✅ Add See More link
+                return trimmedHTML +
+                    '... <a href="#" onclick="showModalForZPL(\'' + header + '\', \'' + safeData + '\')">See More</a>';
+            }
+            return data;
+        };
+    };
+
+
+
+
+
+
+
     $(document).ready(function () {
         LoadData();
         loadAssigneeDropdown();
@@ -463,6 +533,12 @@
     } else {
         $('#progress_percentage').closest('.col-md-4').show();
     }
+
+
+
+        
+
+
 
 
         $('#filterStatus, #filterType, #filterPriority').change(function () {
@@ -594,13 +670,14 @@
                             }
                         },
                         {
-                            "data": "Title", "title": "Title", "width": "90px", "className": "text-center",
+                            "data": "Title", "title": "Title", "width": "200px", "className": "text-center",
                             render: function (data, type, row) {
                                 var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
                                 return '<a href="' + url + '" target="_blank">' + data + '</a>';
                             }
                         },
-                        { "data": "Description", "title": "Description", "width": "360px", "className": "text-center" },
+                        { "data": "Description", "title": "Description", "width": "380px", "render": $.fn.dataTable.render.ellipsisAdr(38, "Description") },
+                        { "data": "Description", "title": "Description", "width": "260px", "visible": false },
                         { "data": "Ticket_Type", "title": "Type", "width": "60px", "className": "text-center" },
                         { "data": "Status", "title": "Status", "width": "100px", "className": "text-center" },
                         {
