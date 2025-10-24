@@ -268,7 +268,7 @@
                     <div class="card shadow-sm" style="max-width: 600px; margin: 0 auto; padding: 10px; border-radius: 10px;">
                         <div class="row">
                             <!-- Tracker -->
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold small">
                                     Tracker <span class="text-danger">*</span>
                                 </label>
@@ -278,7 +278,7 @@
                                     <option value="Feature">Feature</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold small">
                                     Status <span class="text-danger">*</span>
                                 </label>
@@ -287,6 +287,17 @@
                                     <option value="In Progress">In Progress</option>
                                     <option value="Resolved">Resolved</option>
                                     <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold small">
+                                    Priority <span class="text-danger">*</span>
+                                </label>
+                                <select id="priority" class="form-select form-select-sm">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
                                 </select>
                             </div>
                         </div>
@@ -311,35 +322,27 @@
                         <!-- Status, % Done, Priority -->
                         <div class="row">
 
+                            @if ((ViewBag.UserType + "").ToLower() != "buyer")
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-semibold small">% Done</label>
+                                    <select id="progress_percentage" class="form-select form-select-sm">
+                                        <option value="0">0%</option>
+                                        <option value="10">10%</option>
+                                        <option value="20">20%</option>
+                                        <option value="30">30%</option>
+                                        <option value="40">40%</option>
+                                        <option value="50">50%</option>
+                                        <option value="60">60%</option>
+                                        <option value="70">70%</option>
+                                        <option value="80">80%</option>
+                                        <option value="90">90%</option>
+                                        <option value="100">100%</option>
+                                    </select>
+                                </div>
+                            }
 
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-semibold small">% Done</label>
-                                <select id="progress_percentage" class="form-select form-select-sm">
-                                    <option value="0">0%</option>
-                                    <option value="10">10%</option>
-                                    <option value="20">20%</option>
-                                    <option value="30">30%</option>
-                                    <option value="40">40%</option>
-                                    <option value="50">50%</option>
-                                    <option value="60">60%</option>
-                                    <option value="70">70%</option>
-                                    <option value="80">80%</option>
-                                    <option value="90">90%</option>
-                                    <option value="100">100%</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-semibold small">
-                                    Priority <span class="text-danger">*</span>
-                                </label>
-                                <select id="priority" class="form-select form-select-sm">
-                                    <option value="Low">Low</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="High">High</option>
-                                    <option value="Critical">Critical</option>
-                                </select>
-                            </div>
+                            
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold small">
                                     Requested Due Date <span class="text-danger">*</span>
@@ -454,60 +457,72 @@
     $(document).ready(function () {
         LoadData();
         loadAssigneeDropdown();
-      
-        // 🔹 Auto reload on filter change
+          var userType = '@ViewBag.UserType';
+    if (userType === "Buyer") {
+        $('#progress_percentage').closest('.col-md-4').hide();
+    } else {
+        $('#progress_percentage').closest('.col-md-4').show();
+    }
+
+
         $('#filterStatus, #filterType, #filterPriority').change(function () {
             LoadData();
         });
 
-        $('#btnCreateTicket').click(function () {
+        $('#btnCreateTicket').click(function () {debugger
             $('#ticketForm')[0].reset();
             $('#createTicketModal').modal('show');
+
             loadAssigneeDropdown();
             DescriptionFormatting();
+
+
+    var userType = '@ViewBag.UserType';
+    if (userType === "Buyer") {
+        $('#progress_percentage').closest('.col-md-4').hide();
+    } else {
+        $('#progress_percentage').closest('.col-md-4').show();
+    }
         });
 
-        $('#btnSaveTicket').click(function () {
-            debugger;
-            var ticketData = {
-                title: $('#title').val().trim(),
-                description: encodeURIComponent($('#Description').summernote('code')), // ✅ small d
-                ticket_type: $('#ticket_type').val(),
-                status: $('#status').val(),
-                priority: $('#priority').val(),
-                eta: $('#eta').val(),
-                progress_percentage: $('#progress_percentage').val(),
-                notes: $('#notes').val().trim()
-            };
+       $('#btnSaveTicket').click(function () {
+    var userType = '@ViewBag.UserType';
+    var ticketData = {
+        title: $('#title').val().trim(),
+        description: encodeURIComponent($('#Description').summernote('code')),
+        ticket_type: $('#ticket_type').val(),
+        status: $('#status').val(),
+        priority: $('#priority').val(),
+        eta: $('#eta').val(),
+        progress_percentage: (userType === "Buyer") ? 0 : $('#progress_percentage').val(),
+        notes: $('#notes').val().trim()
+    };
 
-            // ✅ Client-side validation
-            if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
-                !ticketData.status || !ticketData.priority || !ticketData.eta || !ticketData.progress_percentage) {
+    if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
+        !ticketData.status || !ticketData.priority || !ticketData.eta) {
+        MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
+        return;
+    }
 
-                MsgToast('⚠️ Please fill all required fields before saving.', 'Validation Error', 'warning');
-                return;
+    $.ajax({
+        url: '/TicketSystem/SaveTicket',
+        type: 'POST',
+        data: ticketData,
+        success: function (response) {
+            if (response.success) {
+                MsgToast('✅ Ticket created successfully.', 'Success', 'success');
+                $('#createTicketModal').modal('hide');
+                LoadData();
+            } else {
+                MsgToast(response.message || '❌ Failed to save ticket.', 'Error', 'error');
             }
+        },
+        error: function () {
+            MsgToast('❌ Something went wrong while saving the ticket.', 'Error', 'error');
+        }
+    });
+});
 
-            console.log("🚀 Sending Ticket Data:", ticketData);
-
-            $.ajax({
-                url: '/TicketSystem/SaveTicket',
-                type: 'POST',
-                data: ticketData,
-                success: function (response) {
-                    if (response.success) {
-                        MsgToast(response.message || '✅ Ticket created successfully.', 'Success', 'success');
-                        $('#createTicketModal').modal('hide');
-                        LoadData();
-                    } else {
-                        MsgToast(response.message || '❌ Failed to save ticket.', 'Error', 'error');
-                    }
-                },
-                error: function (xhr) {
-                    MsgToast('❌ Something went wrong while saving the ticket.', 'Error', 'error');
-                }
-            });
-        });
 
 
         function DescriptionFormatting() {

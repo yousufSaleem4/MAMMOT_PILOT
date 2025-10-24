@@ -7,6 +7,9 @@ using System.Web.Mvc;
 using System.Linq;
 using System.Configuration;
 using System.Web;
+using IP.Classess;
+using System.Net;
+using System.Net.Http;
 
 namespace PlusCP.Controllers
 {
@@ -18,7 +21,8 @@ namespace PlusCP.Controllers
 
         public ActionResult Index()
         {
-
+            string UserType = Session["UserType"] != null ? Session["UserType"].ToString() : "User";
+            ViewBag.UserType = UserType;
             return View();
         }
 
@@ -67,7 +71,10 @@ namespace PlusCP.Controllers
             try
             {
                 TicketSystem oTicket = new TicketSystem();
-                
+                string UserType = Session["UserType"] != null ? Session["UserType"].ToString() : "User";
+                ViewBag.UserType = UserType;
+
+
                 bool success = oTicket.GetDetail(ticketId);
                 oTicket.serializer = new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
                 
@@ -125,6 +132,8 @@ namespace PlusCP.Controllers
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);
             string decodedDescription = HttpUtility.UrlDecode(description);
+            int progress = 0;
+            int.TryParse(Request["progress_percentage"], out progress);
 
             string ticketId = oTicket.CreateTicket(
                 title,
@@ -134,7 +143,7 @@ namespace PlusCP.Controllers
                 priority,
                 created_by,
                 eta,
-                progress_percentage,
+                progress,
                 notes
             );
 
@@ -161,14 +170,13 @@ namespace PlusCP.Controllers
 
             string subject = $"New Ticket Created - {title}";
             DataTable dtTemplate = oTicket.NewTicketEmailTemplate();
-
             string htmlBody = dtTemplate.Rows.Count > 0
                 ? dtTemplate.Rows[0]["SysValue"].ToString()
                 : "<p>Email template not found in zSysIni.</p>";
 
             htmlBody = htmlBody
                 .Replace("{title}", title)
-                .Replace("{description}", description)
+                .Replace("{description}", decodedDescription)
                 .Replace("{priority}", priority)
                 .Replace("{status}", status)
                 .Replace("{eta}", eta.ToString("yyyy-MM-dd"))

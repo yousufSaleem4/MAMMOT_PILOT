@@ -18,7 +18,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
-       /* padding: 30px 30px;*/
+        /* padding: 30px 30px;*/
         /* max-width: 1400px;*/
         margin: auto;
     }
@@ -509,7 +509,7 @@
                     <div class="card shadow-sm" style="max-width: 600px; margin: 0 auto; padding: 10px; border-radius: 10px;">
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold small">Tracker <span class="text-danger">*</span></label>
                                 <select id="edit_ticket_type" class="form-select form-select-sm">
                                     <option value="">Select Type</option>
@@ -517,13 +517,22 @@
                                     <option value="Feature">Feature</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold small">Status <span class="text-danger">*</span></label>
                                 <select id="edit_status" class="form-select form-select-sm">
                                     <option value="Open">Open</option>
                                     <option value="In Progress">In Progress</option>
                                     <option value="Resolved">Resolved</option>
                                     <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold small">Priority <span class="text-danger">*</span></label>
+                                <select id="edit_priority" class="form-select form-select-sm">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
                                 </select>
                             </div>
                         </div>
@@ -553,15 +562,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-semibold small">Priority <span class="text-danger">*</span></label>
-                                <select id="edit_priority" class="form-select form-select-sm">
-                                    <option value="Low">Low</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="High">High</option>
-                                    <option value="Critical">Critical</option>
-                                </select>
-                            </div>
+                            
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold small">Requested Due Date <span class="text-danger">*</span></label>
@@ -595,17 +596,17 @@
 </div>
 
 <script>
-
 $(document).ready(function () {
-    var ticketId = '@Model.ticket_id'; // or whatever your model property is
-    LoadComments(ticketId);
-});
 
+    const userType = '@ViewBag.UserType';
+    const ticketId = '@Model.ticket_id';
 
+    // ✅ Load comments initially
+    if (ticketId) LoadComments(ticketId);
 
-
+    // ✅ Summernote description formatting
     function DescriptionFormatting() {
-        var $el = $('#edit_description');
+        const $el = $('#edit_description');
         if ($el.length && !$el.next('.note-editor').length) {
             $el.summernote({
                 placeholder: 'Write description...',
@@ -621,53 +622,42 @@ $(document).ready(function () {
         }
     }
 
-
-
-
+    // ✅ Open Edit Modal
     $(document).on("click", "#btnEditTicket", function () {
-        debugger
-        DescriptionFormatting();
-        var ticketId = $(this).data("id");
+        debugger;
+        const ticketId = $(this).data("id");
         console.log("Fetching ticket ID:", ticketId);
-
 
         $.ajax({
             url: '/TicketSystem/GetTicketById',
             type: 'GET',
-            data: { ticketId: ticketId },
+            data: { ticketId },
             success: function (response) {
-                if (response.success) {
-                    $("#ticket_id").val(response.ticket_id);
-                    $("#edit_title").val(response.title);
+                if (!response.success) return alert("Ticket not found!");
 
-                    // ✅ Initialize Summernote first, then set value
-                    $('#edit_description').summernote({
-                        placeholder: 'Write description...',
-                        height: 120,
-                        toolbar: [
-                            ['style', ['bold', 'italic', 'underline', 'clear']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['font', ['strikethrough', 'superscript', 'subscript']],
-                            ['insert', ['link']],
-                            ['view', ['undo', 'redo']]
-                        ]
-                    });
+                // ✅ Fill data
+                $("#ticket_id").val(response.ticket_id);
+                $("#edit_title").val(response.title);
 
-                    // ✅ Set Summernote content from server
-                    $('#edit_description').summernote('code', response.description || '');
+                DescriptionFormatting();
+                $('#edit_description').summernote('code', response.description || '');
 
-                    $("#edit_ticket_type").val(response.ticket_type);
-                    $("#edit_status").val(response.status);
-                    $("#edit_priority").val(response.priority);
-                    $("#edit_eta").val(response.eta ? response.eta.split('T')[0] : '');
-                    $("#edit_progress_percentage").val(response.progress);
-                    $("#edit_notes").val(response.notes);
+                $("#edit_ticket_type").val(response.ticket_type);
+                $("#edit_status").val(response.status);
+                $("#edit_priority").val(response.priority);
+                $("#edit_eta").val(response.eta ? response.eta.split('T')[0] : '');
+                $("#edit_progress_percentage").val(response.progress);
+                $("#edit_notes").val(response.notes);
 
-                    $("#editTicketModal").modal("show");
-
+                // ✅ Hide % Done if user is Buyer
+                if (userType === "Buyer") {
+                    $('#edit_progress_percentage').closest('.col-md-4').hide();
+                    $('#edit_progress_percentage').val(0);
                 } else {
-                    alert("Ticket not found!");
+                    $('#edit_progress_percentage').closest('.col-md-4').show();
                 }
+
+                $("#editTicketModal").modal("show");
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching ticket:", error);
@@ -676,87 +666,72 @@ $(document).ready(function () {
         });
     });
 
+    // ✅ Update Ticket
     $(document).on("click", "#btnUpdateTicket", function () {
         debugger;
+
         DescriptionFormatting();
-        var ticket_id = $('#ticket_id').val();
-        var title = $('#edit_title').val();
-        var description = encodeURIComponent($('#edit_description').summernote('code')); // ✅ small d
-        //var description = $('#edit_description').val();
-        var ticket_type = $('#edit_ticket_type').val();
-        var status = $('#edit_status').val();
-        var priority = $('#edit_priority').val();
-        var eta = $('#edit_eta').val();
-        var progress_percentage = parseInt($('#edit_progress_percentage').val());
-        var notes = $('#edit_notes').val();
 
+        const ticketData = {
+            ticket_id: $('#ticket_id').val(),
+            title: $('#edit_title').val().trim(),
+            description: encodeURIComponent($('#edit_description').summernote('code')),
+            ticket_type: $('#edit_ticket_type').val(),
+            status: $('#edit_status').val(),
+            priority: $('#edit_priority').val(),
+            eta: $('#edit_eta').val(),
+            progress_percentage: (userType === "Buyer") ? 0 : parseInt($('#edit_progress_percentage').val() || 0),
+            notes: $('#edit_notes').val().trim()
+        };
 
-        if (!ticket_type || !title || !description ||
-            !status || !priority || !eta || isNaN(progress_percentage) || !notes) {
-
+        // ✅ Validation
+        if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
+            !ticketData.status || !ticketData.priority || !ticketData.eta) {
             MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
             return;
         }
 
-
         $.ajax({
             url: '/TicketSystem/UpdateTicket',
             type: 'POST',
-            data: {
-                ticket_id: ticket_id,
-                title: title,
-                description: description,
-                ticket_type: ticket_type,
-                status: status,
-                priority: priority,
-                eta: eta,
-                progress_percentage: progress_percentage,
-                notes: notes
-            },
-            datatype: JSON,
+            data: ticketData,
             success: function (data) {
                 if (data.success) {
                     MsgToast(data.message || 'Ticket updated successfully.', 'Success', 'success');
                     $('#editTicketModal').modal('hide');
-                    setTimeout(function () {
-                        window.location.href = '/TicketSystem/Detail?ticketId=' + ticket_id + '&page=list';
-                    }, 2700); //
 
+                    setTimeout(() => {
+                        window.location.href = '/TicketSystem/Detail?ticketId=' + ticketData.ticket_id + '&page=list';
+                    }, 2700);
                 } else {
                     MsgToast(data.message || 'Failed to update ticket.', 'Error', 'error');
                 }
             },
             error: function (xhr) {
-                MsgToast('Something went wrong while saving the ticket.', 'Error', 'error');
                 console.error(xhr.responseText);
+                MsgToast('Something went wrong while saving the ticket.', 'Error', 'error');
             }
         });
     });
-
-
-
 
     // ✅ Load Comments
     function LoadComments(ticketId) {
         $.ajax({
             url: '/TicketSystem/GetComments',
             type: 'GET',
-            data: { ticketId: ticketId },
+            data: { ticketId },
             success: function (res) {
-                let comments = res.comments || res; // handle both {comments: []} and [] formats
+                const comments = res.comments || res;
                 if (comments.length > 0) {
-                    let html = '';
-                    comments.forEach(c => {
-                        html += `
-                        <div class="comment-item">
-                            <div class="comment-header">
-                                <span class="comment-user"><i class="fas fa-user-circle"></i> ${c.UserName}</span>
-                                <span class="comment-time">${c.CreatedAt}</span>
+                    let html = comments.map(c => `
+                        <div class="comment-item mb-2 p-2 bg-white rounded shadow-sm">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-semibold text-primary"><i class="fas fa-user-circle me-1"></i>${c.UserName}</span>
+                                <small class="text-muted">${c.CreatedAt}</small>
                             </div>
-                            <div class="comment-text">${c.CommentText}</div>
+                            <div class="mt-1 text-dark">${c.CommentText}</div>
                         </div>
-                    `;
-                    });
+                    `).join('');
                     $('#commentsSection').html(html);
                 } else {
                     $('#commentsSection').html('<p class="text-muted">No comments yet.</p>');
@@ -768,41 +743,34 @@ $(document).ready(function () {
         });
     }
 
-
-
-
-// ✅ Add New Comment
+    // ✅ Add Comment
     $(document).on('click', '#btnAddComment', function () {
-        debugger
-    var comment = $('#newComment').val().trim();
-    var ticketId = '@Model.ticket_id';
-
-    if (comment === '') {
-        MsgToast('Please write a comment before posting.', 'Validation', 'warning');
-        return;
-    }
-
-    $.ajax({
-        url: '/TicketSystem/InsertComment',
-        type: 'POST',
-        data: {
-            ticketId: ticketId,
-            commentText: comment
-        },
-        success: function (res) {
-
-            if (res.success) {
-                MsgToast('Comment added successfully!', 'Success', 'success');
-                $('#newComment').val('');
-                LoadComments(ticketId);
-            } else {
-                MsgToast(res.message || 'Failed to add comment.', 'Error', 'error');
-            }
-        },
-        error: function () {
-            MsgToast('Error adding comment.', 'Error', 'error');
+        debugger;
+        const comment = $('#newComment').val().trim();
+        if (comment === '') {
+            MsgToast('Please write a comment before posting.', 'Validation', 'warning');
+            return;
         }
+
+        $.ajax({
+            url: '/TicketSystem/InsertComment',
+            type: 'POST',
+            data: { ticketId, commentText: comment },
+            success: function (res) {
+                if (res.success) {
+                    MsgToast('Comment added successfully!', 'Success', 'success');
+                    $('#newComment').val('');
+                    LoadComments(ticketId);
+                } else {
+                    MsgToast(res.message || 'Failed to add comment.', 'Error', 'error');
+                }
+            },
+            error: function () {
+                MsgToast('Error adding comment.', 'Error', 'error');
+            }
+        });
     });
 });
 </script>
+
 
