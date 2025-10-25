@@ -176,7 +176,7 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
                 updated_at = dr["Updated_At"] == DBNull.Value ? "" : dr["updated_at"].ToString();
                 eta = dr["ETA"] == DBNull.Value ? "" : dr["ETA"].ToString();
 
-                // 👇 convert progress to int safely
+               
                 progress = dr["Progress_Percentage"] == DBNull.Value ? 0 : Convert.ToInt32(dr["Progress_Percentage"]);
                 notes = dr["Notes"].ToString();
                 createdDays = dr["Days_Since_Created"] == DBNull.Value ? 0 : Convert.ToInt32(dr["Days_Since_Created"]);
@@ -238,7 +238,7 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
             {
                 cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
 
-                // 🔹 Safely get current user ID
+               
                 int updated_by = 0;
                 if (HttpContext.Current.Session["SigninId"] != null)
                     updated_by = Convert.ToInt32(HttpContext.Current.Session["SigninId"]);

@@ -59,7 +59,7 @@ namespace PlusCP.Controllers
             TicketSystem oTicket = new TicketSystem();
             string decodedDescription = HttpUtility.UrlDecode(Description);
 
-            // ✅ Restrict non-super users
+          
             if (Session["FirstName"]?.ToString() != "Super")
             {
                 ETA = null;
@@ -225,29 +225,29 @@ namespace PlusCP.Controllers
             TicketSystem oTicket = new TicketSystem();
             int userId = Convert.ToInt32(Session["SigninId"]);
 
-            // 1️⃣ Save comment first
+           
             bool result = oTicket.SaveComment(ticketId, userId, commentText);
 
             if (!result)
                 return Json(new { success = false, message = oTicket.ErrorMessage });
 
-            // 2️⃣ Get username
+          
             DataTable dtUser = oTicket.GetUserName(userId);
             string userName = dtUser.Rows.Count > 0 ? dtUser.Rows[0]["UserName"].ToString() : "Unknown User";
 
-            // 3️⃣ Get comment email template
+          
             DataTable dtTemplate = oTicket.NewCommentEmailTemplate();
             string htmlBody = dtTemplate.Rows.Count > 0
                 ? dtTemplate.Rows[0]["SysValue"].ToString()
                 : "<p>Email template not found.</p>";
 
-            // 4️⃣ Get ticket details for context
+           
             DataTable dtTicket = oTicket.GetTicketDetails(ticketId);
             string title = dtTicket.Rows.Count > 0 ? dtTicket.Rows[0]["Title"].ToString() : "";
             string priority = dtTicket.Rows.Count > 0 ? dtTicket.Rows[0]["Priority"].ToString() : "";
             string status = dtTicket.Rows.Count > 0 ? dtTicket.Rows[0]["Status"].ToString() : "";
 
-            // 5️⃣ Replace placeholders in email template
+           
             htmlBody = htmlBody
                 .Replace("{ticket_id}", ticketId)
                 .Replace("{title}", title)
@@ -257,10 +257,10 @@ namespace PlusCP.Controllers
                 .Replace("{status}", status)
                 .Replace("{datetime}", DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 
-            // 6️⃣ Email Subject
+           
             string subject = $"New Comment on Ticket {ticketId} - {title}";
 
-            // 7️⃣ Determine email recipient (same logic as ticket creation)
+            
             string deployMode = ConfigurationManager.AppSettings["DEPLOYMODE"]?.Trim().ToUpper() ?? "TEST";
             string testEmail = ConfigurationManager.AppSettings["TESTEMAIL"]?.Trim();
             string adminEmail = "";
@@ -276,12 +276,12 @@ namespace PlusCP.Controllers
                     adminEmail = dtAdmin.Rows[0]["Email"].ToString();
             }
 
-            // 8️⃣ Send Email
+          
             string emailResult = !string.IsNullOrEmpty(adminEmail)
                 ? cCommon.SendEmail(adminEmail, subject, htmlBody, "", null)
                 : "NO_EMAIL_FOUND";
 
-            // 9️⃣ Return response
+           
             if (emailResult == "SENT" || emailResult == "NO_EMAIL_FOUND")
                 return Json(new { success = true, message = "Comment added successfully and email notification sent!" });
             else

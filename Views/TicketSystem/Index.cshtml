@@ -36,24 +36,23 @@
         }
 
     table.table thead th {
-        background-color: #003B59 !important; /* Change to your desired color */
-        color: white; /* Change to desired text color */
+        background-color: #003B59 !important; 
+        color: white; 
         font-size: 15px;
         font-family: 'Poppins', sans-serif;
         height: 40px;
     }
 
     table.table tbody td, lbl_ {
-        /*background-color: white !important; /* Change to your desired color */
         font-size: 15px;
         color: #003B59 !important;
     }
 
     table.table tbody tr {
-        height: 50px; /* Adjust height as needed */
+        height: 50px; 
     }
 
-        /* Hover effect */
+   
         table.table tbody tr:hover {
             background-color: #f5f5f5 !important; /* Light gray background on hover */
             transition: background-color 0.8s ease-in-out;
@@ -64,10 +63,8 @@
 
 
     table th {
-        /*padding: 1rem 0.5rem !important;*/
         border: 1px solid white;
         border-bottom: 1px solid white;
-        /*padding: 8px;*/
         text-align: left;
     }
 
@@ -100,7 +97,7 @@
         resize: vertical;
     }
 
-    /* Make all inputs consistent height */
+
     .api-settings-card .form-control,
     .api-settings-card .input-group .form-control {
         height: 16px;
@@ -108,43 +105,34 @@
         border-radius: 6px;
     }
 
-    /* XXL Modal Width */
-    /* .modal-xxl {
-        max-width: 95%;
-        width: 95%;
-    }*/
+    
 
-    /* Scroll + Padding */
+
     .modal-body {
         max-height: 80vh;
         overflow-y: hidden;
         padding: 2rem 3rem;
     }
 
-    /*.modal-header,
-    .modal-footer {
-        background-color: #D6EFE8;
-        color: #003B59
-    }*/
+    
 
     .form-label {
         font-weight: 600;
         color: #333;
     }
 
-    /* 🔹 Rounded dropdowns (pill style) */
+    
     .form-select {
         border-radius: 50px !important;
         border: 1px solid #00b4d8 !important;
         padding: 4px 9px !important;
-        /*font-weight: 500;*/
         color: #003b59;
         background-color: #ffffff;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
         transition: all 0.2s ease-in-out;
     }
 
-        /* Hover + focus effects */
+    
         .form-select:hover {
             box-shadow: 0 3px 8px rgba(0, 180, 216, 0.2);
         }
@@ -157,18 +145,15 @@
 
 
 
-    /* Gradient Header */
+   
     .modal-header {
         background-color: #D6EFE8;
         color: #003B59
     }
 
-    /*.modal-footer {
-        background: #f8f9fa;
-        border-top: none;
-    }*/
+   
 
-    /* Add spacing between form fields */
+
     .mb-3 {
         margin-bottom: 1.25rem !important;
     }
@@ -180,8 +165,7 @@
     }
 
 
-    /* Priority badges */
-    /* Priority badges - border only */
+   
     .priority-badge {
         display: inline-block;
         padding: 4px 10px;
@@ -192,7 +176,7 @@
         background-color: transparent !important;
     }
 
-    /* Border colors instead of background */
+   
     .priority-critical {
         border: 2px solid #dc3545;
         color: #dc3545;
@@ -221,7 +205,7 @@
     }
 
         .btnCreate:hover {
-            background-color: transparent; /* Make background transparent on hover */
+            background-color: transparent; /* Make 
             border-color: #003B59; /* Dark border color on hover */
             color: #003B59; /* Dark font color on hover */
         }
@@ -454,34 +438,34 @@
             if (type === 'display') {
                 if (!data) return '';
 
-                // Encode quotes and remove line breaks
+               
                 var safeData = data
                     .replace(/(\r\n|\n|\r)/gm, " ")
                     .replace(/'/g, "&#39;")
                     .replace(/"/g, "&quot;");
 
-                // Convert HTML into plain text (for length) but keep original HTML for output
+              
                 var temp = $('<div>').html(data);
                 var plainText = temp.text();
 
-                // ✅ If short enough, show as is
+               
                 if (plainText.length <= cutoff) {
                     return data;
                 }
 
-                // ✅ Build shortened formatted HTML
+                
                 var trimmedHTML = '';
                 var remaining = cutoff;
                 temp.contents().each(function () {
                     if (remaining <= 0) return false;
 
                     if (this.nodeType === 3) {
-                        // Text node
+                       
                         var text = this.nodeValue.substring(0, remaining);
                         trimmedHTML += text;
                         remaining -= text.length;
                     } else if (this.nodeType === 1) {
-                        // Element node (preserve tags like <b>, <i>, <span>)
+                        
                         var innerHTML = $(this).html();
                         var textInside = $(this).text();
 
@@ -489,7 +473,7 @@
                             trimmedHTML += this.outerHTML;
                             remaining -= textInside.length;
                         } else {
-                            // Trim inside element if it exceeds cutoff
+                           
                             var partialInner = textInside.substring(0, remaining);
                             trimmedHTML += '<' + this.nodeName.toLowerCase() + '>' +
                                 partialInner + '</' + this.nodeName.toLowerCase() + '>';
@@ -498,7 +482,7 @@
                     }
                 });
 
-                // ✅ Add See More link
+               
                 return trimmedHTML +
                     '... <a href="#" onclick="showModalForZPL(\'' + header + '\', \'' + safeData + '\')">See More</a>';
             }
@@ -523,7 +507,7 @@
             LoadData();
         });
 
-        $('#btnCreateTicket').click(function () {debugger
+        $('#btnCreateTicket').click(function () {
             $('#ticketForm')[0].reset();
             $('#createTicketModal').modal('show');
 
@@ -554,15 +538,15 @@
         data: ticketData,
         success: function (response) {
             if (response.success) {
-                MsgToast('✅ Ticket created successfully.', 'Success', 'success');
+                MsgToast('Ticket created successfully.', 'Success', 'success');
                 $('#createTicketModal').modal('hide');
                 LoadData();
             } else {
-                MsgToast(response.message || '❌ Failed to save ticket.', 'Error', 'error');
+                MsgToast(response.message || 'Failed to save ticket.', 'Error', 'error');
             }
         },
         error: function () {
-            MsgToast('❌ Something went wrong while saving the ticket.', 'Error', 'error');
+            MsgToast('Something went wrong while saving the ticket.', 'Error', 'error');
         }
     });
 });
@@ -572,7 +556,7 @@
         function DescriptionFormatting() {
             var $el = $('#Description'); // Correct ID
             if ($el.length) {
-                // Agar pehle se init hua ho to reset kar do
+               
                 if ($el.next('.note-editor').length) {
                     $el.summernote('destroy');
                 }
@@ -607,7 +591,7 @@
                     });
                 },
                 error: function () {
-                    MsgToast('❌ Error loading assignee list.', 'Error', 'error');
+                    MsgToast(' Error loading assignee list.', 'Error', 'error');
 
                 }
             });
@@ -752,12 +736,12 @@
                     }
                  
 
-                    // agar DataTable pehle se initialized hai to destroy karke reload karo
+                  
                     if ($.fn.DataTable.isDataTable('#lstTicket')) {
                         $('#lstTicket').DataTable().clear().destroy();
                     }
 
-                    // chahe data empty ho, grid show karo
+                    
                     MakeDataGridForTraining('lstTicket', data.lstTicket, 0, columnDef, 'buttons', true, true, false, false);
                 }
             }

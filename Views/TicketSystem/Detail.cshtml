@@ -18,8 +18,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
-        /* padding: 30px 30px;*/
-        /* max-width: 1400px;*/
         margin: auto;
     }
 
@@ -299,7 +297,7 @@
 
     /* Comments List */
     .comments-list {
-        /*max-height: auto;*/
+       
         overflow-y: hidden;
         padding-right: 8px;
     }
@@ -338,7 +336,7 @@
         line-height: 1.5;
     }
 
-    /* Add Comment Box */
+    
     .comment-box {
         display: flex;
         align-items: flex-start;
@@ -471,16 +469,16 @@
         </div>
     </div>
 </div>
-<!-- 🗨️ COMMENTS SECTION -->
+
 <div class="comment-wrapper">
     <h5 class="comments-title"><i class="fas fa-comments"></i> Discussion</h5>
 
-    <!-- Comments -->
+   
     <div id="commentsSection" class="comments-list">
         <p class="text-muted">Loading comments...</p>
     </div>
 
-    <!-- Add Comment -->
+   
     <div class="comment-box">
         <textarea id="newComment" placeholder="Write a comment..."></textarea>
         <button id="btnAddComment"><i class="fas fa-paper-plane"></i> Post</button>
@@ -488,12 +486,12 @@
 </div>
 
 
-<!-- ✅ EDIT TICKET MODAL -->
+
 <div class="modal fade" id="editTicketModal" tabindex="-1" aria-labelledby="editTicketModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow-lg">
 
-            <!-- Header -->
+           
             <div class="modal-header">
                 <h4 class="modal-title fw-bold">
                     <i class="fas fa-edit me-2"></i> Edit Ticket
@@ -501,7 +499,7 @@
                 <button type="button" class="close full-opacity-hover" data-dismiss="modal">&times;</button>
             </div>
 
-            <!-- Body -->
+           
             <div class="modal-body bg-light" style="font-size: 14px; padding: 10px;">
                 <form id="editTicketForm">
                     <input type="hidden" id="ticket_id" />
@@ -613,10 +611,10 @@ $(document).ready(function () {
     const userType = '@ViewBag.UserType';
     const ticketId = '@Model.ticket_id';
 
-    // ✅ Load comments initially
+    
     if (ticketId) LoadComments(ticketId);
 
-    // ✅ Summernote description formatting
+    
     function DescriptionFormatting() {
         const $el = $('#edit_description');
         if ($el.length && !$el.next('.note-editor').length) {
@@ -634,16 +632,16 @@ $(document).ready(function () {
         }
     }
 
-    // ✅ Open Edit Modal
+
     $(document).on("click", "#btnEditTicket", function () {debugger
         debugger;
         const ticketId = $(this).data("id");
         console.log("Fetching ticket ID:", ticketId);
 
-        // ✅ Hide ETA and % Done based on role
+        
 if (firstName !== "Super") {
-    $('#edit_eta').closest('.col-md-4').hide();            // hide ETA
-    $('#edit_progress_percentage').closest('.col-md-4').hide(); // hide % Done
+    $('#edit_eta').closest('.col-md-4').hide();            
+    $('#edit_progress_percentage').closest('.col-md-4').hide(); 
 } else {
     $('#edit_eta').closest('.col-md-4').show();
     $('#edit_progress_percentage').closest('.col-md-4').show();
@@ -657,7 +655,7 @@ if (firstName !== "Super") {
             success: function (response) {
                 if (!response.success) return alert("Ticket not found!");
 
-                // ✅ Fill data
+               
                 $("#ticket_id").val(response.ticket_id);
                 $("#edit_title").val(response.title);
 
@@ -671,7 +669,7 @@ if (firstName !== "Super") {
                 $("#edit_progress_percentage").val(response.progress);
                 $("#edit_notes").val(response.notes);
 
-                // ✅ Hide % Done if user is Buyer
+               
                 if (firstName !== "Super") {
                     $('#edit_progress_percentage').closest('.col-md-4').hide();
                     $('#edit_progress_percentage').val(0);
@@ -688,7 +686,7 @@ if (firstName !== "Super") {
         });
     });
 
-    // ✅ Update Ticket
+    
     $(document).on("click", "#btnUpdateTicket", function () {
         debugger;
 
@@ -700,7 +698,7 @@ if (firstName !== "Super") {
             description: encodeURIComponent($('#edit_description').summernote('code')),
             ticket_type: $('#edit_ticket_type').val(),
             status: $('#edit_status').val(),
-            priority: $('#edit_priority').val(), // ✅ Added
+            priority: $('#edit_priority').val(), 
             eta: (firstName === "Super") ? $('#edit_eta').val() : null,
             progress_percentage: (firstName === "Super") ? parseInt($('#edit_progress_percentage').val() || 0) : 0,
             notes: $('#edit_notes').val().trim()
@@ -708,7 +706,7 @@ if (firstName !== "Super") {
 
 
         if (firstName !== "Super") {
-            // ✅ Validation
+           
             if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
                 !ticketData.status || !ticketData.priority) {
                 MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
@@ -716,7 +714,7 @@ if (firstName !== "Super") {
             }
         }
             else {
-                     // ✅ Validation
+                     
         if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
             !ticketData.status || !ticketData.priority || !ticketData.eta) {
             MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
@@ -749,7 +747,7 @@ if (firstName !== "Super") {
         });
     });
 
-    // ✅ Load Comments
+    
     function LoadComments(ticketId) {
         $.ajax({
             url: '/TicketSystem/GetComments',
@@ -778,7 +776,7 @@ if (firstName !== "Super") {
         });
     }
 
-    // ✅ Add Comment
+    
     $(document).on('click', '#btnAddComment', function () {
         debugger;
         const comment = $('#newComment').val().trim();
