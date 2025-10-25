@@ -518,15 +518,15 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold small">Status <span class="text-danger">*</span></label>
                                 <select id="edit_status" class="form-select form-select-sm">
+                                    <!-- hidden New option for binding -->
+                                    <option value="New" style="display:none;">New</option>
+
                                     @if (ViewBag.FirstName == "Super")
                                     {
                                         <option value="In Progress">In Progress</option>
                                         <option value="Resolved">Resolved</option>
                                         <option value="Closed">Closed</option>
-
-
                                     }
-
                                     else
                                     {
                                         <option value="Reopen">Reopen</option>
@@ -633,20 +633,18 @@ $(document).ready(function () {
     }
 
 
-    $(document).on("click", "#btnEditTicket", function () {debugger
+    $(document).on("click", "#btnEditTicket", function () {
         debugger;
         const ticketId = $(this).data("id");
         console.log("Fetching ticket ID:", ticketId);
 
-        
-if (firstName !== "Super") {
-    $('#edit_eta').closest('.col-md-4').hide();            
-    $('#edit_progress_percentage').closest('.col-md-4').hide(); 
-} else {
-    $('#edit_eta').closest('.col-md-4').show();
-    $('#edit_progress_percentage').closest('.col-md-4').show();
-}
-
+        if (firstName !== "Super") {
+            $('#edit_eta').closest('.col-md-4').hide();
+            $('#edit_progress_percentage').closest('.col-md-4').hide();
+        } else {
+            $('#edit_eta').closest('.col-md-4').show();
+            $('#edit_progress_percentage').closest('.col-md-4').show();
+        }
 
         $.ajax({
             url: '/TicketSystem/GetTicketById',
@@ -655,7 +653,7 @@ if (firstName !== "Super") {
             success: function (response) {
                 if (!response.success) return alert("Ticket not found!");
 
-               
+                // Basic fields
                 $("#ticket_id").val(response.ticket_id);
                 $("#edit_title").val(response.title);
 
@@ -663,13 +661,27 @@ if (firstName !== "Super") {
                 $('#edit_description').summernote('code', response.description || '');
 
                 $("#edit_ticket_type").val(response.ticket_type);
-                $("#edit_status").val(response.status);
                 $("#edit_priority").val(response.priority);
                 $("#edit_eta").val(response.eta ? response.eta.split('T')[0] : '');
                 $("#edit_progress_percentage").val(response.progress);
                 $("#edit_notes").val(response.notes);
 
-               
+                // ✅ STATUS HANDLING
+                const statusDropdown = $("#edit_status");
+                const currentStatus = response.status?.trim() || '';
+
+                // Check if the dropdown already has this option
+                if (currentStatus && statusDropdown.find(`option[value='${currentStatus}']`).length === 0) {
+                    // Add temporary option (e.g. "New")
+                    statusDropdown.prepend(
+                        $('<option>', { value: currentStatus, text: currentStatus })
+                    );
+                }
+
+                // Select the current status
+                statusDropdown.val(currentStatus);
+
+                // ✅ Progress visibility logic
                 if (firstName !== "Super") {
                     $('#edit_progress_percentage').closest('.col-md-4').hide();
                     $('#edit_progress_percentage').val(0);
@@ -685,6 +697,7 @@ if (firstName !== "Super") {
             }
         });
     });
+
 
     
     $(document).on("click", "#btnUpdateTicket", function () {
