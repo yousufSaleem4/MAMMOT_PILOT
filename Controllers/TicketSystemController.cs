@@ -21,8 +21,8 @@ namespace PlusCP.Controllers
 
         public ActionResult Index()
         {
-            string UserType = Session["UserType"] != null ? Session["UserType"].ToString() : "User";
-            ViewBag.UserType = UserType;
+            string FirstName = Session["FirstName"] != null ? Session["FirstName"].ToString() : "User";
+            ViewBag.FirstName = FirstName;
             return View();
         }
 
@@ -53,11 +53,20 @@ namespace PlusCP.Controllers
 
         [HttpPost]
         public JsonResult UpdateTicket(string Ticket_ID, string Title, string Description, string Ticket_Type,
-                                 string Status, string Priority, DateTime ETA,
+                                 string Status, string Priority, DateTime? ETA,
                                  int Progress_Percentage, string Notes)
         {
             TicketSystem oTicket = new TicketSystem();
             string decodedDescription = HttpUtility.UrlDecode(Description);
+
+            // ✅ Restrict non-super users
+            if (Session["FirstName"]?.ToString() != "Super")
+            {
+                ETA = null;
+                Progress_Percentage = 0;
+            }
+
+
             bool success = oTicket.UpdateTicket(Ticket_ID, Title, decodedDescription, Ticket_Type, Status, Priority, ETA, Progress_Percentage, Notes);
             oTicket.SaveTicketHistory(Ticket_ID, Status, Progress_Percentage);
             if (success)
@@ -71,8 +80,8 @@ namespace PlusCP.Controllers
             try
             {
                 TicketSystem oTicket = new TicketSystem();
-                string UserType = Session["UserType"] != null ? Session["UserType"].ToString() : "User";
-                ViewBag.UserType = UserType;
+                string FirstName = Session["FirstName"] != null ? Session["FirstName"].ToString() : "User";
+                ViewBag.FirstName = FirstName;
 
 
                 bool success = oTicket.GetDetail(ticketId);
@@ -127,7 +136,7 @@ namespace PlusCP.Controllers
 
         [HttpPost]
         public JsonResult SaveTicket(string title, string description, string ticket_type, string status,
-                             string priority, DateTime eta, int progress_percentage, string notes)
+                             string priority, int progress_percentage, string notes)
         {
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);
@@ -142,7 +151,6 @@ namespace PlusCP.Controllers
                 status,
                 priority,
                 created_by,
-                eta,
                 progress,
                 notes
             );
@@ -179,7 +187,6 @@ namespace PlusCP.Controllers
                 .Replace("{description}", decodedDescription)
                 .Replace("{priority}", priority)
                 .Replace("{status}", status)
-                .Replace("{eta}", eta.ToString("yyyy-MM-dd"))
                 .Replace("{created_by}", created_by.ToString());
 
             string emailResult = !string.IsNullOrEmpty(adminEmail)

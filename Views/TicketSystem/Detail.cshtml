@@ -520,10 +520,21 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold small">Status <span class="text-danger">*</span></label>
                                 <select id="edit_status" class="form-select form-select-sm">
-                                    <option value="Open">Open</option>
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Resolved">Resolved</option>
-                                    <option value="Closed">Closed</option>
+                                    @if (ViewBag.FirstName == "Super")
+                                    {
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Resolved">Resolved</option>
+                                        <option value="Closed">Closed</option>
+
+
+                                    }
+
+                                    else
+                                    {
+                                        <option value="Reopen">Reopen</option>
+                                        <option value="Closed">Closed</option>
+                                    }
+
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -597,6 +608,7 @@
 
 <script>
 $(document).ready(function () {
+    const firstName = '@ViewBag.FirstName';
 
     const userType = '@ViewBag.UserType';
     const ticketId = '@Model.ticket_id';
@@ -623,10 +635,20 @@ $(document).ready(function () {
     }
 
     // ✅ Open Edit Modal
-    $(document).on("click", "#btnEditTicket", function () {
+    $(document).on("click", "#btnEditTicket", function () {debugger
         debugger;
         const ticketId = $(this).data("id");
         console.log("Fetching ticket ID:", ticketId);
+
+        // ✅ Hide ETA and % Done based on role
+if (firstName !== "Super") {
+    $('#edit_eta').closest('.col-md-4').hide();            // hide ETA
+    $('#edit_progress_percentage').closest('.col-md-4').hide(); // hide % Done
+} else {
+    $('#edit_eta').closest('.col-md-4').show();
+    $('#edit_progress_percentage').closest('.col-md-4').show();
+}
+
 
         $.ajax({
             url: '/TicketSystem/GetTicketById',
@@ -650,7 +672,7 @@ $(document).ready(function () {
                 $("#edit_notes").val(response.notes);
 
                 // ✅ Hide % Done if user is Buyer
-                if (userType === "Buyer") {
+                if (firstName !== "Super") {
                     $('#edit_progress_percentage').closest('.col-md-4').hide();
                     $('#edit_progress_percentage').val(0);
                 } else {
@@ -678,18 +700,31 @@ $(document).ready(function () {
             description: encodeURIComponent($('#edit_description').summernote('code')),
             ticket_type: $('#edit_ticket_type').val(),
             status: $('#edit_status').val(),
-            priority: $('#edit_priority').val(),
-            eta: $('#edit_eta').val(),
-            progress_percentage: (userType === "Buyer") ? 0 : parseInt($('#edit_progress_percentage').val() || 0),
+            priority: $('#edit_priority').val(), // ✅ Added
+            eta: (firstName === "Super") ? $('#edit_eta').val() : null,
+            progress_percentage: (firstName === "Super") ? parseInt($('#edit_progress_percentage').val() || 0) : 0,
             notes: $('#edit_notes').val().trim()
         };
 
-        // ✅ Validation
+
+        if (firstName !== "Super") {
+            // ✅ Validation
+            if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
+                !ticketData.status || !ticketData.priority) {
+                MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
+                return;
+            }
+        }
+            else {
+                     // ✅ Validation
         if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
             !ticketData.status || !ticketData.priority || !ticketData.eta) {
             MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
             return;
         }
+            }
+        
+       
 
         $.ajax({
             url: '/TicketSystem/UpdateTicket',
@@ -726,7 +761,7 @@ $(document).ready(function () {
                     let html = comments.map(c => `
                         <div class="comment-item mb-2 p-2 bg-white rounded shadow-sm">
                             <div class="d-flex justify-content-between">
-                                <span class="fw-semibold text-primary"><i class="fas fa-user-circle me-1"></i>${c.UserName}</span>
+                                <span class="fw-semibold text-primary" style=font-size:16px; font-weight:bold;><i class="fas fa-user-circle me-1" style=padding:2px; ></i>${c.UserName}</span>
                                 <small class="text-muted">${c.CreatedAt}</small>
                             </div>
                             <div class="mt-1 text-dark">${c.CommentText}</div>

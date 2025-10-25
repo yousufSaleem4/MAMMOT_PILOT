@@ -95,7 +95,7 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
         }
 
 
-        public bool UpdateTicket(string Ticket_ID, string Title, string Description, string Ticket_Type, string Status, string Priority, DateTime ETA, int Progress_Percentage, string Notes)
+        public bool UpdateTicket(string Ticket_ID, string Title, string Description, string Ticket_Type, string Status, string Priority, DateTime? ETA, int Progress_Percentage, string Notes)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
 
@@ -190,19 +190,29 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
 
 
         public string CreateTicket(string title, string description, string ticket_type, string status, string priority,
-                             int created_by, DateTime eta, int progress_percentage, string notes)
+                             int created_by, int progress_percentage, string notes)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string getAssigneeSql = "SELECT TOP 1 UserID FROM SRM.UserInfo WHERE FirstName = 'Super' ";
+            DataTable dtAssignee = oDAL.GetData(getAssigneeSql);
+
+            if (dtAssignee.Rows.Count == 0)
+            {
+                ErrorMessage = "Assignee user 'super' not found.";
+                return null;
+            }
+
+            int assigned_to = Convert.ToInt32(dtAssignee.Rows[0]["UserID"]);
+
 
             string sql = "EXEC SRM.usp_CreateTicket " +
                          "@Title = '" + title + "', " +
                          "@Description = '" + description + "', " +
                          "@Ticket_Type = '" + ticket_type + "', " +
-                         "@Status = '" + status + "', " +
+                         "@Status = 'New', " +
                          "@Priority = '" + priority + "', " +
                          "@Created_By = " + created_by + ", " +
-                         "@Assigned_To = 1026, " +
-                         "@ETA = '" + eta + "', " +
+                          "@Assigned_To = " + assigned_to + ", " +
                          "@Progress_Percentage = " + progress_percentage + ", " +
                          "@Notes = '" + notes + "'";
 

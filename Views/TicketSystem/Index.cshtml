@@ -268,7 +268,7 @@
                     <div class="card shadow-sm" style="max-width: 600px; margin: 0 auto; padding: 10px; border-radius: 10px;">
                         <div class="row">
                             <!-- Tracker -->
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold small">
                                     Tracker <span class="text-danger">*</span>
                                 </label>
@@ -278,7 +278,7 @@
                                     <option value="Feature">Feature</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4 mb-3" style="display:none;">
                                 <label class="form-label fw-semibold small">
                                     Status <span class="text-danger">*</span>
                                 </label>
@@ -289,7 +289,7 @@
                                     <option value="Closed">Closed</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold small">
                                     Priority <span class="text-danger">*</span>
                                 </label>
@@ -322,9 +322,8 @@
                         <!-- Status, % Done, Priority -->
                         <div class="row">
 
-                            @if ((ViewBag.UserType + "").ToLower() != "buyer")
-                            {
-                                <div class="col-md-4 mb-3">
+                          
+                                <div class="col-md-4 mb-3" style="display:none;">
                                     <label class="form-label fw-semibold small">% Done</label>
                                     <select id="progress_percentage" class="form-select form-select-sm">
                                         <option value="0">0%</option>
@@ -340,15 +339,10 @@
                                         <option value="100">100%</option>
                                     </select>
                                 </div>
-                            }
+                            
+
 
                             
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-semibold small">
-                                    Requested Due Date <span class="text-danger">*</span>
-                                </label>
-                                <input type="date" id="eta" class="form-control form-control-sm" />
-                            </div>
                         </div>
 
                         <!-- ETA and Additional Notes -->
@@ -410,18 +404,9 @@
             <button id="btnCreateTicket" class="btn btn-badges">
                 <i class="fa fa-plus"></i> Create Ticket
             </button>
-
-
-
-
-            @*<div id="buttons" class="box-tools pull-right">
-                </div>*@
-
-
         </div>
-        <!-- 🔹 Data Grid -->
         <div class="box-body bg-light card mt-4" id="lstP">
-            <table id="lstTicket" class="table table-bordered table-striped text-sm table-hover" >
+            <table id="lstTicket" class="table table-bordered table-striped text-sm table-hover" width="100%">
                 <thead class="sorted-asc fw-light small">
                     <tr style="background-color: white">
                         <th></th>
@@ -431,9 +416,12 @@
                         <th></th>
                         <th></th>
                         <th></th>
-                        <th></th>
+                        @if (ViewBag.FirstName == "Super")
+                        {
+                            <th></th>
+                            <th></th>
+                        }
 
-                        <th></th>
                         <th></th>
                         <th></th>
                         <th></th>
@@ -527,16 +515,6 @@
     $(document).ready(function () {
         LoadData();
         loadAssigneeDropdown();
-          var userType = '@ViewBag.UserType';
-    if (userType === "Buyer") {
-        $('#progress_percentage').closest('.col-md-4').hide();
-    } else {
-        $('#progress_percentage').closest('.col-md-4').show();
-    }
-
-
-
-        
 
 
 
@@ -551,31 +529,21 @@
 
             loadAssigneeDropdown();
             DescriptionFormatting();
-
-
-    var userType = '@ViewBag.UserType';
-    if (userType === "Buyer") {
-        $('#progress_percentage').closest('.col-md-4').hide();
-    } else {
-        $('#progress_percentage').closest('.col-md-4').show();
-    }
         });
 
        $('#btnSaveTicket').click(function () {
-    var userType = '@ViewBag.UserType';
     var ticketData = {
         title: $('#title').val().trim(),
         description: encodeURIComponent($('#Description').summernote('code')),
         ticket_type: $('#ticket_type').val(),
         status: $('#status').val(),
         priority: $('#priority').val(),
-        eta: $('#eta').val(),
-        progress_percentage: (userType === "Buyer") ? 0 : $('#progress_percentage').val(),
+        progress_percentage: $('#progress_percentage').val(),
         notes: $('#notes').val().trim()
     };
 
     if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
-        !ticketData.status || !ticketData.priority || !ticketData.eta) {
+        !ticketData.status || !ticketData.priority) {
         MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
         return;
     }
@@ -649,6 +617,8 @@
 
 
     function LoadData() {
+        const firstName = '@ViewBag.FirstName';
+
         $.ajax({
             cache: false,
             type: "GET",
@@ -661,72 +631,126 @@
             dataType: "json",
             success: function (data) {
                 if (data && data.lstTicket) {
-                    var columnDef = [
-                        {
-                            "data": "Ticket_Id", "title": "Ticket #", "width": "80px", "className": "text-center",
-                            render: function (data, type, row) {
-                                var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
-                                return '<a href="' + url + '" target="_blank">' + data + '</a>';
-                            }
-                        }, 
-                        {
-                            "data": "Title", "title": "Title", "width": "200px", "className": "text-center",
-                            render: function (data, type, row) {
-                                var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
-                                return '<a href="' + url + '" target="_blank">' + data + '</a>';
-                            }
-                        },
-                        { "data": "Description", "title": "Description", "width": "380px", "render": $.fn.dataTable.render.ellipsisAdr(38, "Description") },
-                        { "data": "Description", "title": "Description", "width": "260px", "visible": false },
-                        { "data": "Ticket_Type", "title": "Type", "width": "60px", "className": "text-center" },
-                        { "data": "Status", "title": "Status", "width": "100px", "className": "text-center" },
-                        {
-                            "data": "Priority", "className": "text-center", "width": "60px", "className": "text-center",
-                            "title": "Priority",
-                            render: function (data, type, row) {
-                                var className = '';
-                                switch (data.toLowerCase()) {
-                                    case 'critical': className = 'priority-critical'; break;
-                                    case 'high': className = 'priority-high'; break;
-                                    case 'medium': className = 'priority-medium'; break;
-                                    case 'low': className = 'priority-low'; break;
-                                    default: className = '';
+                    if (firstName == "Super") {
+                        var columnDef = [
+                            {
+                                "data": "Ticket_Id", "title": "Ticket #", "width": "80px", "className": "text-center",
+                                render: function (data, type, row) {
+                                    var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
+                                    return '<a href="' + url + '" target="_blank">' + data + '</a>';
                                 }
+                            },
+                            {
+                                "data": "Title", "title": "Title", "width": "200px", "className": "text-center"
+                            },
+                            { "data": "Description", "title": "Description", "render": $.fn.dataTable.render.ellipsisAdr(38, "Description") },
+                            { "data": "Description", "title": "Description", "width": "260px", "visible": false },
+                            { "data": "Ticket_Type", "title": "Type", "width": "60px", "className": "text-center" },
+                            { "data": "Status", "title": "Status", "width": "100px", "className": "text-center" },
+                            {
+                                "data": "Priority", "className": "text-center", "width": "60px", "className": "text-center",
+                                "title": "Priority",
+                                render: function (data, type, row) {
+                                    var className = '';
+                                    switch (data.toLowerCase()) {
+                                        case 'critical': className = 'priority-critical'; break;
+                                        case 'high': className = 'priority-high'; break;
+                                        case 'medium': className = 'priority-medium'; break;
+                                        case 'low': className = 'priority-low'; break;
+                                        default: className = '';
+                                    }
 
-                                return '<span class="priority-badge ' + className + '">' + data + '</span>';
-                            }
-                        },
+                                    return '<span class="priority-badge ' + className + '">' + data + '</span>';
+                                }
+                            },
 
-                        {
-                            "data": "Progress_Percentage", "width": "60px",
-                            "title": "Progress",
-                            "className": "text-center",
-                            render: function (data, type, row) {
-                                if (data == null || data === '') return '0%';
-                                return data + '%';
-                            }
-                        },
+                            {
+                                "data": "Progress_Percentage", "width": "60px",
+                                "title": "Progress",
+                                "className": "text-center",
+                                render: function (data, type, row) {
+                                    if (data == null || data === '') return '0%';
+                                    return data + '%';
+                                }
+                            },
 
-                        { "data": "ETA", "title": "ETA", "width": "150px", "className": "text-center" },
-                        { "data": "Created_At", "title": "Created At", "width": "150px", "className": "text-center" },
-                        {
-                            "data": "Updated_At",
-                            "title": "Updated At", "width": "150px", "className": "text-center",
-                            render: function (data, type, row) {
-                                if (!data) return '';
-                                var date = new Date(data);
-                                var yyyy = date.getFullYear();
-                                var mm = ('0' + (date.getMonth() + 1)).slice(-2);
-                                var dd = ('0' + date.getDate()).slice(-2);
-                                var hh = ('0' + date.getHours()).slice(-2);
-                                var min = ('0' + date.getMinutes()).slice(-2);
-                                return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
-                            }
-                        },
+                            { "data": "ETA", "title": "ETA", "width": "150px", "className": "text-center" },
+                            { "data": "Created_At", "title": "Created At", "width": "150px", "className": "text-center" },
+                            {
+                                "data": "Updated_At",
+                                "title": "Updated At", "width": "150px", "className": "text-center",
+                                render: function (data, type, row) {
+                                    if (!data) return '';
+                                    var date = new Date(data);
+                                    var yyyy = date.getFullYear();
+                                    var mm = ('0' + (date.getMonth() + 1)).slice(-2);
+                                    var dd = ('0' + date.getDate()).slice(-2);
+                                    var hh = ('0' + date.getHours()).slice(-2);
+                                    var min = ('0' + date.getMinutes()).slice(-2);
+                                    return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
+                                }
+                            },
 
-                        { "data": "Assigned_To_Name", "title": "Assigned To", "width": "150px", "className": "text-center" },
-                        { "data": "Created_By_Name", "title": "Created By", "width": "150px", "className": "text-center" }
-                    ];
+                            { "data": "Assigned_To_Name", "title": "Assigned To", "width": "150px", "className": "text-center" },
+                            { "data": "Created_By_Name", "title": "Created By", "width": "150px", "className": "text-center" }
+                        ];
+                    }
+
+                    else {
+                        var columnDef = [
+                            {
+                                "data": "Ticket_Id", "title": "Ticket #", "width": "80px", "className": "text-center",
+                                render: function (data, type, row) {
+                                    var url = '\\TicketSystem\\Detail?ticketId=' + row["Ticket_Id"] + '&page=list';
+                                    return '<a href="' + url + '" target="_blank">' + data + '</a>';
+                                }
+                            },
+                            {
+                                "data": "Title", "title": "Title", "width": "200px", "className": "text-center"
+                            },
+                            { "data": "Description", "title": "Description", "render": $.fn.dataTable.render.ellipsisAdr(38, "Description") },
+                            { "data": "Description", "title": "Description", "width": "260px", "visible": false },
+                            { "data": "Ticket_Type", "title": "Type", "width": "60px", "className": "text-center" },
+                            { "data": "Status", "title": "Status", "width": "100px", "className": "text-center" },
+                            {
+                                "data": "Priority", "className": "text-center", "width": "60px", "className": "text-center",
+                                "title": "Priority",
+                                render: function (data, type, row) {
+                                    var className = '';
+                                    switch (data.toLowerCase()) {
+                                        case 'critical': className = 'priority-critical'; break;
+                                        case 'high': className = 'priority-high'; break;
+                                        case 'medium': className = 'priority-medium'; break;
+                                        case 'low': className = 'priority-low'; break;
+                                        default: className = '';
+                                    }
+
+                                    return '<span class="priority-badge ' + className + '">' + data + '</span>';
+                                }
+                            },
+
+
+                            { "data": "Created_At", "title": "Created At", "width": "150px", "className": "text-center" },
+                            {
+                                "data": "Updated_At",
+                                "title": "Updated At", "width": "150px", "className": "text-center",
+                                render: function (data, type, row) {
+                                    if (!data) return '';
+                                    var date = new Date(data);
+                                    var yyyy = date.getFullYear();
+                                    var mm = ('0' + (date.getMonth() + 1)).slice(-2);
+                                    var dd = ('0' + date.getDate()).slice(-2);
+                                    var hh = ('0' + date.getHours()).slice(-2);
+                                    var min = ('0' + date.getMinutes()).slice(-2);
+                                    return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
+                                }
+                            },
+
+                            { "data": "Assigned_To_Name", "title": "Assigned To", "width": "150px", "className": "text-center" },
+                            { "data": "Created_By_Name", "title": "Created By", "width": "150px", "className": "text-center" }
+                        ];
+                    }
+                 
 
                     // agar DataTable pehle se initialized hai to destroy karke reload karo
                     if ($.fn.DataTable.isDataTable('#lstTicket')) {
