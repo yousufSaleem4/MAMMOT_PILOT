@@ -49,30 +49,68 @@ namespace PlusCP.Controllers
             return jsonResult;
         }
 
-        
+
 
         [HttpPost]
         public JsonResult UpdateTicket(string Ticket_ID, string Title, string Description, string Ticket_Type,
-                                 string Status, string Priority, DateTime? ETA,
-                                 int Progress_Percentage, string Notes)
+                             string Status, string Priority, DateTime? ETA,
+                             int Progress_Percentage, string Notes)
         {
             TicketSystem oTicket = new TicketSystem();
             string decodedDescription = HttpUtility.UrlDecode(Description);
 
-          
             if (Session["FirstName"]?.ToString() != "Super")
             {
                 ETA = null;
                 Progress_Percentage = 0;
             }
 
-
             bool success = oTicket.UpdateTicket(Ticket_ID, Title, decodedDescription, Ticket_Type, Status, Priority, ETA, Progress_Percentage, Notes);
             oTicket.SaveTicketHistory(Ticket_ID, Status, Progress_Percentage);
-            if (success)
-                return Json(new { success = true, message = "Ticket updated successfully!" });
-            else
-                return Json(new { success = false, message = " Error: " + oTicket.ErrorMessage });
+
+            if (!success)
+                return Json(new { success = false, message = "Error: " + oTicket.ErrorMessage });
+
+            DataTable dtEmail = oTicket.GetTicketUpdateEmail(Ticket_ID);
+            string recipientEmail = "";
+            if (dtEmail.Rows.Count > 0)
+                recipientEmail = dtEmail.Rows[0]["Email"].ToString();
+
+            DataTable dtTemplate = oTicket.UpadateTicketEmailTemplate();
+            string htmlBody = dtTemplate.Rows.Count > 0
+                ? dtTemplate.Rows[0]["SysValue"].ToString()
+                : "<p>Update Ticket email template not found in zSysIni.</p>";
+
+            string subject = $"Ticket Updated - {Title}";
+
+            string priorityColor = "#333";
+            switch (Priority.ToUpper())
+            {
+                case "HIGH":
+                    priorityColor = "red"; break;
+                case "MEDIUM":
+                    priorityColor = "orange"; break;
+                case "LOW":
+                    priorityColor = "green"; break;
+            }
+
+            htmlBody = htmlBody
+                .Replace("{ticket_id}", Ticket_ID)
+                .Replace("{title}", Title)
+                .Replace("{description}", decodedDescription)
+                .Replace("{priority}", Priority)
+                .Replace("{priority_color}", priorityColor)
+                .Replace("{status}", Status)
+                .Replace("{eta}", ETA.HasValue ? ETA.Value.ToString("yyyy-MM-dd") : "N/A")
+                .Replace("{progress_percentage}", Progress_Percentage.ToString())
+                .Replace("{notes}", Notes ?? "")
+                .Replace("{updated_by}", Session["FirstName"]?.ToString() ?? "System");
+
+            string emailResult = !string.IsNullOrEmpty(recipientEmail)
+                ? cCommon.SendEmail(recipientEmail, subject, htmlBody, "", null)
+                : "NO_EMAIL_FOUND";
+
+            return Json(new { success = true, message = "Ticket updated successfully." });
         }
 
         public ActionResult Detail(string ticketId)

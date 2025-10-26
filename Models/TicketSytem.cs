@@ -324,6 +324,26 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
             return oDAL.GetData(sql);
         }
 
+        public DataTable UpadateTicketEmailTemplate()
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string sql = @"
+        SELECT TOP 1 SysValue 
+        FROM [dbo].[zSysIni] 
+        WHERE SysDesc = 'UPDATETICKETEMAIL'
+        ORDER BY SysCode DESC";
+            return oDAL.GetData(sql);
+        }
+
+        public DataTable GetTicketUpdateEmail(string ticketId)
+        {
+            cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
+            string sql = "SELECT U.Email FROM SRM.Tickets T INNER JOIN SRM.UserInfo U ON T.Created_By = U.UserId WHERE T.Ticket_Id = '" + ticketId + "' ";
+            return oDAL.GetData(sql);
+        }
+        
+
+
         public DataTable GetUserName(int userId)
         {
             cDAL oDAL = new cDAL(cDAL.ConnectionType.ACTIVE);
