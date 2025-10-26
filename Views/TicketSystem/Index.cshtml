@@ -339,9 +339,9 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!--<div class="row">-->
                             <!-- Attachment Upload -->
-                            <div class="col-sm-12 mb-3">
+                            <!--<div class="col-sm-12 mb-3">
                                 <div class="document-box border rounded p-3 h-100">
                                     <label for="fileUpload" class="font-weight-bold ModalLabelColor">Upload Document</label>
                                     <input type="file" id="fileUpload" class="form-control-file"
@@ -352,7 +352,7 @@
                                     <small class="text-danger">Accepted: PDF, XPS, JPG, PNG — Max: 1MB</small>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                 </form>
             </div>
@@ -531,8 +531,8 @@
         });
 
         $('#btnSaveTicket').click(function () {
-            var fileInput = $('#fileUpload')[0];
-            var file = fileInput.files[0];
+            //var fileInput = $('#fileUpload')[0];
+            //var file = fileInput.files[0];
     var ticketData = {
         title: $('#title').val().trim(),
         description: encodeURIComponent($('#Description').summernote('code')),
@@ -540,8 +540,8 @@
         status: $('#status').val(),
         priority: $('#priority').val(),
         progress_percentage: $('#progress_percentage').val(),
-        notes: $('#notes').val().trim(),
-        AttachFile: $('#fileAttachment')[0].files[0]
+        notes: $('#notes').val().trim()
+        /*AttachFile: $('#fileAttachment')[0].files[0]*/
     };
 
     if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
