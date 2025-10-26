@@ -296,7 +296,7 @@ LEFT JOIN SRM.UserInfo au ON t.Assigned_To = au.UserId
         FROM SRM.TicketComments c
         INNER JOIN SRM.UserInfo u ON c.UserID = u.UserID
         WHERE c.TicketID = '" + ticketId.Replace("'", "''") + @"'
-        ORDER BY c.Created_At DESC";
+        ORDER BY c.Created_At ";
 
             DataTable dt = oDAL.GetData(sql);
             return dt;

@@ -136,7 +136,7 @@ namespace PlusCP.Controllers
 
         [HttpPost]
         public JsonResult SaveTicket(string title, string description, string ticket_type, string status,
-                             string priority, int progress_percentage, string notes)
+                             string priority, int progress_percentage, string notes, HttpPostedFileBase AttachFile)
         {
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);

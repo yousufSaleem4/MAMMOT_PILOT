@@ -36,8 +36,8 @@
         }
 
     table.table thead th {
-        background-color: #003B59 !important; 
-        color: white; 
+        background-color: #003B59 !important;
+        color: white;
         font-size: 15px;
         font-family: 'Poppins', sans-serif;
         height: 40px;
@@ -49,10 +49,10 @@
     }
 
     table.table tbody tr {
-        height: 50px; 
+        height: 50px;
     }
 
-   
+
         table.table tbody tr:hover {
             background-color: #f5f5f5 !important; /* Light gray background on hover */
             transition: background-color 0.8s ease-in-out;
@@ -105,7 +105,7 @@
         border-radius: 6px;
     }
 
-    
+
 
 
     .modal-body {
@@ -114,14 +114,14 @@
         padding: 2rem 3rem;
     }
 
-    
+
 
     .form-label {
         font-weight: 600;
         color: #333;
     }
 
-    
+
     .form-select {
         border-radius: 50px !important;
         border: 1px solid #00b4d8 !important;
@@ -132,7 +132,7 @@
         transition: all 0.2s ease-in-out;
     }
 
-    
+
         .form-select:hover {
             box-shadow: 0 3px 8px rgba(0, 180, 216, 0.2);
         }
@@ -145,13 +145,13 @@
 
 
 
-   
+
     .modal-header {
         background-color: #D6EFE8;
         color: #003B59
     }
 
-   
+
 
 
     .mb-3 {
@@ -165,7 +165,7 @@
     }
 
 
-   
+
     .priority-badge {
         display: inline-block;
         padding: 4px 10px;
@@ -176,7 +176,7 @@
         background-color: transparent !important;
     }
 
-   
+
     .priority-critical {
         border: 2px solid #dc3545;
         color: #dc3545;
@@ -205,7 +205,7 @@
     }
 
         .btnCreate:hover {
-            background-color: transparent; /* Make 
+            background-color: transparent; /* Make
             border-color: #003B59; /* Dark border color on hover */
             color: #003B59; /* Dark font color on hover */
         }
@@ -306,27 +306,27 @@
                         <!-- Status, % Done, Priority -->
                         <div class="row">
 
-                          
-                                <div class="col-md-4 mb-3" style="display:none;">
-                                    <label class="form-label fw-semibold small">% Done</label>
-                                    <select id="progress_percentage" class="form-select form-select-sm">
-                                        <option value="0">0%</option>
-                                        <option value="10">10%</option>
-                                        <option value="20">20%</option>
-                                        <option value="30">30%</option>
-                                        <option value="40">40%</option>
-                                        <option value="50">50%</option>
-                                        <option value="60">60%</option>
-                                        <option value="70">70%</option>
-                                        <option value="80">80%</option>
-                                        <option value="90">90%</option>
-                                        <option value="100">100%</option>
-                                    </select>
-                                </div>
-                            
+
+                            <div class="col-md-4 mb-3" style="display:none;">
+                                <label class="form-label fw-semibold small">% Done</label>
+                                <select id="progress_percentage" class="form-select form-select-sm">
+                                    <option value="0">0%</option>
+                                    <option value="10">10%</option>
+                                    <option value="20">20%</option>
+                                    <option value="30">30%</option>
+                                    <option value="40">40%</option>
+                                    <option value="50">50%</option>
+                                    <option value="60">60%</option>
+                                    <option value="70">70%</option>
+                                    <option value="80">80%</option>
+                                    <option value="90">90%</option>
+                                    <option value="100">100%</option>
+                                </select>
+                            </div>
 
 
-                            
+
+
                         </div>
 
                         <!-- ETA and Additional Notes -->
@@ -336,6 +336,21 @@
                             <div class="col-md-12 mb-3">
                                 <label class="form-label fw-semibold small">Additional Notes</label>
                                 <textarea id="notes" class="form-control form-control-sm" rows="2" placeholder="Optional notes or comments"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Attachment Upload -->
+                            <div class="col-sm-12 mb-3">
+                                <div class="document-box border rounded p-3 h-100">
+                                    <label for="fileUpload" class="font-weight-bold ModalLabelColor">Upload Document</label>
+                                    <input type="file" id="fileUpload" class="form-control-file"
+                                           accept=".pdf,.xps,.jpg,.jpeg,.png"
+                                           onchange="validateFileSize(this)" data-error-id="doError" />
+                                    <label id="doError" class="text-danger" style="display:none"></label>
+                                    <div id="doViewBtnContainer" class="mt-2"></div>
+                                    <small class="text-danger">Accepted: PDF, XPS, JPG, PNG — Max: 1MB</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -438,34 +453,34 @@
             if (type === 'display') {
                 if (!data) return '';
 
-               
+
                 var safeData = data
                     .replace(/(\r\n|\n|\r)/gm, " ")
                     .replace(/'/g, "&#39;")
                     .replace(/"/g, "&quot;");
 
-              
+
                 var temp = $('<div>').html(data);
                 var plainText = temp.text();
 
-               
+
                 if (plainText.length <= cutoff) {
                     return data;
                 }
 
-                
+
                 var trimmedHTML = '';
                 var remaining = cutoff;
                 temp.contents().each(function () {
                     if (remaining <= 0) return false;
 
                     if (this.nodeType === 3) {
-                       
+
                         var text = this.nodeValue.substring(0, remaining);
                         trimmedHTML += text;
                         remaining -= text.length;
                     } else if (this.nodeType === 1) {
-                        
+
                         var innerHTML = $(this).html();
                         var textInside = $(this).text();
 
@@ -473,7 +488,7 @@
                             trimmedHTML += this.outerHTML;
                             remaining -= textInside.length;
                         } else {
-                           
+
                             var partialInner = textInside.substring(0, remaining);
                             trimmedHTML += '<' + this.nodeName.toLowerCase() + '>' +
                                 partialInner + '</' + this.nodeName.toLowerCase() + '>';
@@ -482,7 +497,7 @@
                     }
                 });
 
-               
+
                 return trimmedHTML +
                     '... <a href="#" onclick="showModalForZPL(\'' + header + '\', \'' + safeData + '\')">See More</a>';
             }
@@ -515,7 +530,9 @@
             DescriptionFormatting();
         });
 
-       $('#btnSaveTicket').click(function () {
+        $('#btnSaveTicket').click(function () {
+            var fileInput = $('#fileUpload')[0];
+            var file = fileInput.files[0];
     var ticketData = {
         title: $('#title').val().trim(),
         description: encodeURIComponent($('#Description').summernote('code')),
@@ -523,7 +540,8 @@
         status: $('#status').val(),
         priority: $('#priority').val(),
         progress_percentage: $('#progress_percentage').val(),
-        notes: $('#notes').val().trim()
+        notes: $('#notes').val().trim(),
+        AttachFile: $('#fileAttachment')[0].files[0]
     };
 
     if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
@@ -556,7 +574,7 @@
         function DescriptionFormatting() {
             var $el = $('#Description'); // Correct ID
             if ($el.length) {
-               
+
                 if ($el.next('.note-editor').length) {
                     $el.summernote('destroy');
                 }
@@ -734,14 +752,14 @@
                             { "data": "Created_By_Name", "title": "Created By", "width": "150px", "className": "text-center" }
                         ];
                     }
-                 
 
-                  
+
+
                     if ($.fn.DataTable.isDataTable('#lstTicket')) {
                         $('#lstTicket').DataTable().clear().destroy();
                     }
 
-                    
+
                     MakeDataGridForTraining('lstTicket', data.lstTicket, 0, columnDef, 'buttons', true, true, false, false);
                 }
             }
@@ -957,5 +975,27 @@
 
 
         //return table;
+    }
+    function validateFileSize(input) {
+        const allowedExtensions = ['pdf', 'xps', 'jpg', 'jpeg', 'png'];
+        const maxSize = 1 * 1024 * 1024; // 1MB
+        const errorLabelId = input.getAttribute("data-error-id");
+        const errorLabel = document.getElementById(errorLabelId);
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            const fileSize = file.size;
+
+            if (!allowedExtensions.includes(fileExt) || fileSize > maxSize) {
+                // ❌ Invalid file
+                errorLabel.style.display = "block";
+                errorLabel.textContent = "Invalid file. Only PDF, XPS, JPG, PNG under 1MB allowed.";
+                input.value = ""; // clear input so file isn't uploaded
+            } else {
+                // ✅ Valid file
+                errorLabel.style.display = "none";
+            }
+        }
     }
 </script>
