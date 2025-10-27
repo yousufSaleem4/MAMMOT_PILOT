@@ -174,7 +174,7 @@ namespace PlusCP.Controllers
 
         [HttpPost]
         public JsonResult SaveTicket(string title, string description, string ticket_type, string status,
-                             string priority, int progress_percentage, string notes)
+                      string priority, int progress_percentage, string notes)
         {
             TicketSystem oTicket = new TicketSystem();
             int created_by = Convert.ToInt32(Session["SigninId"]);
@@ -214,6 +214,9 @@ namespace PlusCP.Controllers
                     adminEmail = dtAdmin.Rows[0]["Email"].ToString();
             }
 
+            DataTable dtUser = oTicket.GetUserName(created_by);
+            string createdByName = dtUser.Rows.Count > 0 ? dtUser.Rows[0]["UserName"].ToString() : "Unknown User";
+
             string subject = $"New Ticket Created - {title}";
             DataTable dtTemplate = oTicket.NewTicketEmailTemplate();
             string htmlBody = dtTemplate.Rows.Count > 0
@@ -225,19 +228,16 @@ namespace PlusCP.Controllers
                 .Replace("{description}", decodedDescription)
                 .Replace("{priority}", priority)
                 .Replace("{status}", status)
-                .Replace("{created_by}", created_by.ToString());
+                .Replace("{created_by}", createdByName); 
 
             string emailResult = !string.IsNullOrEmpty(adminEmail)
                 ? cCommon.SendEmail(adminEmail, subject, htmlBody, "", null)
                 : "NO_EMAIL_FOUND";
 
-            if (emailResult == "SENT")
-                return Json(new { success = true, message = $"Ticket submitted successfully. A member of the Collablly Team will reach out soon." });
-            else if (emailResult == "NO_EMAIL_FOUND")
+            if (emailResult == "SENT" || emailResult == "NO_EMAIL_FOUND")
                 return Json(new { success = true, message = "Ticket submitted successfully. A member of the Collablly Team will reach out soon." });
             else
-                return Json(new { success = true, message = $"Ticket submitted successfully. A member of the Collablly Team will reach out soon." });
-
+                return Json(new { success = true, message = "Ticket submitted successfully. A member of the Collablly Team will reach out soon." });
         }
 
 
