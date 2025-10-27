@@ -605,23 +605,16 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-
+$(document).ready(function () {
     const firstName = '@ViewBag.FirstName';
 
     const userType = '@ViewBag.UserType';
-        const ticketId = '@Model.ticket_id';
-
-
-setInterval(() => {
     const ticketId = '@Model.ticket_id';
-    if (ticketId) LoadComments(ticketId);
-}, 10000); // 10 seconds
 
-
+    
     if (ticketId) LoadComments(ticketId);
 
-
+    
     function DescriptionFormatting() {
         const $el = $('#edit_description');
         if ($el.length && !$el.next('.note-editor').length) {
@@ -706,7 +699,7 @@ setInterval(() => {
     });
 
 
-
+    
     $(document).on("click", "#btnUpdateTicket", function () {
         debugger;
 
@@ -718,7 +711,7 @@ setInterval(() => {
             description: encodeURIComponent($('#edit_description').summernote('code')),
             ticket_type: $('#edit_ticket_type').val(),
             status: $('#edit_status').val(),
-            priority: $('#edit_priority').val(),
+            priority: $('#edit_priority').val(), 
             eta: (firstName === "Super") ? $('#edit_eta').val() : null,
             progress_percentage: (firstName === "Super") ? parseInt($('#edit_progress_percentage').val() || 0) : 0,
             notes: $('#edit_notes').val().trim()
@@ -726,7 +719,7 @@ setInterval(() => {
 
 
         if (firstName !== "Super") {
-
+           
             if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
                 !ticketData.status || !ticketData.priority) {
                 MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
@@ -734,15 +727,15 @@ setInterval(() => {
             }
         }
             else {
-
+                     
         if (!ticketData.ticket_type || !ticketData.title || !ticketData.description ||
             !ticketData.status || !ticketData.priority || !ticketData.eta) {
             MsgToast('Please fill all required fields before saving.', 'Validation Error', 'warning');
             return;
         }
             }
-
-
+        
+       
 
         $.ajax({
             url: '/TicketSystem/UpdateTicket',
@@ -767,54 +760,36 @@ setInterval(() => {
         });
     });
 
-
-        function LoadComments(ticketId) {
-            $.ajax({
-                url: '/TicketSystem/GetComments',
-                type: 'GET',
-                data: { ticketId },
-                success: function (res) {
-                    const comments = res.comments || res;
-                    if (comments.length > 0) {
-                        let html = comments.map(c => {
-                           
-                            const color = stringToColor(c.UserName || 'User');
-                            return `
+    
+    function LoadComments(ticketId) {
+        $.ajax({
+            url: '/TicketSystem/GetComments',
+            type: 'GET',
+            data: { ticketId },
+            success: function (res) {
+                const comments = res.comments || res;
+                if (comments.length > 0) {
+                    let html = comments.map(c => `
                         <div class="comment-item mb-2 p-2 bg-white rounded shadow-sm">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold text-primary" style="font-size:16px; font-weight:bold;">
-                                    <i class="fas fa-user-circle me-1" 
-                                       style="color:${color}; font-size:16px; vertical-align:middle;"></i>
-                                    ${c.UserName}
-                                </span>
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-semibold text-primary" style=font-size:16px; font-weight:bold;><i class="fas fa-user-circle me-1" style=padding:2px; ></i>${c.UserName}</span>
                                 <small class="text-muted">${c.CreatedAt}</small>
                             </div>
                             <div class="mt-1 text-dark">${c.CommentText}</div>
                         </div>
-                    `;
-                        }).join('');
-                        $('#commentsSection').html(html);
-                    } else {
-                        $('#commentsSection').html('<p class="text-muted">No comments yet.</p>');
-                    }
-                },
-                error: function () {
-                    $('#commentsSection').html('<p class="text-danger">Failed to load comments.</p>');
+                    `).join('');
+                    $('#commentsSection').html(html);
+                } else {
+                    $('#commentsSection').html('<p class="text-muted">No comments yet.</p>');
                 }
-            });
-        }
-
-       
-        function stringToColor(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            },
+            error: function () {
+                $('#commentsSection').html('<p class="text-danger">Failed to load comments.</p>');
             }
-            const color = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-            return "#" + "000000".substring(0, 6 - color.length) + color;
-        }
+        });
+    }
 
-
+    
     $(document).on('click', '#btnAddComment', function () {
         debugger;
         const comment = $('#newComment').val().trim();
